@@ -83,4 +83,4 @@ To test uprt yourself, there are test input files located under the `test/test-d
 Simply copy any of the examples given in `uprt -h` and try out the test files.
 
 Here is a demonstration done on Mac Catalina:
-<img src="/uproot/blob/master/readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
+<img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
