@@ -30,20 +30,20 @@ Binaries are included for MacOs, Linux, and Windows for the latest releases. Sim
 
 If you choose to compile yourself:
 
-1. Install the latest version of [Dart] (<https://dart.dev/get-dart>) for your operating system.
+1. Install the latest version of [Dart](https://dart.dev/get-dart) for your operating system.
 2. Open a terminal.
 3. Type the following:
-4. 
+
  `cd bin
   dart compile exe uprt.dart -o uprt`
 
 ## Use
 
-For a complete list of options, simply type `uprt` or `uprt -h` 
+For a complete list of options, simply type `uprt` or `uprt -h`
 
 Here is the latest help (version 2021-09):
 
-`uprt (2021-09 running on windows "Windows 10 Pro" 10.0 (Build 19042))
+````uprt (2021-09 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
 
@@ -74,13 +74,13 @@ Examples:
 
   Convert Mikrotik file to json:
 
-  uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output`
+  uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
+````
 
 ## Demo
 
-To test yourself, there are test input files located under the `test/test-data` folder.
-Simply copy any of the examples given in help and try out the test files. 
+To test uprt yourself, there are test input files located under the `test/test-data` folder.
+Simply copy any of the examples given in `uprt -h` and try out the test files.
 
 Here is a demonstration done on Mac Catalina:
-
-![Animated Gif showing demo of uprt](cli/readme-pics\uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true "Demo")
+<img src="/uproot/blob/master/readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
