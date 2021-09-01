@@ -24,7 +24,7 @@ Also supports the following file formats:
 
 ## Installation
 
-Binaries are included for MacOs, Linux, and Windows for the latest releases. Simply download to your respective platform and put in your path.
+Binaries are included for macOS, Linux, and Windows for the latest releases. Simply download to your respective platform and put in your path.
 
 ## Compiling
 
@@ -34,18 +34,20 @@ If you choose to compile yourself:
 2. Open a terminal.
 3. Type the following:
 
- `cd bin
-  dart compile exe uprt.dart -o uprt`
+````bash
+  cd bin
+  dart compile exe uprt.dart -o uprt
+````
 
 ## Use
 
 For a complete list of options, simply type `uprt` or `uprt -h`
 
-Here is the latest help (version 2021-09):
+Here is the latest help (version 2021.09.001):
 
-````.
+````bash
 
-uprt (2021-09 running on windows "Windows 10 Pro" 10.0 (Build 19042))
+uprt (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, 
 and pfSense routers. Also supports cvs and json.
@@ -83,9 +85,10 @@ Examples:
 ## Demo
 
 To test uprt yourself, there are test input files located under the `test/test-data` folder.
-Simply copy any of the examples given in `uprt -h` and try out the test files.
+Simply copy the examples given in `uprt -h` and try out the test files.
 
 Below is a demonstration done on Mac Catalina showing the conversion from a .csv file to all formats.
 After the conversion the demo scrolls through the resulting files.
-
+<!-- markdownlint-disable MD033 -->
 <img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
+<!-- markdownlint-enable MD037 -->

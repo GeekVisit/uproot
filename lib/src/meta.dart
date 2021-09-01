@@ -7,7 +7,7 @@
      // ignore: lines_longer_than_80_chars
       String description = "A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.";
       String name = "uprt";
-      String version = "2021-09";
+      String version = "2021.09.001";
    }
 
   

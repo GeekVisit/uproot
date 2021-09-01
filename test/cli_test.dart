@@ -16,8 +16,6 @@ void main() {
   testUpRooted();
 }
 
-void createVersionInfo() {}
-
 void testUpRooted() {
 //Test whether have same number of lease components
 //in final file and have expected length
