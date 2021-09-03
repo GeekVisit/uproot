@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-import 'globals.dart';
-import 'pfsense.dart';
 import 'src.dart';
 
 void upRoot(List<String> arguments) {
   try {
+    MetaUpdate("pubspec.yaml").verifyLatestVersionFromPubSpec();
     argResults = cliArgs.getArgs(arguments);
     cliArgs.checkArgs();
     initialize();
@@ -216,7 +215,7 @@ void initialize() {
   printMsg("${newL}uprt converting ...", onlyIfVerbose: true);
   if (logPath != "") {
     String logMessage =
-        '''${meta.name} (${meta.version} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} Locale: ${Platform.localeName})$newL''';
+        '''${meta['name']} (${meta['version']} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} Locale: ${Platform.localeName})$newL''';
 
     printMsg(logMessage, logOnly: true);
   }

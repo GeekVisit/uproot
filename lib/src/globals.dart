@@ -5,8 +5,9 @@ import 'package:path/path.dart' as p;
 import 'cli_args.dart';
 
 import 'file_ops.dart';
-import 'meta.dart';
 import 'validate_leases.dart';
+
+    
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
@@ -127,5 +128,4 @@ String logPath = "";
 
 bool testRun = false;
 
-Meta meta = Meta();
 String newL = (Platform.isWindows) ? "\r\n" : newL = "\n";

@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as p;
-import '../lib.dart';
-import 'globals.dart';
-import 'ip.dart';
+import 'src.dart';
 
 class CliArgs {
   ArgParser parser = ArgParser();
@@ -75,16 +73,16 @@ Creates Log file, if -p not set, then location is at '${p.join(Directory.systemT
 
   void displayHelp() {
     print("""
-${meta.name} (${meta.version} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion})
+${meta["name"]} (${meta['version']} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion})
 
-${meta.description}
+${meta['description']}
 
 Usage: 
 ${cliArgs.parser.usage}
 
 Examples: 
 
-  Convert Csv file to all formats (csv, ddwrt, json, mikrotik, openwrt, opnsense, pfsense):
+  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):
 
   uprt -i test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
   

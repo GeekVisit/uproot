@@ -9,6 +9,7 @@ export 'globals.dart';
 export 'ip.dart';
 export 'json.dart';
 export 'meta.dart';
+export 'meta_update.dart';
 export 'mikrotik.dart';
 export 'open_wrt.dart';
 export 'opnsense.dart';

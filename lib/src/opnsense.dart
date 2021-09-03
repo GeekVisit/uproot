@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:xml/xml.dart';
-import '../lib.dart';
+import 'src.dart';
 
 class OpnSense extends FileType {
   //

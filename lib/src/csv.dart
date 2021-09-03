@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
-import '../lib.dart';
+import 'src.dart';
 
 class Csv extends FileType {
   //

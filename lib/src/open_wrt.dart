@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../lib.dart';
+import 'src.dart';
 
 class OpenWrt extends FileType {
   String fileType = fFormats.openwrt.formatName;
@@ -13,7 +13,8 @@ class OpenWrt extends FileType {
             onlyIfVerbose: true);
         return true;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""", errMsg: true);
+        printMsg("""$filePath is invalid format for $fileType)}""",
+            errMsg: true);
         return false;
       }
     } on Exception catch (e) {

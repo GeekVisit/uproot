@@ -1,5 +1,5 @@
 import 'dart:io';
-import '../lib.dart';
+import 'src.dart';
 
 class Ddwrt extends FileType {
   //
