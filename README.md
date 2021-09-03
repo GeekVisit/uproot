@@ -107,7 +107,7 @@ Below are the export/import steps for each supported router/firewall type.
 
     ````bash
     nvram get static_leases > static_leases.ddwrt
-        ````
+    ````
 
 2. You can now download this file from the ddwrt router by using WinScp or a similar utility (if using WinScp, make sure you use the SCP protocol).
 
@@ -134,7 +134,7 @@ Below are the export/import steps for each supported router/firewall type.
 6. Tip: If you have any issues with the above, log in using your browser to your router and view the changes as you make them. For instance, you can click on the `Services` tab and view the static leases after you set the nvram variable. If the `nvram commit` doesn't work try clicking "Save" and then "Apply Settings" in the browser interface.
 
 Video Demo of DD-WRT import:
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/2bRY8d098CM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2bRY8d098CM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ## OPEN-WRT
 
 ### Export From Open-WRT Router
@@ -177,5 +177,5 @@ WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwr
 2. Tip: If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps 2-4 above, viewing the browser window as you make them. After the static leases appear, click `Save & Apply" on the`DHCP and DNS` web page.
 
 Video Demo of Open-WRT import:
-<iframe width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/c-3m4Lm-XjA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 ## OPEN-WRT
