@@ -7,8 +7,6 @@ import 'cli_args.dart';
 import 'file_ops.dart';
 import 'validate_leases.dart';
 
-    
-
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
 String dirOut = argResults['directory-out'];
@@ -129,3 +127,10 @@ String logPath = "";
 bool testRun = false;
 
 String newL = (Platform.isWindows) ? "\r\n" : newL = "\n";
+
+// ignore: avoid_classes_with_only_static_members
+class MetaCheck {
+  static int match = 0;
+  static int mismatch = 1;
+  static int runningAsBinary = 2;
+}

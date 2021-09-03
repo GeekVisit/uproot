@@ -1,15 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:uprt/lib.dart';
 
 void main() {
   testRun = true;
+  //Update version info
   MetaUpdate("pubspec.yaml").writeMetaDartFile("lib/src/meta.dart");
+  //run all test
   testUpRooted();
 }
 
+/// ******* DEFINE SOME TEST VALUES****************************
+///
 void testUpRooted() {
 //Test whether have same number of lease components
 //in final file and have expected length
@@ -52,9 +57,39 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
         (leaseMap[lbHost]?.length == listLength));
   }
 
-/**************** TESTS: *******************/
   Ip ip = Ip();
+/**************** TESTS: *******************/
+  test('metaCheck', () {
+    Directory pubSpecTestDir = Directory.systemTemp.createTempSync("uprt-test");
+    File pubSpecTestFile =
+        File(p.join(pubSpecTestDir.absolute.path, "pubspec-test.yaml"));
 
+    pubSpecTestFile.writeAsStringSync(
+        """
+    name: uprt
+    description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
+    version: 2019.09.001
+
+    """);
+
+    MetaUpdate mu = MetaUpdate(pubSpecTestFile.absolute.path);
+
+    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.mismatch);
+
+    pubSpecTestFile.writeAsStringSync(
+        """
+    name: ${meta['name']}
+    description: ${meta['description']}
+    version: ${meta['version']}
+
+    """);
+    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.match);
+
+    mu = MetaUpdate("file-does-not-exist.yaml");
+    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.runningAsBinary);
+
+    pubSpecTestDir.delete();
+  });
   test('isWithinRange', () {
     argResults = cliArgs.getArgs(args);
     expect(
