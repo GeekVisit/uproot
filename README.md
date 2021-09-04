@@ -177,5 +177,6 @@ WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwr
 2. Tip: If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps 2-4 above, viewing the browser window as you make them. After the static leases appear, click `Save & Apply" on the`DHCP and DNS` web page.
 
 Video Demo of Open-WRT import:
-<iframe width="560" height="315" src="https://www.youtube.com/embed/c-3m4Lm-XjA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Youtube Demo of OpenWrt Import](readme-pics/openwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
+
 ## OPEN-WRT
