@@ -204,11 +204,11 @@ Video Demo of Open-WRT import:
 
 1. Log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
 
-    ![Backups Menu](/cli/readme-pics/opn-download-backup.png)
+    ![Backups Menu](readme-pics/opn-download-backup.png)
 
 2. The file contains all backup data for the router. However, you only need the data in the static map tags and their parents and related closing tags. Below is an example file containing two static leases and the parent and closing tags. You can delete all other tags and their contents (or copy the staticmap tags you need into a separate file).
   
-    ![Backup File Revised to Contain Only Static Map Tags](/cli/readme-pics/opn-export-2021-09-03_22-01-54.png)
+    ![Backup File Revised to Contain Only Static Map Tags](readme-pics/opn-export-2021-09-03_22-01-54.png)
 
 3. You can use this file as an input file to Uproot to convert to other formats. Conversely, using Uproot you can convert other formats to this format.
 
@@ -218,4 +218,4 @@ Video Demo of Open-WRT import:
 
 2. Log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
 
-    ![Importing Static Lease Through Restore](/cli/readme-pics/opnsense-restore-firefox_2021-08-18_11-13-57.png)
+    ![Importing Static Lease Through Restore](readme-pics/opnsense-restore-firefox.png)
