@@ -62,39 +62,19 @@ class OpnSense extends FileType {
       String preLeaseXml = '''<?xml version="1.0"?>
 <opnsense>
 <dhcpd>
-    <lan>
-      <enable>1</enable>
-      <ddnsdomainalgorithm>hmac-md5</ddnsdomainalgorithm>
-      <numberoptions>
-        <item/>
-      </numberoptions>
-      <range>
-        <from></from>
-        <to></to>
-      </range>
-      <winsserver/>
-      <dnsserver/>
-      <ntpserver/>''';
+    <lan>''';
 
       String leaseXml = '''
  		      <staticmap>
         <mac></mac>
         <ipaddr></ipaddr>
-        <hostname></hostname>
-        <winsserver/>
-        <dnsserver/>
-        <ntpserver/>
+        <hostname></hostname>        
       </staticmap>''';
 
       String postLeaseXml = '''
      </lan>  
   </dhcpd>
   </opnsense>''';
-
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<from></from>", "<from>${argResults['ip-low-address']}</from>");
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<to></to>", "<to>${argResults['ip-high-address']}</to>");
 
       String leaseTags = leaseXml;
       String tmpLeaseTags;

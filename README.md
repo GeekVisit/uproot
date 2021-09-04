@@ -20,9 +20,15 @@ Also supports the following file formats:
 
 ## Features
 
-* checks to see if ip4 and mac addresses in input file are correct and if not excludes them from the output file
-
-* checks to see if all ip addresses are within a valid range provided by user
+* Automatic detection of input format based on extension and content; optionally you can specify the format
+* Single input file can be simultaneously converted into multiple formats
+* Csv and Json files can be used as input
+* Validation Checks which removes errors in importing:
+  * Validation of output format type
+  * Enforced IP range
+  * Enforced Checking if each static lease has an IP, Mac,and Host address
+  * Duplicate Lease Checking, excluding duplicates from output
+  * Validates ip and mac addresses from input file and excludes invalid addresses from the output file
 
 ## Installation
 
@@ -84,38 +90,49 @@ Examples:
   uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
 ````
 
-## Demo
+## Test Data Included
 
 To test uprt yourself, there are test input files located under the `test/test-data` folder.
 Simply copy the examples given in `uprt -h` and try out the test files.
+
+## Video Demo
 
 Below is a demonstration done on Mac Catalina showing the conversion from a .csv file to all formats.
 After the conversion the demo scrolls through the resulting files.
 <img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
 
-# Exporting/Importing Static Leases
+# Exporting amd Importing Static Leases
 
-To use uprt, you'll need to know how to export and import your static leases to your router.
+To use uprt, you'll need to export and import static leases to your router.
 
-Below are the export/import steps for each supported router/firewall type.
+Below are the export/import steps for each router/firewall type that is supported by uproot.
 
 ## DD-WRT
 
-### Export From Old DD-WRT Router
+### DD-WRT - Export
 
-1. ssh into your router and execute the following to export static leases to the `static_leases.ddwrt` file:
+1. Ssh into your router and enter the following on the command line to export static leases to a file:
 
     ````bash
     nvram get static_leases > static_leases.ddwrt
     ````
 
-2. You can now download this file from the ddwrt router by using WinScp or a similar utility (if using WinScp, make sure you use the SCP protocol).
+2. Download the `static_lease.ddwrt` file from the router by using [WinScp](https://winscp.net) or a similar utility. If you do use WinScp, use the SCP protocol.
 
 3. Alternatively you can simply execute `nvram get static_leases` and copy the output from the terminal, paste it into a text file and save it locally.
 
-### Import to New DD-WRT Router
+4. Now use the exported file as an input file to Uproot and convert to your required format.
+
+Example to convert to OpenWrt format, with a range of static leases between 192.168.0.1 to 192.168.0.254.
+
+````bash
+  uprt -i static_leases.ddwrt -b static_leases -g o -L 192.168.0.1 -H 192.168.0.254  
+````
+
+### DD-WRT - Import
 
 1. NOTE: Always Make a backup of your DD-WRT software configuration before importing (via backup tab in the Web interface).
+
 2. Using WinSCP (if on Windows) or a similar utility, login to your router and upload the `static_leases.ddwrt` file to the router.
 3. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, type the following, and press `Enter`,replacing "X" with the number of static leases you are importing.
 
@@ -137,9 +154,9 @@ Video Demo of DD-WRT import:
 
 [![Youtube Demo of DD-WRT Import](readme-pics/ddwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
 
-## OPEN-WRT
+## OpenWrt
 
-### Export From Open-WRT Router
+### OpenWrt - Export
 
 1. NOTE: Always make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing !
 
@@ -159,7 +176,9 @@ Video Demo of DD-WRT import:
 
 5. Using [scp](https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/) or [WinScp](https://winscp.net) if on Windows, download the `static_leases.openwrt` file.
 
-### Import to New Open-WRT Router
+6. You can use the downloaded file as an input file to Uproot to convert to other formats. Conversely, using Uproot you can convert other formats to this format.
+
+### OpenWrt - Import
 
 1. NOTE: Always Make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing !
 
@@ -180,3 +199,23 @@ WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwr
 
 Video Demo of Open-WRT import:
 [![Youtube Demo of OpenWrt Import](readme-pics/openwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
+
+## OPNsense - Exporting
+
+1. Log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
+
+    ![Backups Menu](/cli/readme-pics/opn-download-backup.png)
+
+2. The file contains all backup data for the router. However, you only need the data in the static map tags and their parents and related closing tags. Below is an example file containing two static leases and the parent and closing tags. You can delete all other tags and their contents (or copy the staticmap tags you need into a separate file).
+  
+    ![Backup File Revised to Contain Only Static Map Tags](/cli/readme-pics/opn-export-2021-09-03_22-01-54.png)
+
+3. You can use this file as an input file to Uproot to convert to other formats. Conversely, using Uproot you can convert other formats to this format.
+
+## OPNsense - Importing
+
+1. NOTE: Always make a [backup](https://docs.opnsense.org/manual/backups.html) of your OPNsense configuration before importing !
+
+2. Log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
+
+    ![Importing Static Lease Through Restore](/cli/readme-pics/opnsense-restore-firefox_2021-08-18_11-13-57.png)
