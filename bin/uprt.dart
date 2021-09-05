@@ -8,7 +8,7 @@ void main(List<String> arguments) {
   try {
     arguments = <String>[
       "-i",
-      "test/test-data/lease-list-infile-opn.xml",
+      "test/test-data/lease-list-infile.csv",
       "-L",
       "192.168.0.1",
       "-H",
@@ -18,9 +18,7 @@ void main(List<String> arguments) {
       "-b",
       "test-output-file",
       "-g",
-      "j",
-      "-p",
-      "c:/test.log",
+      "n",
       "-d",
       "test/test-output",
 

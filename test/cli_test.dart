@@ -159,7 +159,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
     argResults = cliArgs.getArgs(args);
     expect(cliArgs.getInputType(), "n");
 
-    args[1] = "test/test-data/lease-list-infile.xml";
+    args[1] = "test/test-data/lease-list-infile-pfs.xml";
     argResults = cliArgs.getArgs(args);
     expect(cliArgs.getInputType(), "p");
 
@@ -440,7 +440,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
 //opnsense->json
     args = <String>[
       "-i",
-      'test/test-data/lease-list-infile.xml',
+      'test/test-data/lease-list-infile-opn.xml',
       "-t",
       "n",
       "-g",
@@ -466,7 +466,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
     //pfsense->json
     args = <String>[
       "-i",
-      'test/test-data/lease-list-infile.xml',
+      'test/test-data/lease-list-infile-pfs.xml',
       "-t",
       "p",
       "-g",
@@ -989,7 +989,8 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
           "test/test-output/test-output-file-pfs.xml",
         ),
         true);
-    expect(pfSense.isFileValid("test/test-data/lease-list-infile.xml"), true);
+    expect(
+        pfSense.isFileValid("test/test-data/lease-list-infile-pfs.xml"), true);
     expect(pfSense.isFileValid("test/test-data/lease-list-infile.json"), false);
     expect(pfSense.isContentValid(fileContents: badPfsense), false);
 

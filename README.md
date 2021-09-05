@@ -123,7 +123,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 4. Now use the exported file as an input file to Uproot and convert to your required format.
 
-Example to convert to OpenWrt format, with a range of static leases between 192.168.0.1 to 192.168.0.254.
+Uprt example to convert from DD-WRT format to OpenWrt format, with static leases having a range between 192.168.0.1 to 192.168.0.254:
 
 ````bash
   uprt -i static_leases.ddwrt -b static_leases -g o -L 192.168.0.1 -H 192.168.0.254  
@@ -131,9 +131,10 @@ Example to convert to OpenWrt format, with a range of static leases between 192.
 
 ### DD-WRT - Import
 
-1. NOTE: Always Make a backup of your DD-WRT software configuration before importing (via backup tab in the Web interface).
+1. NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface). **All imports will REPLACE your existing static leases.**
 
 2. Using WinSCP (if on Windows) or a similar utility, login to your router and upload the `static_leases.ddwrt` file to the router.
+
 3. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, type the following, and press `Enter`,replacing "X" with the number of static leases you are importing.
 
     ```bash
@@ -148,9 +149,10 @@ Example to convert to OpenWrt format, with a range of static leases between 192.
     ````
 
 5. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
-6. Tip: If you have any issues with the above, log in using your browser to your router and view the changes as you make them. For instance, you can click on the `Services` tab and view the static leases after you set the nvram variable. If the `nvram commit` doesn't work try clicking "Save" and then "Apply Settings" in the browser interface.
 
-Video Demo of DD-WRT import:
+6. TIP: If you have any issues with the above, log in using your browser to your router and view the changes as you make them. For instance, you can click on the `Services` tab and view the static leases after you set the nvram variable. If the `nvram commit` doesn't work try clicking "Save" and then "Apply Settings" in the browser interface.
+
+### Video Demo of DD-WRT Import
 
 [![Youtube Demo of DD-WRT Import](readme-pics/ddwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
 
@@ -158,29 +160,33 @@ Video Demo of DD-WRT import:
 
 ### OpenWrt - Export
 
-1. NOTE: Always make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing !
-
-2. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, log into your router and type the following:
+1. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, log into your router and type the following:
 
     ````bash
         grep -hnr -A3 "config host" /etc/config/dhcp > static_leases.openwrt
     ````
 
-3. Check if the resulting contains the static leases:
+2. Check if the resulting contains the static leases:
 
     ````bash
       cat static_leases.openwrt
     ````
 
-4. To confirm you have all the proper attributes for the static leases, open the /etc/config/dhcp file in vim and compare the resulting output with the "config host" sections in /etc/config/dhcp.
+3. To confirm you have all the proper attributes for the static leases, open the /etc/config/dhcp file in vim and compare the resulting output with the "config host" sections in /etc/config/dhcp.
 
-5. Using [scp](https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/) or [WinScp](https://winscp.net) if on Windows, download the `static_leases.openwrt` file.
+4. Using [scp](https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/) or [WinScp](https://winscp.net) if on Windows, download the `static_leases.openwrt` file.
 
-6. You can use the downloaded file as an input file to Uproot to convert to other formats. Conversely, using Uproot you can convert other formats to this format.
+5. Use the exported file as an input file to Uproot and convert to your required format.
+
+    **Example: Convert DD-WRT to a json file**
+
+    ````bash
+      uprt -i static_leases.ddwrt -b static_leases -g j -L 192.168.0.1 -H 192.168.0.254  
+    ````
 
 ### OpenWrt - Import
 
-1. NOTE: Always Make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing !
+1. NOTE: Always Make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing !  **All imports will REPLACE your existing static leases.**
 
 2. Using [WinSCP](https://winscp.net/) (if on Windows) or a similar scp utility, login to your router and upload the file to be imported to the router (`static_leases.openwrt` in the Open-WRT export example).
 
@@ -191,14 +197,15 @@ Video Demo of DD-WRT import:
         cat *infile.openwrt >> /etc/config/dhcp
     ````
 
-WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup!
+    WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup!
 
-1. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
+4. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
 
-2. Tip: If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps 2-4 above, viewing the browser window as you make them. After the static leases appear, click `Save & Apply" on the`DHCP and DNS` web page.
+5. TIP: If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps 2-4 above, viewing the browser window as you make them. After the static leases appear, click `Save & Apply" on the`DHCP and DNS` web page.
 
-Video Demo of Open-WRT import:
-[![Youtube Demo of OpenWrt Import](readme-pics/openwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
+### Video Demo of Open-WRT import
+
+  [![Youtube Demo of OpenWrt Import](readme-pics/openwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
 
 ## OPNsense - Exporting
 
@@ -210,12 +217,90 @@ Video Demo of Open-WRT import:
   
     ![Backup File Revised to Contain Only Static Map Tags](readme-pics/opn-export-2021-09-03_22-01-54.png)
 
-3. You can use this file as an input file to Uproot to convert to other formats. Conversely, using Uproot you can convert other formats to this format.
+3. Use the exported file as an input file to Uproot and convert to your required format.
+
+    **Example: Convert OPNSense to pfSense**
+
+    ````bash
+      uprt -i static_leases-opn.xml -b static_leases -g p -L 192.168.0.1 -H 192.168.0.254  
+    ````
 
 ## OPNsense - Importing
 
 1. NOTE: Always make a [backup](https://docs.opnsense.org/manual/backups.html) of your OPNsense configuration before importing !
 
-2. Log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
+2. In addition, importing REPLACES any static leases you currently have. See [below](#user-content-OpnSense--adding-leases-to-an-existing-pfSense-configuration) if you just are adding leases to an existing configuration.
 
-    ![Importing Static Lease Through Restore](readme-pics/opnsense-restore-firefox.png)
+3. To start your import, log in to your OPNsense router and navigate to System->Configuration->Backups. Click on the big "Download configuration" button and download the file.
+
+    ![Backups Menu](readme-pics/opn-download-backup.png)
+
+4. In the `Restore` section under the `Restore Area` click on the drop down arrow and change `All` to `DHCP Server`. Click on `Browse ..." and select the file to be imported. Then click "Restore configuration".
+
+    ![Backups Menu](readme-pics/opnsense-restore-firefox.png)
+
+5. OPNSense should respond with a "Successful" message. To view the imported leases, navigate to Services->DHCPv4->[LAN].
+
+   ![Navigate to Lan Static Lease Menu](readme-pics/opn-sense-lan-static-leases-show.png).
+
+6. Scroll down and verify the static leases have been imported.
+
+   ![Imported Static Leases](readme-pics/opn-sense-imported%20leases.png)
+
+## pfSense - Exporting
+
+1. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
+
+    ![pfSense Backup and Restore](readme-pics/pfsense-backup-restore-menu-uprt.png)
+
+2. Scroll down to `Backup Configuration` and set `Backup area` to `DHCP Server`. Click `Download configuration as XML`.
+
+    ![Backing up static leases](readme-pics/pfsense-backup-red.png)
+
+3. Use the exported file as an input file to Uproot and convert to your required format.
+
+    **Example - Convert pfSense to OPNsense:**
+
+    ````bash
+    uprt -i static_leases-pfs.xml -b static_leases -g p -L 192.168.0.1 -H 192.168.0.254  
+
+    ````
+
+### OpnSense - Adding Leases to An Existing Configuration
+
+If you are ADDING leases to an existing router, you'll need to download a backup from your configuration, copy out all the "staticmap" tags from your backup, and copy them into your import file so your import file is in this format:
+
+![Format of OpnSense Static Leases](readme-pics/opn-export-2021-09-03_22-01-54.png)
+
+## pfSense - Importing
+
+1. NOTE: Always make a [backup](https://docs.netgate.com/pfsense/en/latest/backup/index.html) of your pfSense configuration before importing !
+
+2. In addition, importing REPLACES any static leases you currently have. See [below](#user-content-pfSense--adding-leases-to-an-existing-pfSense-configuration) if you just are adding leases to an existing configuration.
+
+3. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
+
+    ![pfSense Backup and Restore](readme-pics/pfsense-backup-restore-menu-uprt.png)
+
+4. In the `Restore` section under the `Restore Area` click on the drop down arrow and change `All` to `DHCP Server`. Click on `Browse ..." and select the file to be imported. Then click "Restore Configuration".
+
+    ![Backups Menu](readme-pics/pfsense-restore-red.png)
+
+5. pfSense should respond with a "The configuration area has been restored. The firewall may need to be rebooted."
+
+6. To verify the leases have been imported, navigate to Services->DHCP Server. Click on the LAN tab.  Scroll down to the "DHCP Static Mappings for this Interface" sect ion.  Your imported leases should appear here.
+
+   ![Navigate to Lan Static Lease Menu](readme-pics/pfsense-static-leases-list-red.png).
+
+7. Scroll down and verify the static leases have been imported.
+
+### pfSense - Adding Leases to An Existing  Configuration
+
+If you are ADDING leases to an existing router, you'll need to download a backup from your configuration, copy out all the "staticmap" tags from your backup, and copy them into your import file so your import file is in this format:
+
+  ![Format of pfSense Static Leases](readme-pics/pfsense-xml-format-of-leases.png)
+   ![Imported Static Leases](readme-readme-pics/pfsense-static-leases-list-red.png)
+
+## Mikrotik - Exporting
+
+## Mikrotik - Importing
