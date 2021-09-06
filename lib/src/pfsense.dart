@@ -160,7 +160,8 @@ class PfSense extends FileType {
       dynamic leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.openwrt.formatName)) {
         return false;
       }
       validateLeases.validateLeaseList(leaseMap, fFormats.pfsense.formatName);

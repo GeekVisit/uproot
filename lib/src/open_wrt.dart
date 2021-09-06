@@ -32,7 +32,8 @@ class OpenWrt extends FileType {
       }
       dynamic leaseMap = getLease(fileLines: fileLines, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.openwrt.formatName)) {
         return false;
       }
 

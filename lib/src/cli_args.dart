@@ -29,6 +29,11 @@ class CliArgs {
             defaultsTo: p.current,
             abbr: 'd',
             help: "Directory to write files to, defaults to current directory.")
+        ..addOption("server",
+            mandatory: false,
+            defaultsTo: "defconf",
+            abbr: 's',
+            help: "Optional name for Mikrotik dhcp server.")
         ..addFlag("write-over",
             defaultsTo: false,
             help: "Overwrite output files, if left out, will not overwrite",

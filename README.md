@@ -38,14 +38,19 @@ Binaries are included for macOS, Linux, and Windows for the latest releases. Sim
 
 If you choose to compile yourself:
 
-1. Install the latest version of [Dart](https://dart.dev/get-dart) for your operating system.
-2. Open a terminal.
-3. Type the following:
+1. Open a terminal.
+2. Install the latest version of [Dart](https://dart.dev/get-dart) for your operating system.
+3. Clone the repository (you'll need a [personal access](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) token if by https). Alternatively, download the zip file). Example:
 
-````bash
-  cd bin
+  ````bash
+  ````git clone https://github.com/GeekVisit/uproot.git
+
+5. Type the following:
+
+  ````bash
+  cd uproot/bin
   dart compile exe uprt.dart -o uprt
-````
+  ````
 
 ## Use
 
@@ -74,7 +79,7 @@ o (openwrt), p (pfsense)
 j (json),m (mikrotik), n (opnsense), o (openwrt), p (pfsense)
                          (defaults to "M")
 -b, --base-name          Base Name of Output Files
--l, --[no-]log           Creates Log file, if -p not set, then location is at 'J:\temp\uprt.log'
+-l, --[no-]log           Creates Log file, if -p not set
 -p, --log-file-path      Log error messages to specified file path.
 
 -v, --[no-]verbose       Verbosity - additional debugging messages
@@ -92,8 +97,7 @@ Examples:
 
 ## Test Data Included
 
-To test uprt yourself, there are test input files located under the `test/test-data` folder.
-Simply copy the examples given in `uprt -h` and try out the test files.
+To test uprt yourself, there are test input files located under the `test/test-data` folder in the repository. Simply open a terminal, clone the repository, cd into the uproot directory and apply the examples given in `uprt -h` on the test files.
 
 ## Video Demo
 
@@ -302,5 +306,16 @@ If you are ADDING leases to an existing router, you'll need to download a backup
    ![Imported Static Leases](readme-readme-pics/pfsense-static-leases-list-red.png)
 
 ## Mikrotik - Exporting
+
+1. Open [Winbox](https://mikrotik.com/download) or ssh into your router.
+2. In Winbox, click on `New Terminal` in menu.
+3. Execute the following:
+
+    ````bash
+    /ip dhcp-server lease export file=dhcp-static-leases
+    ````
+
+4. This exports a file called "dhcp-static-leases.rsc" to your files.
+5. Download the "dhcp-static-leases.rsc" to your computer.
 
 ## Mikrotik - Importing

@@ -70,7 +70,8 @@ class Json extends FileType {
       Map<String, List<String>> leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.json.formatName)) {
         return false;
       }
 
@@ -150,7 +151,6 @@ class Json extends FileType {
   }
 
   String toPfsense() {
-
     PfSense pfSense = PfSense();
     StringBuffer sbPfsense = StringBuffer();
 
@@ -161,7 +161,6 @@ class Json extends FileType {
   }
 
   String toOpnsense() {
-
     OpnSense opnSense = OpnSense();
     StringBuffer sbOpnsense = StringBuffer();
 

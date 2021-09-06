@@ -35,11 +35,18 @@ class ValidateLeases {
   }
 
   //Checks if ip is valid, within range and not a duplicate before adding
-  bool isLeaseValid(String macAddress, String hostName, String ipAddress) {
+  bool isLeaseValid(Map<String, dynamic> leaseMap, int i, String fileType) {
+    String macAddress = leaseMap[lbMac]![i], ipAddress = leaseMap[lbIp]![i];
+    String hostName;
+    if (fileType != fFormats.mikrotik.formatName) {
+      hostName = leaseMap[lbHost]![i];
+    } else {
+      hostName = "";
+    }
+
     ValidateLeases.initialize();
     Ip ip = Ip();
-    String leaseValues =
-        "mac-address=$macAddress name=$hostName address=$ipAddress";
+    String leaseValues = "mac-address=$macAddress address=$ipAddress";
 
     if (!ip.isMacAddress(macAddress)) {
       printMsg("$macAddress is not a valid Mac Address", errMsg: true);
@@ -67,22 +74,17 @@ class ValidateLeases {
     return true;
   }
 
-  bool containsBadLeases(Map<String, List<String>> leaseMap) {
+  bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
     try {
       bool returnValue = false;
-      if (leaseMap[lbMac] == null ||
-          leaseMap[lbHost] == null ||
-          leaseMap[lbIp] == null) throw Exception("Error - no valid leases");
+      if (leaseMap.isEmpty) throw Exception("Error - no valid leases");
 
-      if (leaseMap[lbMac]!.length != leaseMap[lbHost]!.length ||
-          leaseMap[lbMac]!.length != leaseMap[lbIp]!.length) {
-        throw Exception(
-            "Mac Addresses do not match number of host names and/or ip addresses. Make sure you have a host name defined for each static lease.");
+      if (leaseMap[lbMac]!.length != leaseMap[lbIp]!.length) {
+        throw Exception("Mac Addresses do not match number of ip addresses.");
       }
 
       for (int i = 0; i < leaseMap[lbMac]!.length; i++) {
-        if (!validateLeases.isLeaseValid(
-            leaseMap[lbMac]![i], leaseMap[lbHost]![i], leaseMap[lbIp]![i])) {
+        if (!validateLeases.isLeaseValid(leaseMap, i, fileType)) {
           returnValue = true;
         }
       }
@@ -110,37 +112,33 @@ class ValidateLeases {
   }
 
   Map<String, List<String>> removeBadLeases(
-      Map<String, List<String>> leaseMap) {
-    if (leaseMap[lbMac] == null ||
-        leaseMap[lbHost] == null ||
-        leaseMap[lbIp] == null) throw Exception("Error - no valid leases");
+      Map<String, List<String>> leaseMap, String fileType) {
+    try {
+      if (leaseMap.isEmpty) throw Exception("Error - no valid leases");
 
-    for (int i = 0; i < leaseMap[lbMac]!.length; i++) {
-      if (!validateLeases.isLeaseValid(
-          leaseMap[lbMac]![i], leaseMap[lbHost]![i], leaseMap[lbIp]![i])) {
-        leaseMap[lbMac]!.removeAt(i);
-        leaseMap[lbHost]!.removeAt(i);
-        leaseMap[lbIp]!.removeAt(i);
-        continue;
+      for (int i = 0; i < leaseMap[lbMac]!.length; i++) {
+        if (!validateLeases.isLeaseValid(leaseMap, i, fileType)) {
+          leaseMap.keys.forEach(((dynamic e) => leaseMap[e]!.removeAt(i)));
+
+          continue;
+        }
+        return leaseMap;
       }
+      return leaseMap;
+    } on Exception {
+      rethrow;
     }
-
-    return leaseMap;
   }
 
   bool validateLeaseList(Map<String, List<String>?> leaseMap, String fileType) {
     try {
-      if (leaseMap[lbMac]!.isEmpty &&
-          leaseMap[lbHost]!.isEmpty &&
-          leaseMap[lbIp]!.isEmpty) {
+      if (leaseMap.isEmpty) {
         throw Exception(
             """File ${argResults['input-file']} is empty of Leases or is not a ${conversionTypes[inputType]} format.""");
       }
-      if ((leaseMap[lbMac]?.length != leaseMap[lbHost]?.length) ||
-          (leaseMap[lbMac]?.length != leaseMap[lbIp]?.length)) {
-        throw Exception(
-            "Corrupt $fileType file, each Lease must have a host-name, "
-            "ip_address and mac-address.");
+      if ((leaseMap[lbMac]?.length != leaseMap[lbIp]?.length)) {
+        throw Exception("Corrupt $fileType file, each Lease must have an "
+            "ip address and mac address.");
       }
 
       return true;
@@ -154,7 +152,7 @@ class ValidateLeases {
   Map<String, List<String>> getValidLeaseMap(
       Map<String, List<String>> leaseMap, String fileType) {
     try {
-      leaseMap = removeBadLeases(leaseMap);
+      leaseMap = removeBadLeases(leaseMap, fileType);
 
       validateLeaseList(leaseMap, fileType);
       printBadLeases();

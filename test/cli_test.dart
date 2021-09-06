@@ -537,21 +537,21 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
     String badMikrotik =
         """
     /ip dhcp-server lease 
-    add mac-address= name=SATURN address=192.168.0.2 server=defconf 
-    add mac-address=AC:18:26:55:7B:66 =printer address=192.168.0.146 server=defconf
+    add mac-address= address=192.168.0.2 server=defconf 
+    add mac-address=AC:18:26:55:7B:66 address=192.168.0.146 server=defconf
     """;
 
     String badMikrotik2 =
         """
     /ip dhcp-server lease 
-    add mac-address= name=SATURN address=192.168.0.2 server=defconf 
+    add mac-address= address=192.168.0.2 server=defconf 
     add mac-address=dasdfe =printer address=192.168.0.146 server=defconf
     """;
     String badMikrotik3 =
         """
     /ip dhcp-server lease 
-    add mac-address= name=SATURN address=192.168.0.2 server=defconf 
-    add mac-address=AC:18:26:55:7B:66 =printer address=192168.0146 server=defconf
+    add mac-address= address=192.168.0.2 server=defconf 
+    add mac-address=AC:18:26:55:7B:66 address=192168.0146 server=defconf
     """;
     expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"), true);
     expect(mikrotik.isFileValid("test/test-data/lease-list-infile.rsc"), true);

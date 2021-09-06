@@ -110,7 +110,8 @@ class OpnSense extends FileType {
       dynamic leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.opnsense.formatName)) {
         return false;
       }
       validateLeases.validateLeaseList(leaseMap, fFormats.opnsense.formatName);

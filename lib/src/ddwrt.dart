@@ -73,7 +73,8 @@ class Ddwrt extends FileType {
       dynamic leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.ddwrt.formatName)) {
         return false;
       }
       validateLeases.validateLeaseList(leaseMap, fFormats.ddwrt.formatName);

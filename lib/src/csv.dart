@@ -84,7 +84,7 @@ class Csv extends FileType {
       if (fileContents == "" && fileLines == null) {
         throw Exception("Missing Argument for isContentValid");
       }
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(leaseMap, fFormats.csv.formatName)) {
         return false;
       }
 

@@ -38,7 +38,7 @@ class Mikrotik extends FileType {
   String build(Map<String, List<String>?> deviceList, StringBuffer sbMikrotik) {
     for (int x = 0; x < deviceList[lbHost]!.length; x++) {
       sbMikrotik.write(
-          """\nadd mac-address=${deviceList[lbMac]?[x]} name=${deviceList[lbHost]?[x]} address=${deviceList[lbIp]?[x]} server=defconf""");
+          """\nadd mac-address=${deviceList[lbMac]?[x]} address=${deviceList[lbIp]?[x]} server=${argResults['server']?[x]}""");
     }
     return "/ip dhcp-server lease\n${sbMikrotik.toString().trim()}";
   }
@@ -60,7 +60,8 @@ class Mikrotik extends FileType {
       Map<String, List<String>> leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (validateLeases.containsBadLeases(
+          leaseMap, fFormats.mikrotik.formatName)) {
         return false;
       }
 
