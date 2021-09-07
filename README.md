@@ -112,9 +112,9 @@ After the conversion the demo scrolls through the resulting files.
 
 # Exporting amd Importing Static Leases
 
-To use uprt, you'll need to export and import static leases to your router.
+To use Uproot, you'll need to export and import static leases to the respective routers.
 
-Below are the export/import steps for each router/firewall type that is supported by uproot.
+Below are the export/import steps for each router/firewall type that is supported by Uproot.
 
 ## DD-WRT
 
@@ -372,7 +372,7 @@ If you are ADDING leases to an existing pfSense configuration, you'll need to do
 
 5. The terminal should respond "Script file loaded and executed successfully".
 
-    ![Importing Mikrotik Leases](readme-pics/mikrotik-import-winbox.png))
+    ![Importing Mikrotik Leases](readme-pics/mikrotik-import-winbox.png)
 
 6. Common Error Messages:
 
