@@ -33,7 +33,7 @@ class CliArgs {
             mandatory: false,
             defaultsTo: "defconf",
             abbr: 's',
-            help: "Optional name for Mikrotik dhcp server.")
+            help: "Name to designate in output file for Mikrotik dhcp server.")
         ..addFlag("write-over",
             defaultsTo: false,
             help: "Overwrite output files, if left out, will not overwrite",

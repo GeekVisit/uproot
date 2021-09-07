@@ -6,31 +6,31 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    arguments = <String>[
-      "-i",
-      "test/test-data/lease-list-infile.csv",
-      "-L",
-      "192.168.0.1",
-      "-H",
-      "192.168.0.254",
-//      "-t",
-      //    "c",
-      "-b",
-      "test-output-file",
-      "-g",
-      "m",
-      "-d",
-      "test/test-output",
-      //  "-s",
-      //    "myserver",
+//     arguments = <String>[
+//       "-i",
+//       "test/test-data/lease-list-infile.csv",
+//       "-L",
+//       "192.168.0.1",
+//       "-H",
+//       "192.168.0.254",
+// //      "-t",
+//       //    "c",
+//       "-b",
+//       "test-output-file",
+//       "-g",
+//       "m",
+//       "-d",
+//       "test/test-output",
+//       "-s",
+//   //    "myserver",
 
-//      "c",
-      //   "cdjnmop",
-      "-w",
-      //"-v",
-      // "-l",
-      // "uprt-log-example.log"
-    ];
+// //      "c",
+//       //   "cdjnmop",
+//       "-w",
+//       //"-v",
+//       // "-l",
+//       // "uprt-log-example.log"
+//     ];
 
     upRoot(arguments);
   } on FileSystemException catch (e) {

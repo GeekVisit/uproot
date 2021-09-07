@@ -67,37 +67,35 @@ Below is the latest help (version 2021.09.001):
 
 uprt (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
-A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, 
-and pfSense routers. Also supports cvs and json.
+A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
 
 Usage:
 -L, --ip-low-address     Ip4 Lowest Address of Network Range
 -H, --ip-high-address    Ip4 Highest Address of Network Range
 -i, --input-file         Input File to be converted
--t, --input-type         Input file type:   c (csv), d (ddwrt), j (json),m (mikrotik), n (opnsense),
-o (openwrt), p (pfsense)
+-t, --input-type         Input file type:   c (csv), d (ddwrt), j (json),m (mikrotik), 
+                         n (opnsense), o (openwrt), p (pfsense)
 -d, --directory-out      Directory to write files to, defaults to current directory.
-                         
+-s, --server             Name to designate in output file for Mikrotik dhcp server.
+                         (defaults to "defconf")
 -w, --[no-]write-over    Overwrite output files, if left out, will not overwrite
 -h, --[no-]help          Help
--g, --generate-type      Generated types may be multiple. Valid values include:  c (csv), d (ddwrt),
-j (json),m (mikrotik), n (opnsense), o (openwrt), p (pfsense)
-                         (defaults to "M")
+-g, --generate-type      Generated types may be multiple. Valid values include:  c (csv), d (ddwrt), j (json),m (mikrotik), n (opnsense), o (openwrt), p (pfsense)
 -b, --base-name          Base Name of Output Files
--l, --[no-]log           Creates Log file, if -p not set
+-l, --[no-]log           Creates Log file, if -p not set, then location is in system temporary folder
 -p, --log-file-path      Log error messages to specified file path.
-
 -v, --[no-]verbose       Verbosity - additional debugging messages
 
 Examples:
 
-  Convert Csv file to all formats (csv, ddwrt, json, mikrotik, openwrt, opnsense, pfsense):
+  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense): 
 
   uprt -i test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
 
-  Convert Mikrotik RouterOS file to json:
+  Convert Mikrotik file to json:
 
   uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
+
 ````
 
 ## Test Data Included
@@ -189,12 +187,18 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 5. Use the exported file as an input file to Uproot and convert to your required format.
 
-    **Example:**
+    **Examples:**
 
     Converting DD-WRT to a json file
 
     ````bash
       uprt -i static_leases.ddwrt -b static_leases -g j -L 192.168.0.1 -H 192.168.0.254  
+    ````
+
+    Converting DD-WRT to a Mikrotik RouterOS import script
+
+    ````bash
+      uprt -i static_leases.ddwrt -b static_leases -g m -L 192.168.0.1 -H 192.168.0.254 -s defconf 
     ````
 
 ### OpenWrt - Import
