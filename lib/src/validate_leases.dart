@@ -78,8 +78,9 @@ class ValidateLeases {
   bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
     try {
       bool returnValue = false;
-      if (areAllLeaseMapValuesEmpty(leaseMap))
+      if (areAllLeaseMapValuesEmpty(leaseMap)) {
         throw Exception("Error - no valid leases");
+      }
 
       if (leaseMap[lbMac]!.length != leaseMap[lbIp]!.length) {
         throw Exception("Mac Addresses do not match number of ip addresses.");
@@ -159,6 +160,7 @@ class ValidateLeases {
         0;
   }
 
+  // ignore: slash_for_doc_comments
   /** Deletes bad leases, also validates lease */
   Map<String, List<String>> getValidLeaseMap(
       Map<String, List<String>> leaseMap, String fileType) {

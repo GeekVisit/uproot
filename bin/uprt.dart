@@ -18,9 +18,11 @@ void main(List<String> arguments) {
       "-b",
       "test-output-file",
       "-g",
-      "n",
+      "m",
       "-d",
       "test/test-output",
+      //  "-s",
+      //    "myserver",
 
 //      "c",
       //   "cdjnmop",
