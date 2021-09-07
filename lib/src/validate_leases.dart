@@ -38,7 +38,8 @@ class ValidateLeases {
   bool isLeaseValid(Map<String, dynamic> leaseMap, int i, String fileType) {
     String macAddress = leaseMap[lbMac]![i], ipAddress = leaseMap[lbIp]![i];
     String hostName;
-    if (fileType != fFormats.mikrotik.formatName) {
+    if (fileType != fFormats.mikrotik.formatName &&
+        i < leaseMap[lbHost].length) {
       hostName = leaseMap[lbHost]![i];
     } else {
       hostName = "";
@@ -77,7 +78,8 @@ class ValidateLeases {
   bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
     try {
       bool returnValue = false;
-      if (leaseMap.isEmpty) throw Exception("Error - no valid leases");
+      if (areAllLeaseMapValuesEmpty(leaseMap))
+        throw Exception("Error - no valid leases");
 
       if (leaseMap[lbMac]!.length != leaseMap[lbIp]!.length) {
         throw Exception("Mac Addresses do not match number of ip addresses.");
@@ -132,7 +134,8 @@ class ValidateLeases {
 
   bool validateLeaseList(Map<String, List<String>?> leaseMap, String fileType) {
     try {
-      if (leaseMap.isEmpty) {
+      // if all of lists in leaseMap entries are empty, i.e., have 0 length
+      if (areAllLeaseMapValuesEmpty(leaseMap)) {
         throw Exception(
             """File ${argResults['input-file']} is empty of Leases or is not a ${conversionTypes[inputType]} format.""");
       }
@@ -148,7 +151,15 @@ class ValidateLeases {
     }
   }
 
-  //Deletes bad leases, also validates lease
+  //** checks if all values of Lease Map are Empty Lists */
+  bool areAllLeaseMapValuesEmpty(Map<String, List<String>?> leaseMap) {
+    return (leaseMap.values
+            .toList()
+            .fold(0, (dynamic t, dynamic e) => t + e.length)) ==
+        0;
+  }
+
+  /** Deletes bad leases, also validates lease */
   Map<String, List<String>> getValidLeaseMap(
       Map<String, List<String>> leaseMap, String fileType) {
     try {

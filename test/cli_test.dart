@@ -52,9 +52,8 @@ void testUpRooted() {
     print(
         """
 List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength""");
-    return ((leaseMap[lbHost]?.length == leaseMap[lbIp]?.length) &&
-        (leaseMap[lbIp]?.length == leaseMap[lbMac]?.length) &&
-        (leaseMap[lbHost]?.length == listLength));
+    return ((leaseMap[lbIp]?.length == leaseMap[lbMac]?.length) &&
+        (leaseMap[lbMac]?.length == listLength));
   }
 
   Ip ip = Ip();
