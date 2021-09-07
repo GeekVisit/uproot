@@ -2,7 +2,7 @@
 
 # Uproot
 
-uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert static leases between routers. Currently only ip4 static leases are supported.
+uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert static leases between routers. **Currently only ip4 static leases are supported.**
 
 Current router/firewall software supported:
 
@@ -23,15 +23,20 @@ Also supports the following file formats:
 * Automatic detection of input format based on extension and content; optionally you can specify the format
 * Single input file can be simultaneously converted into multiple formats
 * Csv and Json input files
-* Validation Checks which remove errors in importing:
-  * Validation of output format type
-  * Enforced IP range
-  * Enforced Checking if each static lease has an IP, Mac,and Host address
-  * Duplicate Lease Checking, excluding duplicates from output
-  * Validates ip and mac addresses from input file and excludes invalid addresses from the output file
-* Example input files available in source download for testing
+* Validation Checks to avoid errors while importing:
+  * Validates all generated files against output format type
+  * Enforces IP range
+  * Requires each static lease to have an IP, Mac,and (except for Mikrotick RouterOS files), Host address
+  * Excludes unnecessary duplicates from output
+  * Excludes invalid ip4 and Mac addresses from output file
+* Example input files available in source for testing
 
-## Installation
+## Limitations
+
+* Mikrotik RouerOS format: Does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
+* Does not support ip6 leases
+
+## Installing
 
 Binaries are included for macOS, Linux, and Windows for the latest releases. Simply download to your respective platform and put in your path.
 
@@ -65,11 +70,11 @@ Below is the latest help (version 2021.09.001):
 
 ````bash
 
-uprt (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
+**uprt** (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
 
-Usage:
+**Usage:**
 -L, --ip-low-address     Ip4 Lowest Address of Network Range
 -H, --ip-high-address    Ip4 Highest Address of Network Range
 -i, --input-file         Input File to be converted
@@ -86,13 +91,13 @@ Usage:
 -p, --log-file-path      Log error messages to specified file path.
 -v, --[no-]verbose       Verbosity - additional debugging messages
 
-Examples:
+**Examples:**
 
-  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense): 
+**  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense): **
 
   uprt -i test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
 
-  Convert Mikrotik file to json:
+ ** Convert Mikrotik file to json:**
 
   uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
 
