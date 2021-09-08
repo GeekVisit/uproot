@@ -10,6 +10,11 @@ import 'validate_leases.dart';
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
 String dirOut = argResults['directory-out'];
+
+//Glob baseOutputFileNames = Glob;
+//
+List<String> inputFiles = <String>[];
+
 //Output directory with basename attached
 String basePath = File(p.join(dirOut, argResults['base-name'])).absolute.path;
 

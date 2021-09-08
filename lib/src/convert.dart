@@ -9,40 +9,44 @@ void upRoot(List<String> arguments) {
     MetaUpdate("pubspec.yaml").verifyLatestVersionFromPubSpec();
     argResults = cliArgs.getArgs(arguments);
     cliArgs.checkArgs();
+
     initialize();
-    convertToJson();
-    convertToOutput();
+
+    for (String inputFile in inputFiles) {
+      convertToJson(inputFile);
+      convertToOutput(inputFile);
+    }
   } on Exception {
     rethrow;
   }
 }
 
-void convertToJson() {
+void convertToJson(String inputFile) {
   try {
     Json json = Json();
 
-    inputType = cliArgs.getInputType();
+    inputType = cliArgs.getInputType(inputFile);
     printMsg("Converting Input File to Json temporary file..",
         onlyIfVerbose: true);
     switch (inputType) {
       case 'c':
         Csv csv = Csv();
-        csv.isFileValid(File(argResults['input-file']).absolute.path);
+        csv.isFileValid(File(inputFile).absolute.path);
         saveOutFile(csv.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("Csv");
         break;
 
       case 'd':
         Ddwrt ddwrt = Ddwrt();
-        ddwrt.isFileValid(File(argResults['input-file']).absolute.path);
+        ddwrt.isFileValid(File(inputFile).absolute.path);
         saveOutFile(ddwrt.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("Ddwrt");
         break;
 
       case 'j':
-        File inFile = File(File(argResults['input-file']).absolute.path);
+        File inFile = File(File(inputFile).absolute.path);
         try {
-          json.isFileValid(File(argResults['input-file']).absolute.path);
+          json.isFileValid(File(inputFile).absolute.path);
           inFile.copySync(tempJsonOutFile.path);
         } on FileSystemException {
           tempDir = Directory.systemTemp.createTempSync("uprt_");
@@ -54,28 +58,28 @@ void convertToJson() {
 
       case 'm':
         Mikrotik mikrotik = Mikrotik();
-        mikrotik.isFileValid(File(argResults['input-file']).absolute.path);
+        mikrotik.isFileValid(File(inputFile).absolute.path);
         saveOutFile(mikrotik.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("Mikrotik");
         break;
 
       case 'n':
         OpnSense opnSense = OpnSense();
-        opnSense.isFileValid(File(argResults['input-file']).absolute.path);
+        opnSense.isFileValid(File(inputFile).absolute.path);
         saveOutFile(opnSense.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("Opnsense");
         break;
 
       case 'o':
         OpenWrt openWrt = OpenWrt();
-        openWrt.isFileValid(File(argResults['input-file']).absolute.path);
+        openWrt.isFileValid(File(inputFile).absolute.path);
         saveOutFile(openWrt.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("OpenWrt");
         break;
 
       case 'p':
         PfSense pfSense = PfSense();
-        pfSense.isFileValid(File(argResults['input-file']).absolute.path);
+        pfSense.isFileValid(File(inputFile).absolute.path);
         saveOutFile(pfSense.toJson(), tempJsonOutFile.path);
         printCompletedTmpJson("Pfsense");
         break;

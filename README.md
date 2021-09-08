@@ -26,14 +26,14 @@ Also supports the following file formats:
 * Validation Checks to avoid errors while importing:
   * Validates all generated files against output format type
   * Enforces IP range
-  * Requires each static lease to have an IP, Mac,and (except for Mikrotick RouterOS files), Host address
+  * Requires each static lease to have an IP, Mac,and (except for Mikrotik RouterOS files), Host address
   * Excludes unnecessary duplicates from output
   * Excludes invalid ip4 and Mac addresses from output file
 * Example input files available in source for testing
 
 ## Limitations
 
-* Mikrotik RouerOS format: Does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
+* Mikrotik RouterOS format: Does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
 * Does not support ip6 leases
 
 ## Installing

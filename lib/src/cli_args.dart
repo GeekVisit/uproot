@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:args/args.dart';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'src.dart';
 
@@ -50,8 +52,15 @@ class CliArgs {
                 // ignore: lines_longer_than_80_chars
                 " c (csv), d (ddwrt), j (json),"
                 "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)")
-        ..addOption("base-name",
-            abbr: 'b', help: "Base Name of Output Files", mandatory: false)
+        ..addOption(
+          "base-name",
+          abbr: 'b',
+          help:
+              // ignore: lines_longer_than_80_chars
+              "Specify Base Name of Output Files (default use basename of input file)",
+          mandatory: false,
+          defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
+        )
         ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
 Creates Log file, if -p not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
         ..addOption("log-file-path",
@@ -101,7 +110,10 @@ Examples:
   }
 
   void checkArgs() {
-    verifyOptions(<String>["i", "b", "L", "H"]);
+    verifyOptions(<String>["L", "H"]);
+
+    /** gets all input files after glob from arguments without flags */
+    inputFiles = getInputFiles(argResults.rest);
 
     Ip ip = Ip();
 
@@ -110,7 +122,7 @@ Examples:
         ? throw Exception("Ip Range Limits are invalid Ip4 addresses.")
         : "";
 
-    if (argResults['input-file'].isEmpty) {
+    if (argResults.rest.isEmpty) {
       throw Exception('Required Input File Missing.');
     }
     Directory dir = Directory(argResults['directory-out']);
@@ -126,12 +138,31 @@ Examples:
         : '${p.join(Directory.systemTemp.path, "uprt.log")}';
   }
 
+  // ignore: slash_for_doc_comments
+  /** gets all input file paths after glob from arguments without flags */
+  List<String> getInputFiles(List<String> rest) {
+    try {
+      List<String> inFiles = <String>[""];
+
+      for (dynamic e in argResults.rest) {
+        Glob(e).listSync().forEach((dynamic f) {
+          (!File(f.absolute.path).existsSync())
+              ? inFiles.add(f.absolute.path)
+              : throw Exception("Input File ${f.absolute.path} does not exist");
+        });
+      }
+      return inputFiles;
+    } on Exception {
+      rethrow;
+    }
+  }
+
   ///  Throws exception if any option value is another option
   /// or a mandatory option is missing
   /// Accepts list of mandatory options as abbreviations
   /// Argparser should not set any mandatory single/multiple options to true as this will handle
   ///
-  void verifyOptions(List<String> requiredOptionsByAbbrs) {
+  void verifyOptions([List<String>? requiredOptionsByAbbrs]) {
     try {
       String errorMessages = "";
       List<dynamic> valueList = argResults.options
@@ -159,8 +190,11 @@ Examples:
       }
 
       //Check if Mandatory Options Are Missing from Option or Value arguments
-      errorMessages = """
-$errorMessages${checkForMissingMandatoryOptions(requiredOptionsByAbbrs)}""";
+
+      errorMessages = (requiredOptionsByAbbrs != null)
+          ? """
+$errorMessages${checkForMissingMandatoryOptions(requiredOptionsByAbbrs)}"""
+          : errorMessages;
 
       if (errorMessages != "") {
         throw Exception(errorMessages.trim());
@@ -177,17 +211,17 @@ $newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""")
 //Gets input type (j for json, etc) -
 // use specified format, if not specified, get from extension,
 //if xml look if contains opnsense
-  String getInputType() {
+  String getInputType(String inputFile) {
     try {
       if (argResults['input-type'] != null) {
         return argResults['input-type']!;
       }
 
-      String inputExt =
-          p.extension(argResults['input-file']).replaceAll(".", "");
+      String inputExt = p.extension(inputFile).replaceAll(".", "");
 
       if (inputExt == "xml") {
-        return xmlFirewallFormat(); //determines whether opnsense or pfsense
+        return xmlFirewallFormat(
+            inputFile); //determines whether opnsense or pfsense
       } else {
         if (extToTypes.containsKey(inputExt)) {
           return extToTypes[
@@ -204,10 +238,8 @@ $newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""")
 
 //determines whether xml file is opnsense or pfsense
 
-  String xmlFirewallFormat() {
-    return (File(argResults['input-file'])
-            .readAsStringSync()
-            .contains("<opnsense>"))
+  String xmlFirewallFormat(inputFile) {
+    return (File(inputFile).readAsStringSync().contains("<opnsense>"))
         ? "n"
         : "p";
   }
