@@ -16,23 +16,6 @@ List<String> inputFileList = <String>[];
 String inputFile = "";
 String inputType = "j";
 String baseName = "";
-//Output directory with basename attached
-// String basePath =
-
-//TODO: DELETE Once rewrite outputpath
-// Map<String, String> outputPathNames = <String, String>{
-// ignore: lines_longer_than_80_chars
-//   "${fFormats.openwrt.formatName}": "$basePath.${fFormats.openwrt.outputExt}",
-//   "${fFormats.ddwrt.formatName}": "$basePath.${fFormats.ddwrt.outputExt}",
-// ignore: lines_longer_than_80_chars
-//   "${fFormats.mikrotik.formatName}": "$basePath.${fFormats.mikrotik.outputExt}",
-//   "${fFormats.json.formatName}": "$basePath.${fFormats.json.outputExt}",
-//   "${fFormats.csv.formatName}": "$basePath.${fFormats.csv.outputExt}",
-//   "${fFormats.pfsense.formatName}":
-//       "$basePath-pfs.${fFormats.pfsense.outputExt}",
-//   "${fFormats.opnsense.formatName}":
-//       "$basePath-opn.${fFormats.opnsense.outputExt}",
-// };
 
 Map<String, String> typeOptionToName = <String, String>{
   fFormats.csv.abbrev: fFormats.csv.formatName,
@@ -94,16 +77,6 @@ extension FileFormatProps on fFormats {
     fFormats.openwrt: 'OpenWrt',
     fFormats.pfsense: 'pfSense',
   };
-
-  // static final Map<dynamic, String> outPutPathName = <dynamic, String>{
-  //   fFormats.csv: "$basePath.${fFormats.csv.outputExt}",
-  //   fFormats.ddwrt: "$basePath.${fFormats.ddwrt.outputExt}",
-  //   fFormats.json: "$basePath.${fFormats.json.outputExt}",
-  //   fFormats.mikrotik: "$basePath.${fFormats.mikrotik.outputExt}",
-  //   fFormats.openwrt: "$basePath.${fFormats.openwrt.outputExt}",
-  //   fFormats.opnsense: "$basePath.${fFormats.opnsense.outputExt}",
-  //   fFormats.pfsense: "$basePath.${fFormats.pfsense.outputExt}",
-  // };
 
   String get abbrev => abbrevs[this]!;
   String get outputExt => outputExts[this]!;

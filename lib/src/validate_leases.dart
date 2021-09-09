@@ -59,17 +59,23 @@ class ValidateLeases {
       badLeases.add("Number is Not A Valid IP 4Address: $leaseValues ");
       printMsg("IP $ipAddress is not a valid IP4 Address.", errMsg: true);
       return false;
-    } else if (!ip.isWithinRange(
-      ipAddress,
-      g.argResults['ip-low-address'],
-      g.argResults['ip-high-address'],
-    )) {
-      badLeases.add("IP Outside Range: $ipAddress");
-      printMsg("IP out of range for $ipAddress", errMsg: true);
-      return false;
     } else if (isDuplicate(macAddress, hostName, ipAddress)) {
       printMsg("Duplicate lease for $ipAddress.", errMsg: true);
       return false;
+    }
+
+    if ((g.argResults['ip-low-address'] != null &&
+            g.argResults['ip-high-address'] != null) &&
+        !ip.isWithinRange(
+          ipAddress,
+          g.argResults['ip-low-address'],
+          g.argResults['ip-high-address'],
+        )) {
+      badLeases.add("IP Outside Range: $ipAddress");
+      printMsg("IP out of range for $ipAddress", errMsg: true);
+      return false;
+    } else {
+      printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range");
     }
 
     addProcessedLease(macAddress, hostName, ipAddress);

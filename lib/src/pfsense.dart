@@ -102,11 +102,13 @@ class PfSense extends FileType {
   </lan>
 </dhcpd>''';
 
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<from></from>", "<from>${g.argResults['ip-low-address']}</from>");
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<to></to>", "<to>${g.argResults['ip-high-address']}</to>");
-
+      if (g.argResults['ip-low-address'] != null &&
+          g.argResults['ip-high-address'] != null) {
+        preLeaseXml = preLeaseXml.replaceAll(
+            "<from></from>", "<from>${g.argResults['ip-low-address']}</from>");
+        preLeaseXml = preLeaseXml.replaceAll(
+            "<to></to>", "<to>${g.argResults['ip-high-address']}</to>");
+      }
       String leaseTags = leaseXml;
       String tmpLeaseTags;
 

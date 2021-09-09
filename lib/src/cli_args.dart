@@ -103,25 +103,33 @@ Examples:
 
   void checkArgs() {
     //TODO - get rid of l and h
-    checkIfOptionArgsGiven(<String>["L", "H", "g"]);
+    checkIfOptionArgsAreGiven();
+    checkForMissingMandatoryOptions(<String>["L", "H", "g"]);
+    validateIpRangeOptions();
+    checkIfInputFileGiven();
+  }
 
-    Ip ip = Ip();
-
-    (!ip.isIp4(g.argResults['ip-high-address']) |
-            !ip.isIp4(g.argResults['ip-high-address']))
-        ? throw Exception("Ip Range Limits are invalid Ip4 addresses.")
-        : "";
-
+  void checkIfInputFileGiven() {
     if (g.argResults.rest.isEmpty) {
       throw Exception('Required Input File Missing.');
     }
+  }
 
-    // Set log-file-path to system temp folder if option set
+  void validateIpRangeOptions() {
+    try {
+      Ip ip = Ip();
 
-    g.logPath = (g.argResults['log'] &&
-            isStringAValidFilePath(g.argResults['log-file-path']))
-        ? g.argResults['log-file-path']
-        : '${p.join(Directory.systemTemp.path, "uprt.log")}';
+      ((g.argResults['ip-high-address'] != null ||
+                  g.argResults['ip-high-address'] != "") &&
+              !ip.isIp4(g.argResults['ip-high-address']) |
+                  (g.argResults['ip-low-address'] != null ||
+                      g.argResults['ip-low-address'] != "") &&
+              !ip.isIp4(g.argResults['ip-low-address']))
+          ? throw Exception("Ip Range Limit(s) are invalid Ip4 addresses.")
+          : "";
+    } on Exception {
+      rethrow;
+    }
   }
 
   // ignore: slash_for_doc_comments
@@ -150,7 +158,7 @@ Examples:
   /// Accepts list of mandatory options as abbreviations
   /// Argparser should not set any mandatory single/multiple options to true as this will handle
   ///
-  void checkIfOptionArgsGiven([List<String>? requiredOptionsByAbbrs]) {
+  void checkIfOptionArgsAreGiven() {
     try {
       String errorMessages = "";
       List<dynamic> valueList = g.argResults.options
@@ -180,23 +188,9 @@ Examples:
         }
       }
 
-      //Check if Mandatory Options Are Missing from Option or Value arguments
-
-      errorMessages = (requiredOptionsByAbbrs != null)
-          ? """
-$errorMessages${checkForMissingMandatoryOptions(requiredOptionsByAbbrs)}"""
-          : errorMessages;
-
       if (errorMessages != "") {
         throw Exception(errorMessages.trim());
       }
-      /* only if don't use rest which we do   
-      if (g.argResults.rest.isNotEmpty) {
-         printMsg("""
-${g.newL}${g.newL}Ignoring the following arguments:
-${g.argResults.rest.join()}${g.newL}""");
-      }*/
-
     } on Exception {
       rethrow;
     }
@@ -238,43 +232,45 @@ ${g.argResults.rest.join()}${g.newL}""");
         : "p";
   }
 
-  String checkForMissingMandatoryOptions(List<String> requiredOptions) {
+// ignore: slash_for_doc_comments
+/** Check if Mandatory Options Are Missing from Option or Value arguments */
+  String checkForMissingMandatoryOptions(List<String> requiredOptionsByAbbrs) {
     try {
       List<String> allowedAbbrevList = parser.options.entries
           .map((dynamic e) => e.value.abbr.toString())
           .toList();
-
-      List<dynamic> optionListNames = g.argResults.options.toList(),
-          optionsInValues = g.argResults.options
-              .map((dynamic e) => g.argResults[e])
-              .where((dynamic e) => (((allowedAbbrevList
-                          .contains(e.toString().replaceAll("-", ""))) |
+      List<dynamic> optionsInValues = g.argResults.options
+          .map((dynamic e) => g.argResults[e])
+          .where((dynamic e) =>
+              (((allowedAbbrevList.contains(e.toString().replaceAll("-", ""))) |
                       (allowedAbbrevList
                           .contains(e.toString().replaceAll("--", ""))))
                   ? true
                   : false))
-              // ignore: always_specify_types
-              .map((dynamic e) => {
-                    if (allowedAbbrevList
-                            .contains(e.toString().replaceAll("-", ""))
-                        ? true
-                        : false)
-                      parser
-                          .findByAbbreviation(e.toString().replaceAll("-", ""))!
-                          .name
-                  })
-              .map((dynamic e) => e.join())
-              .toList();
+          // ignore: always_specify_types
+          .map((dynamic e) => {
+                if (allowedAbbrevList.contains(e.toString().replaceAll("-", ""))
+                    ? true
+                    : false)
+                  parser
+                      .findByAbbreviation(e.toString().replaceAll("-", ""))!
+                      .name
+              })
+          .map((dynamic e) => e.join())
+          .toList();
+      List<String> optionListNames = parser.options.keys.toList();
 
       List<String> missingOptionsOnCommandLine = <String>[];
       for (int x = 0; x < optionListNames.length; x++) {
         if (g.argResults[optionListNames[x]] is bool) continue;
-        if (g.argResults[optionListNames[x]].length == 0) {
+
+        if (g.argResults[optionListNames[x]] == null ||
+            g.argResults[optionListNames[x]].length == 0) {
           missingOptionsOnCommandLine.add(optionListNames[x]);
         }
       }
 
-      List<String> requiredOptionsByName = requiredOptions
+      List<String> requiredOptionsByName = requiredOptionsByAbbrs
           .map((dynamic e) =>
               // ignore: always_specify_types
               {e = parser.findByAbbreviation(e.replaceAll("-", ""))!.name})

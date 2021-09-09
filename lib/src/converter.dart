@@ -251,6 +251,7 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
 
     g.argResults = g.cliArgs.getArgs(arguments);
     g.cliArgs.checkArgs();
+    setLogPath();
 
     printMsg("${g.newL}uprt converting ...", onlyIfVerbose: true);
     if (g.logPath != "") {
@@ -261,6 +262,17 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
     }
   }
 
+  // ignore: slash_for_doc_comments
+  /**  Set log-file-path to system temp folder if option set */
+  void setLogPath() {
+    g.logPath = (g.argResults['log'] &&
+            isStringAValidFilePath(g.argResults['log-file-path']))
+        ? g.argResults['log-file-path']
+        : '${p.join(Directory.systemTemp.path, "uprt.log")}';
+  }
+
+  // ignore: slash_for_doc_comments
+  /** Post Conversion Cleanup */
   static void cleanUp() {
     try {
       if (g.tempDir.existsSync()) g.tempDir.deleteSync(recursive: true);
@@ -269,6 +281,8 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
     }
   }
 
+  // ignore: slash_for_doc_comments
+  /**  Build basename of output files*/
   void setBaseName() {
     try {
       g.baseName =
