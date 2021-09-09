@@ -27,7 +27,8 @@ abstract class FileType {
             onlyIfVerbose: true);
         return true;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""", errMsg: true);
+        printMsg("""$filePath is invalid format for $fileType)}""",
+            errMsg: true);
         return false;
       }
     } on Exception catch (e) {

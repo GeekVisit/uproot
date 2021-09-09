@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:yaml/yaml.dart';
 import '../lib.dart';
+import 'globals.dart' as g;
 import 'meta.dart';
 
 /// Return value for verifyLastVersionFromMetaCheck
@@ -39,25 +40,25 @@ Map<String, String> meta = <String, String>{
     return yaml[pubSpecParam];
   }
 
-  int verifyLatestVersionFromPubSpec() {
+  int verifyCodeHasUpdatedMeta() {
     try {
       File f = File(pathToYaml);
       //exit if no pubspec found so no warning in production
-      if (!f.existsSync()) return MetaCheck.runningAsBinary;
+      if (!f.existsSync()) return g.MetaCheck.runningAsBinary;
       //compare meta.dart with pubspec meta and give warning if difference
       if (meta.keys
           .where((dynamic e) => (meta[e] != getPubSpec(e)))
           .isNotEmpty) {
         throw Exception(
-            """${meta['name']} Version number and other meta attributes in code are different from pubspec.yaml.$newL"""
-            """Updating code from pubspec.yaml for next run ...$newL$newL""");
+            """${meta['name']} Version number and other meta attributes in code are different from pubspec.yaml.${g.newL}"""
+            """Updating code from pubspec.yaml for next run ...${g.newL}${g.newL}""");
       }
-      return MetaCheck.match;
+      return g.MetaCheck.match;
     } on Exception catch (e) {
       if (e.toString().contains("pubspec.yaml")) {
         print(e);
-        if (!testRun) writeMetaDartFile("lib/src/meta.dart");
-        return MetaCheck.mismatch;
+        if (!g.testRun) writeMetaDartFile("lib/src/meta.dart");
+        return g.MetaCheck.mismatch;
       }
       rethrow;
     }

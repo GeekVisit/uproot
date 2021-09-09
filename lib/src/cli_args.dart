@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
+import 'globals.dart' as g;
 import 'src.dart';
 
 class CliArgs {
@@ -19,8 +20,6 @@ class CliArgs {
             mandatory: false,
             abbr: 'H',
             help: "Ip4 Highest Address of Network Range")
-        ..addOption("input-file",
-            abbr: "i", help: "Input File to be converted", mandatory: false)
         ..addOption("input-type",
             mandatory: false,
             abbr: 't',
@@ -59,7 +58,6 @@ class CliArgs {
               // ignore: lines_longer_than_80_chars
               "Specify Base Name of Output Files (default use basename of input file)",
           mandatory: false,
-          defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
         )
         ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
 Creates Log file, if -p not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
@@ -73,7 +71,7 @@ Creates Log file, if -p not set, then location is at '${p.join(Directory.systemT
             defaultsTo: false,
             help: "Verbosity - additional debugging messages");
 
-      if (arguments.isEmpty && !testRun) {
+      if (arguments.isEmpty && !g.testRun) {
         displayHelp();
       }
 
@@ -92,7 +90,7 @@ ${meta["name"]} (${meta['version']} running on ${Platform.operatingSystem} ${Pla
 ${meta['description']}
 
 Usage: 
-${cliArgs.parser.usage}
+${g.cliArgs.parser.usage}
 
 Examples: 
 
@@ -110,48 +108,49 @@ Examples:
   }
 
   void checkArgs() {
+    //TODO - get rid of l and h
     verifyOptions(<String>["L", "H"]);
 
     /** gets all input files after glob from arguments without flags */
-    inputFiles = getInputFiles(argResults.rest);
+    g.inputFileList = getInputFileList(g.argResults.rest);
 
     Ip ip = Ip();
 
-    (!ip.isIp4(argResults['ip-high-address']) |
-            !ip.isIp4(argResults['ip-high-address']))
+    (!ip.isIp4(g.argResults['ip-high-address']) |
+            !ip.isIp4(g.argResults['ip-high-address']))
         ? throw Exception("Ip Range Limits are invalid Ip4 addresses.")
         : "";
 
-    if (argResults.rest.isEmpty) {
+    if (g.argResults.rest.isEmpty) {
       throw Exception('Required Input File Missing.');
     }
-    Directory dir = Directory(argResults['directory-out']);
+    Directory dir = Directory(g.argResults['directory-out']);
     if (!dir.existsSync()) {
       throw Exception("Output directory ${dir.path} does not exist. ");
     }
 
     // Set log-file-path to system temp folder if option set
 
-    logPath = (argResults['log'] &&
-            isStringAValidFilePath(argResults['log-file-path']))
-        ? argResults['log-file-path']
+    g.logPath = (g.argResults['log'] &&
+            isStringAValidFilePath(g.argResults['log-file-path']))
+        ? g.argResults['log-file-path']
         : '${p.join(Directory.systemTemp.path, "uprt.log")}';
   }
 
   // ignore: slash_for_doc_comments
-  /** gets all input file paths after glob from arguments without flags */
-  List<String> getInputFiles(List<String> rest) {
+  /** Gets all input file paths after glob from arguments without flags */
+  List<String> getInputFileList(List<String> rest) {
     try {
       List<String> inFiles = <String>[""];
 
-      for (dynamic e in argResults.rest) {
+      for (dynamic e in g.argResults.rest) {
         Glob(e).listSync().forEach((dynamic f) {
           (!File(f.absolute.path).existsSync())
               ? inFiles.add(f.absolute.path)
               : throw Exception("Input File ${f.absolute.path} does not exist");
         });
       }
-      return inputFiles;
+      return g.inputFileList;
     } on Exception {
       rethrow;
     }
@@ -165,11 +164,11 @@ Examples:
   void verifyOptions([List<String>? requiredOptionsByAbbrs]) {
     try {
       String errorMessages = "";
-      List<dynamic> valueList = argResults.options
+      List<dynamic> valueList = g.argResults.options
               .toList()
-              .map((dynamic e) => argResults[e])
+              .map((dynamic e) => g.argResults[e])
               .toList(),
-          optionList = argResults.options.toList(),
+          optionList = g.argResults.options.toList(),
           allowedOptionList = parser.options.keys.toList(),
           allowedAbbrevList =
               parser.options.entries.map((dynamic e) => e.value.abbr).toList();
@@ -182,7 +181,8 @@ Examples:
         if (value.substring(0, 1) == "-" &&
             (allowedOptionList.contains(value.replaceAll("--", "")) ||
                 allowedAbbrevList.contains(value.replaceAll("-", "")))) {
-          errorMessages = (errorMessages != "") ? "$errorMessages$newL" : "";
+          errorMessages =
+              (errorMessages != "") ? "$errorMessages${g.newL}" : "";
           errorMessages =
               "$errorMessages$optionName is missing argument and is set "
               "to $value.";
@@ -199,32 +199,34 @@ $errorMessages${checkForMissingMandatoryOptions(requiredOptionsByAbbrs)}"""
       if (errorMessages != "") {
         throw Exception(errorMessages.trim());
       }
-      if (argResults.rest.isNotEmpty) {
+      // ignore: lines_longer_than_80_chars
+      /* only if don't use rest which we do   if (g.argResults.rest.isNotEmpty) {
         printMsg("""
-$newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""");
-      }
+${g.newL}${g.newL}Ignoring the following arguments: ${g.argResults.rest.join()}${g.newL}""");
+      }*/
+
     } on Exception {
       rethrow;
     }
   }
 
-//Gets input type (j for json, etc) -
+// ignore: slash_for_doc_comments
+/** Gets input type (j for json, etc) -
 // use specified format, if not specified, get from extension,
-//if xml look if contains opnsense
-  String getInputType(String inputFile) {
+//if xml look if contains opnsense */
+  String getInputType() {
     try {
-      if (argResults['input-type'] != null) {
-        return argResults['input-type']!;
+      if (g.argResults['input-type'] != null) {
+        return g.argResults['input-type']!;
       }
 
-      String inputExt = p.extension(inputFile).replaceAll(".", "");
+      String inputExt = p.extension(g.inputFile).replaceAll(".", "");
 
       if (inputExt == "xml") {
-        return xmlFirewallFormat(
-            inputFile); //determines whether opnsense or pfsense
+        return xmlFirewallFormat(); //determines whether opnsense or pfsense
       } else {
-        if (extToTypes.containsKey(inputExt)) {
-          return extToTypes[
+        if (g.extToTypes.containsKey(inputExt)) {
+          return g.extToTypes[
               inputExt]!; //returns type option associated w/extension
         } else {
           throw Exception(
@@ -238,8 +240,8 @@ $newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""")
 
 //determines whether xml file is opnsense or pfsense
 
-  String xmlFirewallFormat(inputFile) {
-    return (File(inputFile).readAsStringSync().contains("<opnsense>"))
+  String xmlFirewallFormat() {
+    return (File(g.inputFile).readAsStringSync().contains("<opnsense>"))
         ? "n"
         : "p";
   }
@@ -250,9 +252,9 @@ $newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""")
           .map((dynamic e) => e.value.abbr.toString())
           .toList();
 
-      List<dynamic> optionListNames = argResults.options.toList(),
-          optionsInValues = argResults.options
-              .map((dynamic e) => argResults[e])
+      List<dynamic> optionListNames = g.argResults.options.toList(),
+          optionsInValues = g.argResults.options
+              .map((dynamic e) => g.argResults[e])
               .where((dynamic e) => (((allowedAbbrevList
                           .contains(e.toString().replaceAll("-", ""))) |
                       (allowedAbbrevList
@@ -289,10 +291,17 @@ $newL${newL}Ignoring the following arguments: ${argResults.rest.join()}$newL""")
           .join(",");
 
       return (missingMandatoryOptions.isNotEmpty)
-          ? "${newL}Missing mandatory option(s): $missingMandatoryOptions"
+          ? "${g.newL}Missing mandatory option(s): $missingMandatoryOptions"
           : "";
     } on Exception {
       rethrow;
     }
+  }
+
+  List<String> getArgListOfMultipleOptions(dynamic argOption) {
+    List<String> types = (argOption[0].length > 1)
+        ? argOption[0].split(RegExp(r"b*"))
+        : argOption[0].split(",");
+    return types;
   }
 }

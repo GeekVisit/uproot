@@ -77,7 +77,6 @@ A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and
 **Usage:**
 -L, --ip-low-address     Ip4 Lowest Address of Network Range
 -H, --ip-high-address    Ip4 Highest Address of Network Range
--i, --input-file         Input File to be converted
 -t, --input-type         Input file type:   c (csv), d (ddwrt), j (json),m (mikrotik), 
                          n (opnsense), o (openwrt), p (pfsense)
 -d, --directory-out      Directory to write files to, defaults to current directory.

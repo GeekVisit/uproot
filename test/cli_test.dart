@@ -4,9 +4,11 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 import 'package:uprt/lib.dart';
+import 'package:uprt/src/globals.dart' as g;
 
 void main() {
-  testRun = true;
+  g.testRun = true;
+
   //Update version info
   MetaUpdate("pubspec.yaml").writeMetaDartFile("lib/src/meta.dart");
   //run all test
@@ -16,6 +18,8 @@ void main() {
 /// ******* DEFINE SOME TEST VALUES****************************
 ///
 void testUpRooted() {
+  Converter uprt = Converter();
+
 //Test whether have same number of lease components
 //in final file and have expected length
   List<String> args = <String>[
@@ -43,7 +47,7 @@ void testUpRooted() {
     "-w"
   ];
 
-  argResults = cliArgs.getArgs(args);
+  g.argResults = g.cliArgs.getArgs(args);
 
   ///*********** TEST METHODS */
 
@@ -51,9 +55,9 @@ void testUpRooted() {
       Map<String, List<String>> leaseMap, int listLength) {
     print(
         """
-List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength""");
-    return ((leaseMap[lbIp]?.length == leaseMap[lbMac]?.length) &&
-        (leaseMap[lbMac]?.length == listLength));
+List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
+    return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
+        (leaseMap[g.lbMac]?.length == listLength));
   }
 
   Ip ip = Ip();
@@ -73,7 +77,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
 
     MetaUpdate mu = MetaUpdate(pubSpecTestFile.absolute.path);
 
-    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.mismatch);
+    expect(mu.verifyCodeHasUpdatedMeta(), g.MetaCheck.mismatch);
 
     pubSpecTestFile.writeAsStringSync(
         """
@@ -82,15 +86,15 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
     version: ${meta['version']}
 
     """);
-    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.match);
+    expect(mu.verifyCodeHasUpdatedMeta(), g.MetaCheck.match);
 
     mu = MetaUpdate("file-does-not-exist.yaml");
-    expect(mu.verifyLatestVersionFromPubSpec(), MetaCheck.runningAsBinary);
+    expect(mu.verifyCodeHasUpdatedMeta(), g.MetaCheck.runningAsBinary);
 
     pubSpecTestDir.delete();
   });
   test('isWithinRange', () {
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
     expect(
         ip.isWithinRange("192.168.0.23", "192.168.0.1", "192.168.0.254"), true);
     expect(
@@ -135,64 +139,60 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
     /* test if multiple options work */
 
     args = <String>[...argsTestBase];
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "c");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "c");
 
     args[1] = "test/test-data/lease-list-infile.ddwrt";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "d");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "d");
 
     args[1] = "test/test-data/lease-list-infile.json";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "j");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "j");
 
     args[1] = "test/test-data/lease-list-infile.rsc";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "m");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "m");
 
     args[1] = "test/test-data/lease-list-infile.openwrt";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "o");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "o");
 
     args[1] = "test/test-data/lease-list-infile-opn.xml";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "n");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "n");
 
     args[1] = "test/test-data/lease-list-infile-pfs.xml";
-    argResults = cliArgs.getArgs(args);
-    expect(cliArgs.getInputType(), "p");
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(g.cliArgs.getInputType(), "p");
 
     args[1] = "test/test-data/lease-list-infile.dd";
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
     expect(
-        () => cliArgs.getInputType(),
+        () => g.cliArgs.getInputType(),
         checkErrorMessage(
             ("Unable to determine file type, please specify using -t")));
 
 /* Test Mandatory */
-    args = <String>[...argsTestBase];
-    args.remove("-i");
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option(s): input-file"));
 
     args = <String>[...argsTestBase];
     args.remove("-H");
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(),
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("Missing mandatory option(s): ip-high-address"));
 
     args = <String>[...argsTestBase];
     args.remove("-L");
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(),
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("Missing mandatory option(s): ip-low-address"));
 
-    args = <String>[...argsTestBase];
-    args.remove("-b");
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option(s): base-name"));
+// no longer mandatory  -  keeping for form of test
+    // args = <String>[...argsTestBase];
+    // args.remove("-b");
+    // g.argResults = g.cliArgs.getArgs(args);
+    // expect(() => g.cliArgs.checkArgs(),
+    //     checkErrorMessage("Missing mandatory option(s): base-name"));
 
 /** Test for Missing Arguments to options*/
     args = <String>[
@@ -212,10 +212,10 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "-w"
     ];
 
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(),
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("Missing mandatory option"));
-    expect(() => cliArgs.checkArgs(),
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("is missing argument and is set to -i"));
 
     args = <String>[
@@ -231,9 +231,9 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "-w"
     ];
 
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
 
-    expect(() => cliArgs.checkArgs(),
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("is missing argument and is set to -d"));
 
     args = <String>[
@@ -248,7 +248,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "-L"
     ];
 
-    expect(() => cliArgs.getArgs(args),
+    expect(() => g.cliArgs.getArgs(args),
         checkErrorMessage('Missing argument for "ip-low-address"'));
     args = <String>[
       "-i",
@@ -264,9 +264,9 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "-w"
     ];
 
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
 
-    expect(() => cliArgs.checkArgs(),
+    expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("is missing argument and is set to --log-file-path"));
 
     /* test if argument is an option without a hyphen it doesnt trigger error, 
@@ -289,9 +289,9 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test-file"
     ];
 
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
 
-    expect(() => cliArgs.checkArgs(), returnsNormally);
+    expect(() => g.cliArgs.checkArgs(), returnsNormally);
 
     /* test if multiple options work */
 
@@ -311,8 +311,8 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "-w"
     ];
 
-    argResults = cliArgs.getArgs(args);
-    expect(() => cliArgs.checkArgs(), returnsNormally);
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(() => g.cliArgs.checkArgs(), returnsNormally);
   });
 
   test('ipRandomMac', () {
@@ -352,7 +352,8 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+
+    uprt.convertAll(args);
     expect(
         json.isContentValid(
             fileContents: File("test/test-output/test-output-file.json")
@@ -377,7 +378,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     expect(
         json.isContentValid(
@@ -403,7 +404,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     expect(
         json.isContentValid(
@@ -429,7 +430,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
     expect(
         json.isContentValid(
             fileContents: File("test/test-output/test-output-file.json")
@@ -454,7 +455,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     expect(
         json.isContentValid(
@@ -480,7 +481,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     expect(
         json.isContentValid(
@@ -531,7 +532,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     String badMikrotik =
         """
@@ -582,7 +583,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     LineSplitter lineSplitter = LineSplitter();
 
@@ -664,7 +665,7 @@ List Map length of host is ${leaseMap[lbHost]!.length}, expected is $listLength"
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     String goodDdWrt =
         '''
@@ -711,7 +712,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     expect(csv.isFileValid("test/test-data/lease-list-infile.csv"), true);
     expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
@@ -772,7 +773,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     String goodOpnsense =
         """<?xml version="1.0"?>
@@ -899,7 +900,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    upRoot(args);
+    uprt.convertAll(args);
 
     String goodPfsense =
         """
@@ -1021,7 +1022,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "-w"
     ];
 
-    argResults = cliArgs.getArgs(args);
+    g.argResults = g.cliArgs.getArgs(args);
 
     expect(
         isCorrectLeaseMapLength(

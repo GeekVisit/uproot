@@ -7,16 +7,12 @@
 //TODO: Get Rid of -i as requirement ?, require filename
 //Wildcard on input not permitted - need to parse
 //TODO: Test log files
-
-import 'dart:io';
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
     arguments = <String>[
       "test/test-data/*.csv",
-      "-i",
-      "test/test-data/lease-list-infile.csv",
       "-L",
       "192.168.0.1",
       "-H",
@@ -29,8 +25,8 @@ void main(List<String> arguments) {
       "m",
       "-d",
       "test/test-output",
-      "-s",
-      //    "myserver",
+      //"-s",
+      // "myserver",
 
 //      "c",
       //   "cdjnmop",
@@ -40,17 +36,14 @@ void main(List<String> arguments) {
       // "uprt-log-example.log"
     ];
 
-    upRoot(arguments);
-  } on FileSystemException catch (e) {
-    displayFatalFileSystemError(e);
-  } on FormatException catch (e) {
-    printMsg(e.message, errMsg: true);
+    Converter uprt = Converter();
+    uprt.convertAll(arguments);
   } on Exception catch (e) {
-    displayFatalException(e);
+    handleExceptions(e);
     // ignore: avoid_catching_errors
   } on Error catch (e) {
     displayFatalError(e);
   } finally {
-    cleanUp();
+    Converter.cleanUp();
   }
 }

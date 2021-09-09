@@ -3,11 +3,11 @@ import 'dart:io';
 
 import '../lib.dart';
 
-import 'globals.dart';
+import 'globals.dart' as g;
 
 class Json extends FileType {
   @override
-  String fileType = fFormats.json.formatName;
+  String fileType = g.fFormats.json.formatName;
 
   Map<String, List<String>> getLease(
       {String fileContents = "",
@@ -15,7 +15,7 @@ class Json extends FileType {
       bool removeBadLeases = true}) {
     //
     // ignore: unused_local_variable
-    String fileType = fFormats.json.formatName;
+    String fileType = g.fFormats.json.formatName;
     //
 
     try {
@@ -28,7 +28,7 @@ class Json extends FileType {
       List<dynamic> deviceList = JsonDecoder().convert(fileContents);
 
       //picks out host-name, mac-address and ip-address from deviceList->Map
-      for (String key in <String>[lbMac, lbHost, lbIp]) {
+      for (String key in <String>[g.lbMac, g.lbHost, g.lbIp]) {
         for (Map<String, dynamic> jsonLease in deviceList) {
           valueList.add(jsonLease[key]);
         }
@@ -36,8 +36,8 @@ class Json extends FileType {
         valueList.clear();
       }
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.json.formatName);
+        return g.validateLeases
+            .getValidLeaseMap(leaseMap, g.fFormats.json.formatName);
       } else {
         return leaseMap;
       }
@@ -48,10 +48,10 @@ class Json extends FileType {
   }
 
   String build(Map<String, List<String>?> deviceList, StringBuffer sbJson) {
-    for (int i = 0; i < deviceList[lbHost]!.length; i++) {
+    for (int i = 0; i < deviceList[g.lbHost]!.length; i++) {
       if (sbJson.isNotEmpty) sbJson.write(',');
       sbJson.write('''
-{ "host-name" : "${deviceList[lbHost]![i]}", "mac-address" : "${deviceList[lbMac]![i]}", "address" : "${deviceList[lbIp]![i]}" }''');
+{ "host-name" : "${deviceList[g.lbHost]![i]}", "mac-address" : "${deviceList[g.lbMac]![i]}", "address" : "${deviceList[g.lbIp]![i]}" }''');
     }
     return "[ ${sbJson.toString()} ]";
   }
@@ -70,12 +70,12 @@ class Json extends FileType {
       Map<String, List<String>> leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(
-          leaseMap, fFormats.json.formatName)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.json.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.json.formatName);
+      g.validateLeases.validateLeaseList(leaseMap, g.fFormats.json.formatName);
 
       return true;
     } on FormatException {
@@ -129,7 +129,7 @@ class Json extends FileType {
   @override
   String toJson() {
     StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(argResults['input-file']).readAsStringSync();
+    String inFileContents = File(g.inputFile).readAsStringSync();
 
     Map<String, List<String>> deviceList =
         getLease(fileContents: inFileContents);
@@ -144,7 +144,7 @@ class Json extends FileType {
     //This defaults to the global temporary file path,
     //otherwise user defined path
     jsonFilePath = (jsonFilePath == "tempJsonOutFilePath")
-        ? tempJsonOutFile.path
+        ? g.tempJsonOutFile.path
         : jsonFilePath;
 
     return File(jsonFilePath).readAsStringSync();

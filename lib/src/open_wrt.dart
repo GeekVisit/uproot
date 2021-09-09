@@ -1,8 +1,10 @@
 import 'dart:io';
+
+import 'globals.dart' as g;
 import 'src.dart';
 
 class OpenWrt extends FileType {
-  String fileType = fFormats.openwrt.formatName;
+  String fileType = g.fFormats.openwrt.formatName;
 
   @override
   bool isFileValid(String filePath) {
@@ -32,12 +34,13 @@ class OpenWrt extends FileType {
       }
       dynamic leaseMap = getLease(fileLines: fileLines, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(
-          leaseMap, fFormats.openwrt.formatName)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.openwrt.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.openwrt.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.openwrt.formatName);
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
@@ -61,9 +64,9 @@ class OpenWrt extends FileType {
       //
 
       Map<String, String> searchParams = <String, String>{
-        lbMac: "option mac",
-        lbHost: "option name",
-        lbIp: "option ip",
+        g.lbMac: "option mac",
+        g.lbHost: "option name",
+        g.lbIp: "option ip",
       };
       List<dynamic> tmp = <dynamic>[];
       List<String> tmp2 = <String>[];
@@ -89,8 +92,8 @@ class OpenWrt extends FileType {
       });
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.openwrt.formatName);
+        return g.validateLeases
+            .getValidLeaseMap(leaseMap, g.fFormats.openwrt.formatName);
       } else {
         return leaseMap;
       }
@@ -102,11 +105,11 @@ class OpenWrt extends FileType {
 
   @override
   String build(Map<String, List<String>?> deviceList, StringBuffer sbOpenwrt) {
-    for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+    for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
       sbOpenwrt.write("""config host
-             option mac \'${deviceList[lbMac]?[x]}\'
-             option name \'${deviceList[lbHost]?[x]}\'
-             option ip \'${deviceList[lbIp]?[x]}\'
+             option mac \'${deviceList[g.lbMac]?[x]}\'
+             option name \'${deviceList[g.lbHost]?[x]}\'
+             option ip \'${deviceList[g.lbIp]?[x]}\'
    """);
     }
     return sbOpenwrt.toString();
@@ -120,7 +123,7 @@ class OpenWrt extends FileType {
     Json json = Json();
 
     Map<String, List<String>?> lease =
-        getLease(fileLines: File(argResults['input-file']).readAsLinesSync());
+        getLease(fileLines: File(g.inputFile).readAsLinesSync());
 
     json.build(lease, sbJson);
 

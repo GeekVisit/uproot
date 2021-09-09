@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'globals.dart';
+import 'globals.dart' as g;
 import 'src.dart';
 
 class Mikrotik extends FileType {
   //
 
-  String fileType = fFormats.mikrotik.formatName;
+  String fileType = g.fFormats.mikrotik.formatName;
 
   Map<String, List<String>> getLease(
       {String fileContents = "",
@@ -18,14 +18,14 @@ class Mikrotik extends FileType {
       List<String> fileLines = extractLeaseMatches(fileContents);
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        lbHost: extractLeaseParam(fileLines, "name"),
-        lbMac: extractLeaseParam(fileLines, lbMac),
-        lbIp: extractLeaseParam(fileLines, lbIp)
+        g.lbHost: extractLeaseParam(fileLines, "name"),
+        g.lbMac: extractLeaseParam(fileLines, g.lbMac),
+        g.lbIp: extractLeaseParam(fileLines, g.lbIp)
       };
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.mikrotik.formatName);
+        return g.validateLeases
+            .getValidLeaseMap(leaseMap, g.fFormats.mikrotik.formatName);
       } else {
         return leaseMap;
       }
@@ -36,9 +36,9 @@ class Mikrotik extends FileType {
   }
 
   String build(Map<String, List<String>?> deviceList, StringBuffer sbMikrotik) {
-    for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+    for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
       sbMikrotik.write(
-          """\nadd mac-address=${deviceList[lbMac]?[x]} address=${deviceList[lbIp]?[x]} server=${argResults['server']}""");
+          """\nadd mac-address=${deviceList[g.lbMac]?[x]} address=${deviceList[g.lbIp]?[x]} server=${g.argResults['server']}""");
     }
     return "/ip dhcp-server lease\n${sbMikrotik.toString().trim()}";
   }
@@ -60,12 +60,13 @@ class Mikrotik extends FileType {
       Map<String, List<String>> leaseMap =
           getLease(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(
-          leaseMap, fFormats.mikrotik.formatName)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.mikrotik.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.mikrotik.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.mikrotik.formatName);
 
       return true;
     } on Exception catch (e) {
@@ -96,8 +97,8 @@ class Mikrotik extends FileType {
       List<String> leaseParamList = <String>[];
 
       List<dynamic> param = importList!
-          .where((dynamic element) => (paramType == lbIp
-              ? element.contains(lbIp) && !element.contains(lbMac)
+          .where((dynamic element) => (paramType == g.lbIp
+              ? element.contains(g.lbIp) && !element.contains(g.lbMac)
               : element.contains(paramType)))
           //.where((dynamic element) => (element.contains(paramType)))
           .map((dynamic e) => (e.split("=")))
@@ -119,8 +120,8 @@ class Mikrotik extends FileType {
     Json json = Json();
     StringBuffer sbJson = StringBuffer();
 
-    Map<String, List<String>?> leaseMap = getLease(
-        fileContents: File(argResults['input-file']).readAsStringSync());
+    Map<String, List<String>?> leaseMap =
+        getLease(fileContents: File(g.inputFile).readAsStringSync());
 
     return json.build(leaseMap, sbJson);
   }

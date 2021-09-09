@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'dart:math';
 import 'package:path/path.dart' as p;
-import '../lib.dart';
-import 'globals.dart';
+import 'globals.dart' as g;
 
 void printMsg(dynamic message,
     {bool errMsg = false, bool onlyIfVerbose = false, bool logOnly = false}) {
@@ -11,21 +10,22 @@ void printMsg(dynamic message,
     stderr.writeln(message.toString().replaceFirst("Exception:", "").trim());
   } else if (!logOnly) {
     if (onlyIfVerbose) {
-      (argResults['verbose']) ? stdout.writeln(message) : "";
+      (g.argResults['verbose']) ? stdout.writeln(message) : "";
     } else {
       stdout.writeln(message.toString().replaceFirst("Exception:", "").trim());
     }
 
     //Write to Log
     try {
-      if (logPath != "") {
-        File logFile = File(logPath);
+      if (g.logPath != "") {
+        File logFile = File(g.logPath);
         logFile.writeAsStringSync(
-            "${"$message  $newL ${StackTrace.current}".toString().trim()}$newL",
+            // ignore: lines_longer_than_80_chars
+            "${"$message  ${g.newL} ${StackTrace.current}".toString().trim()}${g.newL}",
             mode: FileMode.append);
       }
     } on FormatException catch (e) {
-      if (!testRun) {
+      if (!g.testRun) {
         print("${e.message} (log file)");
       }
       rethrow;
@@ -73,10 +73,10 @@ File getTmpIntermedConvFile(String baseName, {String extension = ".tmp"}) {
   // ignore: unused_local_variable
   int x = 1;
   File temp =
-      File(p.join(tempDir.path, "${argResults['base-name']}$extension"));
+      File(p.join(g.tempDir.path, "${g.argResults['base-name']}$extension"));
 
   while (temp.existsSync()) {
-    temp = File(p.join(tempDir.path,
+    temp = File(p.join(g.tempDir.path,
         "uprt_$baseName\_${getRandomString(6)}$extension".replaceAll("'", "")));
     x++;
   }
