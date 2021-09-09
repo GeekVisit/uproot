@@ -10,7 +10,7 @@ class Converter {
   /** Main loop - process each file argument */
 
   String outPath = "";
-
+  List<String> outputFilesSaved = <String>[];
   void convertFileList(List<String> arguments) {
     try {
       initialize(arguments);
@@ -109,6 +109,7 @@ class Converter {
 
       /**  split type argument regardless of comma separator
     */
+
       List<String> types =
           g.cliArgs.getArgListOfMultipleOptions(g.argResults['generate-type']);
 
@@ -117,7 +118,7 @@ class Converter {
           case 'c':
             Csv csv = Csv();
             setOutPath(g.fFormats.csv.outputExt);
-            saveOutFile(json.toCsv());
+            saveOutPath(json.toCsv());
             csv.isFileValid(outPath);
             printCompletedAll(g.fFormats.csv.formatName);
             break;
@@ -125,7 +126,7 @@ class Converter {
           case 'd':
             Ddwrt ddwrt = Ddwrt();
             setOutPath(g.fFormats.ddwrt.outputExt);
-            saveOutFile(json.toDdwrt());
+            saveOutPath(json.toDdwrt());
             ddwrt.isFileValid(outPath);
             printCompletedAll(g.fFormats.ddwrt.formatName);
             break;
@@ -140,7 +141,7 @@ class Converter {
           case 'm':
             Mikrotik mikrotik = Mikrotik();
             setOutPath(g.fFormats.mikrotik.outputExt);
-            saveOutFile(json.toMikroTik());
+            saveOutPath(json.toMikroTik());
             //outPath may change if needs saveFile needs to avoid overwriting
             mikrotik.isFileValid(outPath);
             printCompletedAll(g.fFormats.mikrotik.formatName);
@@ -157,7 +158,7 @@ Run uprt without arguments to see usage.""",
           case 'n':
             OpnSense opnSense = OpnSense();
             setOutPath(g.fFormats.opnsense.outputExt);
-            saveOutFile(json.toOpnsense());
+            saveOutPath(json.toOpnsense());
             opnSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.opnsense.formatName);
 
@@ -166,7 +167,7 @@ Run uprt without arguments to see usage.""",
           case 'o':
             OpenWrt openWrt = OpenWrt();
             setOutPath(g.fFormats.openwrt.outputExt);
-            saveOutFile(json.toOpenWrt());
+            saveOutPath(json.toOpenWrt());
             openWrt.isFileValid(outPath);
             printCompletedAll(g.fFormats.openwrt.formatName);
             break;
@@ -174,7 +175,7 @@ Run uprt without arguments to see usage.""",
           case 'p':
             PfSense pfSense = PfSense();
             setOutPath(g.fFormats.json.outputExt);
-            saveOutFile(json.toPfsense());
+            saveOutPath(json.toPfsense());
             pfSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.pfsense.formatName);
 
@@ -193,25 +194,43 @@ Run uprt without arguments to see usage.""",
     }
   }
 
-  void saveOutFile(String outContents) {
-    //outPath may change if needs saveFile needs to avoid overwriting
-    outPath =
-        saveFile(outContents, outPath, overWrite: g.argResults['write-over']);
+  // ignore: slash_for_doc_comments
+  /** Saves Converted Output file */
+  void saveOutPath(String outContents) {
+    /** Don't save over files previously saved in same run if happen to have
+     *  same name, overrides write-over command line option*/
+    bool overWrite = (outputFilesSaved.contains(outPath))
+        ? false
+        : g.argResults['write-over'];
+
+    outPath = saveFile(outContents, outPath, overWrite: overWrite);
+    outputFilesSaved.add(outPath);
   }
 
 // ignore: slash_for_doc_comments
-/** Build output path for generated filed given the output extension */
+/** Builds output path for generated filed given the output extension */
   void setOutPath(String outputExt) {
+    g.dirOut = (g.argResults['directory-out'] == null ||
+            g.argResults['directory-out'] == "")
+        ? p.dirname(g.inputFile)
+        : g.argResults['directory-out'];
+
+    if (!Directory(g.dirOut).existsSync()) {
+      throw Exception("Output directory ${g.dirOut} does not exist. ");
+    }
+
     outPath =
         p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}."
             "$outputExt");
   }
 
   void printCompletedAll(String fileType) {
-    String displaySourceFile =
-        (g.argResults['verbose']) ? g.inputFile : p.basename(g.inputFile);
-    String displayTargetFile =
-        (g.argResults['verbose']) ? outPath : p.basename(outPath);
+    String displaySourceFile = (g.argResults['verbose'])
+        ? p.canonicalize(g.inputFile)
+        : p.basename(g.inputFile);
+    String displayTargetFile = (g.argResults['verbose'])
+        ? p.canonicalize(outPath)
+        : p.basename(outPath);
 
     printMsg("""
 $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => $fileType) is completed.""");
@@ -251,8 +270,13 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
   }
 
   void setBaseName() {
-    g.baseName = (g.argResults['base-name'] == "")
-        ? p.basenameWithoutExtension(g.inputFile)
-        : g.argResults['base-name'];
+    try {
+      g.baseName =
+          (g.argResults['base-name'] == null || g.argResults['base-name'] == "")
+              ? p.basenameWithoutExtension(g.inputFile)
+              : g.argResults['base-name'];
+    } on Exception {
+      rethrow;
+    }
   }
 } //end Class

@@ -1,17 +1,10 @@
 //Take out requirement to have hostnames and validate without
 //TODO: allow new static leases to be inserted into existing pfsense/opnsense XML doc
 //TODO: test directory input/outputs in production
-//TODO: Make base name optional
 //TODO: Delete deprecated linter
 //TODO: Make low/high optional
-//TODO: Get Rid of -i as requirement ?, require filename
-//Wildcard on input not permitted - need to parse
 //TODO: Add test for file globs/file exists
 //TODO: Test log files
-//TODO: Default output should be folder where input is
-//TODO: if multiple input files and single directory and basename is default
-//then don't overwrite (or if output file is duplicate of one just written don't
-//overwrite - may be easier) [keep track of output paths and compare]
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
@@ -25,8 +18,8 @@ void main(List<String> arguments) {
       "192.168.0.254",
 //      "-t",
       //    "c",
-      "-b",
-      "test-output-file",
+      //"-b",
+      //"test-output-file",
       "-g",
       "m",
       "-d",
@@ -36,7 +29,7 @@ void main(List<String> arguments) {
 
 //      "c",
       //   "cdjnmop",
-      //"-w",
+      "-w",
       //"-v",
       // "-l",
       // "uprt-log-example.log"

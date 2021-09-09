@@ -21,11 +21,8 @@ Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From O
             abbr: 't',
             help: "Input file type:   c (csv), d (ddwrt), j (json),"
                 "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)")
-        ..addOption("directory-out",
-            mandatory: false,
-            defaultsTo: p.current,
-            abbr: 'd',
-            help: "Directory to write files to, defaults to current directory.")
+        ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
+Directory to write files to, defaults to same directory as input file.""")
         ..addOption("server",
             mandatory: false,
             defaultsTo: "defconf",
@@ -33,7 +30,7 @@ Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From O
             help: "Name to designate in output file for Mikrotik dhcp server.")
         ..addFlag("write-over",
             defaultsTo: false,
-            help: "Overwrite output files, if left out, will not overwrite",
+            help: "Overwrites output files, if left out, will not overwrite",
             abbr: "w")
         ..addFlag("help", help: "Help", abbr: "h", callback: (dynamic e) {
           if (e) {
@@ -118,10 +115,6 @@ Examples:
     if (g.argResults.rest.isEmpty) {
       throw Exception('Required Input File Missing.');
     }
-    Directory dir = Directory(g.argResults['directory-out']);
-    if (!dir.existsSync()) {
-      throw Exception("Output directory ${dir.path} does not exist. ");
-    }
 
     // Set log-file-path to system temp folder if option set
 
@@ -171,9 +164,11 @@ Examples:
 
       for (int i = 0; i < valueList.length; i++) {
         String value = valueList[i].toString(), optionName = optionList[i];
+        // skip flags, just looking for arguments
         if (value == "true" || value == "false") {
           continue;
         }
+        //if the argument is an option then give error
         if (value.substring(0, 1) == "-" &&
             (allowedOptionList.contains(value.replaceAll("--", "")) ||
                 allowedAbbrevList.contains(value.replaceAll("-", "")))) {
@@ -271,6 +266,14 @@ ${g.argResults.rest.join()}${g.newL}""");
               .map((dynamic e) => e.join())
               .toList();
 
+      List<String> missingOptionsOnCommandLine = <String>[];
+      for (int x = 0; x < optionListNames.length; x++) {
+        if (g.argResults[optionListNames[x]] is bool) continue;
+        if (g.argResults[optionListNames[x]].length == 0) {
+          missingOptionsOnCommandLine.add(optionListNames[x]);
+        }
+      }
+
       List<String> requiredOptionsByName = requiredOptions
           .map((dynamic e) =>
               // ignore: always_specify_types
@@ -283,7 +286,8 @@ ${g.argResults.rest.join()}${g.newL}""");
       ///  messaged in calling method*/
       String missingMandatoryOptions = requiredOptionsByName
           .where((dynamic e) =>
-              !optionListNames.contains(e) && !optionsInValues.contains(e))
+              missingOptionsOnCommandLine.contains(e) &&
+              !optionsInValues.contains(e))
           .toList()
           .join(",");
 

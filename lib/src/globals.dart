@@ -9,6 +9,7 @@ List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+
 String dirOut = argResults['directory-out'];
 
 List<String> inputFileList = <String>[];
