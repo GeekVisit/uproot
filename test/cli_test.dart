@@ -353,7 +353,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "-w"
     ];
 
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
     expect(
         json.isContentValid(
             fileContents: File("test/test-output/test-output-file.json")
@@ -378,7 +378,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     expect(
         json.isContentValid(
@@ -404,7 +404,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     expect(
         json.isContentValid(
@@ -430,7 +430,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
     expect(
         json.isContentValid(
             fileContents: File("test/test-output/test-output-file.json")
@@ -455,7 +455,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     expect(
         json.isContentValid(
@@ -481,7 +481,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     expect(
         json.isContentValid(
@@ -532,7 +532,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     String badMikrotik =
         """
@@ -583,7 +583,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     LineSplitter lineSplitter = LineSplitter();
 
@@ -665,7 +665,7 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     String goodDdWrt =
         '''
@@ -712,7 +712,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     expect(csv.isFileValid("test/test-data/lease-list-infile.csv"), true);
     expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
@@ -773,7 +773,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     String goodOpnsense =
         """<?xml version="1.0"?>
@@ -900,7 +900,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-    uprt.convertAll(args);
+    uprt.convertFileList(args);
 
     String goodPfsense =
         """

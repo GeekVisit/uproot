@@ -8,13 +8,15 @@ import 'src.dart';
 class Converter {
   // ignore: slash_for_doc_comments
   /** Main loop - process each file argument */
-  void convertAll(List<String> arguments) {
+
+  String outPath = "";
+
+  void convertFileList(List<String> arguments) {
     try {
       initialize(arguments);
-      for (String eachFilePath
-          in g.cliArgs.getInputFileList(g.argResults.rest)) {
+      g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
+      for (String eachFilePath in g.inputFileList) {
         g.inputFile = eachFilePath;
-        setBaseName();
         toJson();
         toOutput();
       }
@@ -23,31 +25,26 @@ class Converter {
     }
   }
 
-  void setBaseName() {
-    g.baseName = (g.argResults['base-name'] == "")
-        ? p.basenameWithoutExtension(g.inputFile)
-        : g.argResults['base-name'];
-  }
-
   void toJson() {
     try {
       Json json = Json();
+      setBaseName();
 
-      g.inputFile = g.cliArgs.getInputType();
+      g.inputType = g.cliArgs.getInputType();
       printMsg("Converting Input File to Json temporary file..",
           onlyIfVerbose: true);
-      switch (g.inputFile) {
+      switch (g.inputType) {
         case 'c':
           Csv csv = Csv();
           csv.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(csv.toJson(), g.tempJsonOutFile.path);
+          saveFile(csv.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Csv");
           break;
 
         case 'd':
           Ddwrt ddwrt = Ddwrt();
           ddwrt.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(ddwrt.toJson(), g.tempJsonOutFile.path);
+          saveFile(ddwrt.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Ddwrt");
           break;
 
@@ -67,33 +64,33 @@ class Converter {
         case 'm':
           Mikrotik mikrotik = Mikrotik();
           mikrotik.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(mikrotik.toJson(), g.tempJsonOutFile.path);
+          saveFile(mikrotik.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Mikrotik");
           break;
 
         case 'n':
           OpnSense opnSense = OpnSense();
           opnSense.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(opnSense.toJson(), g.tempJsonOutFile.path);
+          saveFile(opnSense.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Opnsense");
           break;
 
         case 'o':
           OpenWrt openWrt = OpenWrt();
           openWrt.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(openWrt.toJson(), g.tempJsonOutFile.path);
+          saveFile(openWrt.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("OpenWrt");
           break;
 
         case 'p':
           PfSense pfSense = PfSense();
           pfSense.isFileValid(File(g.inputFile).absolute.path);
-          saveOutFile(pfSense.toJson(), g.tempJsonOutFile.path);
+          saveFile(pfSense.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Pfsense");
           break;
 
         default:
-          printMsg("Incorrect input type: ${g.inputFile}", errMsg: true);
+          printMsg("Incorrect input type: ${g.inputType}", errMsg: true);
           sleep(Duration(seconds: 1));
           g.cliArgs.displayHelp();
           exit(1);
@@ -106,8 +103,7 @@ class Converter {
   void toOutput() {
     try {
       Json json = Json();
-      String outFile;
-      String outPath = "";
+
       printMsg("Converting Temporary json File to Output Formats..",
           onlyIfVerbose: true);
 
@@ -120,83 +116,66 @@ class Converter {
         switch (each_type) {
           case 'c':
             Csv csv = Csv();
-
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.csv.outputExt}";
-
-            outFile = saveOutFile(json.toCsv(), outPath,
-                overWrite: g.argResults['write-over']);
-            csv.isFileValid(outFile);
+            setOutPath(g.fFormats.csv.outputExt);
+            saveOutFile(json.toCsv());
+            csv.isFileValid(outPath);
             printCompletedAll(g.fFormats.csv.formatName);
             break;
 
           case 'd':
             Ddwrt ddwrt = Ddwrt();
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.ddwrt.outputExt}";
-            outFile = saveOutFile(json.toDdwrt(), outPath,
-                overWrite: g.argResults['write-over']);
-            ddwrt.isFileValid(outFile);
-
+            setOutPath(g.fFormats.ddwrt.outputExt);
+            saveOutFile(json.toDdwrt());
+            ddwrt.isFileValid(outPath);
             printCompletedAll(g.fFormats.ddwrt.formatName);
             break;
 
           case 'j':
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.json.outputExt}";
-
+            setOutPath(g.fFormats.json.outputExt);
+            //outPath may change if needs saveFile needs to avoid overwriting
             g.tempJsonOutFile.copySync(outPath);
             printCompletedAll(g.fFormats.json.formatName);
             break;
 
           case 'm':
             Mikrotik mikrotik = Mikrotik();
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.mikrotik.outputExt}";
-            outFile = saveOutFile(json.toMikroTik(), outPath,
-                overWrite: g.argResults['write-over']);
-            mikrotik.isFileValid(outFile);
+            setOutPath(g.fFormats.mikrotik.outputExt);
+            saveOutFile(json.toMikroTik());
+            //outPath may change if needs saveFile needs to avoid overwriting
+            mikrotik.isFileValid(outPath);
             printCompletedAll(g.fFormats.mikrotik.formatName);
             break;
-
+/* //TODO:  don't think i need this any more - test 
           case 'M':
             printMsg("""
-Missing required -g (generated type) option. Run uprt without arguments to see usage.""",
+Missing required -g (generated type) option. 
+Run uprt without arguments to see usage.""",
                 errMsg: true);
             cleanUp();
             break;
-
+*/
           case 'n':
             OpnSense opnSense = OpnSense();
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.opnsense.outputExt}";
-            outFile = saveOutFile(json.toOpnsense(), outPath,
-                overWrite: g.argResults['write-over']);
-
-            opnSense.isFileValid(outFile);
+            setOutPath(g.fFormats.opnsense.outputExt);
+            saveOutFile(json.toOpnsense());
+            opnSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.opnsense.formatName);
 
             break;
 
           case 'o':
             OpenWrt openWrt = OpenWrt();
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.openwrt.outputExt}";
-            outFile = saveOutFile(json.toOpenWrt(), outPath,
-                overWrite: g.argResults['write-over']);
-
-            openWrt.isFileValid(outFile);
+            setOutPath(g.fFormats.openwrt.outputExt);
+            saveOutFile(json.toOpenWrt());
+            openWrt.isFileValid(outPath);
             printCompletedAll(g.fFormats.openwrt.formatName);
             break;
 
           case 'p':
             PfSense pfSense = PfSense();
-            outPath = "${File(p.join(g.dirOut, g.baseName)).absolute.path}"
-                "${g.fFormats.pfsense.outputExt}";
-            outFile = saveOutFile(json.toPfsense(), outPath,
-                overWrite: g.argResults['write-over']);
-
-            pfSense.isFileValid(outFile);
+            setOutPath(g.fFormats.json.outputExt);
+            saveOutFile(json.toPfsense());
+            pfSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.pfsense.formatName);
 
             break;
@@ -214,9 +193,28 @@ Missing required -g (generated type) option. Run uprt without arguments to see u
     }
   }
 
+  void saveOutFile(String outContents) {
+    //outPath may change if needs saveFile needs to avoid overwriting
+    outPath =
+        saveFile(outContents, outPath, overWrite: g.argResults['write-over']);
+  }
+
+// ignore: slash_for_doc_comments
+/** Build output path for generated filed given the output extension */
+  void setOutPath(String outputExt) {
+    outPath =
+        p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}."
+            "$outputExt");
+  }
+
   void printCompletedAll(String fileType) {
+    String displaySourceFile =
+        (g.argResults['verbose']) ? g.inputFile : p.basename(g.inputFile);
+    String displayTargetFile =
+        (g.argResults['verbose']) ? outPath : p.basename(outPath);
+
     printMsg("""
-${g.typeOptionToName[g.inputFile]} to $fileType is completed.""");
+$displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => $fileType) is completed.""");
   }
 
   void printCompletedTmpJson(String fileType) {
@@ -250,5 +248,11 @@ ${g.typeOptionToName[g.inputFile]} to $fileType is completed.""");
     } on Exception {
       rethrow;
     }
+  }
+
+  void setBaseName() {
+    g.baseName = (g.argResults['base-name'] == "")
+        ? p.basenameWithoutExtension(g.inputFile)
+        : g.argResults['base-name'];
   }
 } //end Class

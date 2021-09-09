@@ -36,35 +36,29 @@ void printMsg(dynamic message,
   }
 }
 
-String saveOutFile(String outContents, String outputPath,
-    {bool overWrite = false}) {
+String saveFile(String contents, String savePath, {bool overWrite = false}) {
   try {
     int x = 1;
-    File outputFile = File(outputPath);
-    String outputBaseFileName = p.basenameWithoutExtension(outputFile.path);
-    String ext = p.extension(outputFile.path);
+    File fileToSave = File(savePath);
+    String fileToSaveBaseName = p.basenameWithoutExtension(savePath);
+    String ext = p.extension(savePath);
 
     if (!overWrite) {
-      while (outputFile.existsSync()) {
-        outputFile = File(p.join(p.dirname(outputPath),
-            "$outputBaseFileName(${x.toString().padLeft(2, '0')})$ext"));
+      while (fileToSave.existsSync()) {
+        fileToSave = File(p.join(p.dirname(savePath),
+            "$fileToSaveBaseName(${x.toString().padLeft(2, '0')})$ext"));
         x++;
       }
     }
 
-    outputFile.writeAsStringSync(outContents.trim());
+    fileToSave.writeAsStringSync(contents.trim());
 
     //return name of file saved as may change if exists and didn't overwrite
-    return outputFile.absolute.path;
+    return fileToSave.absolute.path;
   } on Exception catch (e) {
     printMsg(e, errMsg: true);
     rethrow;
   }
-}
-
-void saveFile(String contents, String filePath) {
-  File saveFile = File(filePath);
-  saveFile.writeAsStringSync;
 }
 
 ///  Returns temporary filepath for temporary uprt conversion file

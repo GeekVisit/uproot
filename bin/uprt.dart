@@ -6,13 +6,19 @@
 //TODO: Make low/high optional
 //TODO: Get Rid of -i as requirement ?, require filename
 //Wildcard on input not permitted - need to parse
+//TODO: Add test for file globs/file exists
 //TODO: Test log files
+//TODO: Default output should be folder where input is
+//TODO: if multiple input files and single directory and basename is default
+//then don't overwrite (or if output file is duplicate of one just written don't
+//overwrite - may be easier) [keep track of output paths and compare]
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
     arguments = <String>[
-      "test/test-data/*.csv",
+      "test/test-data/*file.json",
+      "test/test-data/*file.csv",
       "-L",
       "192.168.0.1",
       "-H",
@@ -30,14 +36,14 @@ void main(List<String> arguments) {
 
 //      "c",
       //   "cdjnmop",
-      "-w",
+      //"-w",
       //"-v",
       // "-l",
       // "uprt-log-example.log"
     ];
 
     Converter uprt = Converter();
-    uprt.convertAll(arguments);
+    uprt.convertFileList(arguments);
   } on Exception catch (e) {
     handleExceptions(e);
     // ignore: avoid_catching_errors

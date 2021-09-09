@@ -12,14 +12,10 @@ class CliArgs {
     try {
       // Note that DefaultsTo only applies if option is not given at all
       parser = ArgParser()
-        ..addOption("ip-low-address",
-            mandatory: false,
-            abbr: 'L',
-            help: "Ip4 Lowest Address of Network Range")
-        ..addOption("ip-high-address",
-            mandatory: false,
-            abbr: 'H',
-            help: "Ip4 Highest Address of Network Range")
+        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
+Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Output File""")
+        ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
+Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Output File""")
         ..addOption("input-type",
             mandatory: false,
             abbr: 't',
@@ -46,17 +42,18 @@ class CliArgs {
         })
         ..addMultiOption("generate-type",
             abbr: 'g',
-            defaultsTo: <String>["M"],
+//            defaultsTo: <String>["M"],
             help: "Generated types may be multiple. Valid values include: "
                 // ignore: lines_longer_than_80_chars
                 " c (csv), d (ddwrt), j (json),"
-                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)")
+                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
+                "Required")
         ..addOption(
           "base-name",
           abbr: 'b',
           help:
               // ignore: lines_longer_than_80_chars
-              "Specify Base Name of Output Files (default use basename of input file)",
+              "Specify Base Name of Output Files (default uses basename of input file)",
           mandatory: false,
         )
         ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
@@ -109,10 +106,7 @@ Examples:
 
   void checkArgs() {
     //TODO - get rid of l and h
-    verifyOptions(<String>["L", "H"]);
-
-    /** gets all input files after glob from arguments without flags */
-    g.inputFileList = getInputFileList(g.argResults.rest);
+    checkIfOptionArgsGiven(<String>["L", "H", "g"]);
 
     Ip ip = Ip();
 
@@ -141,16 +135,18 @@ Examples:
   /** Gets all input file paths after glob from arguments without flags */
   List<String> getInputFileList(List<String> rest) {
     try {
-      List<String> inFiles = <String>[""];
-
+      List<String> inFiles = <String>[];
       for (dynamic e in g.argResults.rest) {
+        String fPath;
         Glob(e).listSync().forEach((dynamic f) {
-          (!File(f.absolute.path).existsSync())
-              ? inFiles.add(f.absolute.path)
-              : throw Exception("Input File ${f.absolute.path} does not exist");
+          fPath = p.canonicalize(f.absolute.path);
+          (File(fPath).existsSync())
+              ? inFiles.add(fPath)
+              : throw Exception("Input File $fPath does not exist");
         });
       }
-      return g.inputFileList;
+
+      return inFiles;
     } on Exception {
       rethrow;
     }
@@ -161,7 +157,7 @@ Examples:
   /// Accepts list of mandatory options as abbreviations
   /// Argparser should not set any mandatory single/multiple options to true as this will handle
   ///
-  void verifyOptions([List<String>? requiredOptionsByAbbrs]) {
+  void checkIfOptionArgsGiven([List<String>? requiredOptionsByAbbrs]) {
     try {
       String errorMessages = "";
       List<dynamic> valueList = g.argResults.options
@@ -199,10 +195,11 @@ $errorMessages${checkForMissingMandatoryOptions(requiredOptionsByAbbrs)}"""
       if (errorMessages != "") {
         throw Exception(errorMessages.trim());
       }
-      // ignore: lines_longer_than_80_chars
-      /* only if don't use rest which we do   if (g.argResults.rest.isNotEmpty) {
-        printMsg("""
-${g.newL}${g.newL}Ignoring the following arguments: ${g.argResults.rest.join()}${g.newL}""");
+      /* only if don't use rest which we do   
+      if (g.argResults.rest.isNotEmpty) {
+         printMsg("""
+${g.newL}${g.newL}Ignoring the following arguments:
+${g.argResults.rest.join()}${g.newL}""");
       }*/
 
     } on Exception {
