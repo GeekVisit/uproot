@@ -12,39 +12,6 @@ class CliArgs {
     try {
       // Note that DefaultsTo only applies if option is not given at all
       parser = ArgParser()
-        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
-Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Output File""")
-        ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
-Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Output File""")
-        ..addOption("input-type",
-            mandatory: false,
-            abbr: 't',
-            help: "Input file type:   c (csv), d (ddwrt), j (json),"
-                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)")
-        ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
-Directory to write files to, defaults to same directory as input file.""")
-        ..addOption("server",
-            mandatory: false,
-            defaultsTo: "defconf",
-            abbr: 's',
-            help: "Name to designate in output file for Mikrotik dhcp server.")
-        ..addFlag("write-over",
-            defaultsTo: false,
-            help: "Overwrites output files, if left out, will not overwrite",
-            abbr: "w")
-        ..addFlag("help", help: "Help", abbr: "h", callback: (dynamic e) {
-          if (e) {
-            displayHelp();
-          }
-        })
-        ..addMultiOption("generate-type",
-            abbr: 'g',
-//            defaultsTo: <String>["M"],
-            help: "Generated types may be multiple. Valid values include: "
-                // ignore: lines_longer_than_80_chars
-                " c (csv), d (ddwrt), j (json),"
-                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
-                "Required")
         ..addOption(
           "base-name",
           abbr: 'b',
@@ -53,17 +20,60 @@ Directory to write files to, defaults to same directory as input file.""")
               "Specify Base Name of Output Files (default uses basename of input file)",
           mandatory: false,
         )
+        ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
+Directory to write files to, defaults to same directory as input file.""")
+        ..addFlag("help", help: "Help", abbr: "h", callback: (dynamic e) {
+          if (e) {
+            displayHelp();
+          }
+        })
+        ..addOption("input-type",
+            mandatory: false,
+            abbr: 't',
+            help: "Input file type:   c (csv), d (ddwrt), j (json),"
+                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
+                "If this option is not used, uprt will determine file "
+                "type based on the following extensions: .csv, .ddwrt, "
+                ".json, .rsc (mikrotik), .xml (for opnsense and pfsense, "
+                "distinguishing by searching for <opnsense> in file)")
+        ..addMultiOption("generate-type",
+            abbr: 'g',
+            help: "Generated types may be multiple. Valid values include: "
+                // ignore: lines_longer_than_80_chars
+                " c (csv), d (ddwrt), j (json),"
+                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
+                "Required")
+        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
+Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Output File""")
+        ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
+Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Output File""")
         ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
-Creates Log file, if -p not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
+Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
         ..addOption("log-file-path",
-            abbr: 'p',
+            abbr: 'P',
             mandatory: false,
             defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
-            help: "Log error messages to specified file path.")
-        ..addFlag("verbose",
-            abbr: 'v',
+            help: "Full file path to log file.")
+        ..addOption("server",
+            mandatory: false,
+            defaultsTo: "defconf",
+            abbr: 's',
+            help: "Name to designate in output file for Mikrotik dhcp server.")
+        ..addFlag("verbose", abbr: 'v', help: """
+Verbosity - additional messages""")
+        ..addFlag("verbose-debug", abbr: 'z', help: """
+Verbosity - debug level verbosity""")
+        ..addFlag("version", abbr: 'V', help: "Gives Version",
+            callback: (dynamic e) {
+          if (e) {
+            print("${meta["name"]} version ${meta['version']}");
+            exit(0);
+          }
+        })
+        ..addFlag("write-over",
             defaultsTo: false,
-            help: "Verbosity - additional debugging messages");
+            help: "Overwrites output files, if left out, will not overwrite",
+            abbr: "w");
 
       if (arguments.isEmpty && !g.testRun) {
         displayHelp();
@@ -103,10 +113,14 @@ Examples:
 
   void checkArgs() {
     //TODO - get rid of l and h
-    checkIfOptionArgsAreGiven();
-    checkForMissingMandatoryOptions(<String>["L", "H", "g"]);
-    validateIpRangeOptions();
-    checkIfInputFileGiven();
+    try {
+      checkIfOptionArgsAreGiven();
+      checkForMissingMandatoryOptions(<String>["g"]);
+      validateIpRangeOptions();
+      checkIfInputFileGiven();
+    } on Exception {
+      rethrow;
+    }
   }
 
   void checkIfInputFileGiven() {
@@ -119,11 +133,8 @@ Examples:
     try {
       Ip ip = Ip();
 
-      ((g.argResults['ip-high-address'] != null ||
-                  g.argResults['ip-high-address'] != "") &&
-              !ip.isIp4(g.argResults['ip-high-address']) |
-                  (g.argResults['ip-low-address'] != null ||
-                      g.argResults['ip-low-address'] != "") &&
+      (g.argResults['ip-high-address'] != null &&
+              g.argResults['ip-low-address'] != null &&
               !ip.isIp4(g.argResults['ip-low-address']))
           ? throw Exception("Ip Range Limit(s) are invalid Ip4 addresses.")
           : "";
@@ -234,7 +245,7 @@ Examples:
 
 // ignore: slash_for_doc_comments
 /** Check if Mandatory Options Are Missing from Option or Value arguments */
-  String checkForMissingMandatoryOptions(List<String> requiredOptionsByAbbrs) {
+  void checkForMissingMandatoryOptions(List<String> requiredOptionsByAbbrs) {
     try {
       List<String> allowedAbbrevList = parser.options.entries
           .map((dynamic e) => e.value.abbr.toString())
@@ -287,8 +298,9 @@ Examples:
           .toList()
           .join(",");
 
-      return (missingMandatoryOptions.isNotEmpty)
-          ? "${g.newL}Missing mandatory option(s): $missingMandatoryOptions"
+      (missingMandatoryOptions.isNotEmpty)
+          ? throw Exception(
+              "${g.newL}Missing mandatory option(s): $missingMandatoryOptions")
           : "";
     } on Exception {
       rethrow;

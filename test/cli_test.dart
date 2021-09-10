@@ -7,6 +7,8 @@ import 'package:uprt/lib.dart';
 import 'package:uprt/src/globals.dart' as g;
 
 void main() {
+  deleteFiles("test/test-output/*output*.*");
+  deleteFiles("test/test-output/*.log");
   g.testRun = true;
 
   //Update version info
@@ -23,7 +25,6 @@ void testUpRooted() {
 //Test whether have same number of lease components
 //in final file and have expected length
   List<String> args = <String>[
-    "-i",
     "test/test-data/lease-list-infile.csv",
     "-L",
     "192.168.0.1",
@@ -34,7 +35,6 @@ void testUpRooted() {
   ];
 
   List<String> argsTestBase = <String>[
-    "-i",
     "test/test-data/lease-list-infile.csv",
     "-L",
     "192.168.0.1",
@@ -140,34 +140,30 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
     args = <String>[...argsTestBase];
     g.argResults = g.cliArgs.getArgs(args);
+    g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
+    uprt.setInputFile(g.inputFileList[0]);
+
     expect(g.cliArgs.getInputType(), "c");
 
-    args[1] = "test/test-data/lease-list-infile.ddwrt";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile.ddwrt");
     expect(g.cliArgs.getInputType(), "d");
 
-    args[1] = "test/test-data/lease-list-infile.json";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile.json");
     expect(g.cliArgs.getInputType(), "j");
 
-    args[1] = "test/test-data/lease-list-infile.rsc";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile.rsc");
     expect(g.cliArgs.getInputType(), "m");
 
-    args[1] = "test/test-data/lease-list-infile.openwrt";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile.openwrt");
     expect(g.cliArgs.getInputType(), "o");
 
-    args[1] = "test/test-data/lease-list-infile-opn.xml";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile-opn.xml");
     expect(g.cliArgs.getInputType(), "n");
 
-    args[1] = "test/test-data/lease-list-infile-pfs.xml";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile-pfs.xml");
     expect(g.cliArgs.getInputType(), "p");
 
-    args[1] = "test/test-data/lease-list-infile.dd";
-    g.argResults = g.cliArgs.getArgs(args);
+    uprt.setInputFile("test/test-data/lease-list-infile.dd");
     expect(
         () => g.cliArgs.getInputType(),
         checkErrorMessage(
@@ -176,35 +172,16 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 /* Test Mandatory */
 
     args = <String>[...argsTestBase];
-    args.remove("-H");
+    args.remove("-g");
     g.argResults = g.cliArgs.getArgs(args);
     expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option(s): ip-high-address"));
-
-    args = <String>[...argsTestBase];
-    args.remove("-L");
-    g.argResults = g.cliArgs.getArgs(args);
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option(s): ip-low-address"));
-
-// no longer mandatory  -  keeping for form of test
-    // args = <String>[...argsTestBase];
-    // args.remove("-b");
-    // g.argResults = g.cliArgs.getArgs(args);
-    // expect(() => g.cliArgs.checkArgs(),
-    //     checkErrorMessage("Missing mandatory option(s): base-name"));
+        checkErrorMessage("Missing mandatory option(s): generate-type"));
 
 /** Test for Missing Arguments to options*/
     args = <String>[
-      "-L",
-      "-i",
-      "test/test-data/lease-list-infile.csv",
       "-g",
       "cdjmnop",
-      // "-L",
-      "192.168.0.1",
-      //"--ip-high-address",
-      "192.168.0.254",
+      "-L",
       "-b",
       "test-base-name",
       "-d",
@@ -213,13 +190,13 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option"));
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("is missing argument and is set to -i"));
+
+    expect(
+        () => g.cliArgs.checkArgs(),
+        checkErrorMessage(
+            "ip-low-address is missing argument and is set to -b"));
 
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-L",
       "192.168.0.1",
@@ -237,7 +214,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
         checkErrorMessage("is missing argument and is set to -d"));
 
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-H",
       "192.168.0.254",
@@ -251,7 +227,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
     expect(() => g.cliArgs.getArgs(args),
         checkErrorMessage('Missing argument for "ip-low-address"'));
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-L",
       "192.168.0.1",
@@ -274,7 +249,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
     it's -g d where there is a -d option for directory */
 
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-g",
       "d",
@@ -296,7 +270,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
     /* test if multiple options work */
 
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-g",
       "cdjmnop",
@@ -336,7 +309,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
 //  csv->json
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
       "-t",
       "c",
@@ -362,7 +334,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
 //ddwrt->json
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.ddwrt",
       "-t",
       "d",
@@ -388,7 +359,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
     //mikrotik->json
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.rsc",
       "-t",
       "m",
@@ -414,7 +384,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
     //openwrt->json
     args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.openwrt",
       "-t",
       "o",
@@ -439,7 +408,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
 //opnsense->json
     args = <String>[
-      "-i",
       'test/test-data/lease-list-infile-opn.xml',
       "-t",
       "n",
@@ -465,7 +433,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
 
     //pfsense->json
     args = <String>[
-      "-i",
       'test/test-data/lease-list-infile-pfs.xml',
       "-t",
       "p",
@@ -516,7 +483,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
   test('isMikrotik', () {
     Mikrotik mikrotik = Mikrotik();
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
@@ -567,7 +533,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
   test('isOpenWrt', () {
     OpenWrt openwrt = OpenWrt();
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
@@ -649,7 +614,6 @@ List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLengt
   test('isDdWrt', () {
     Ddwrt ddwrt = Ddwrt();
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
@@ -696,7 +660,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     Csv csv = Csv();
 
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
@@ -757,7 +720,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     OpnSense opnSense = OpnSense();
 
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
@@ -768,7 +730,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "-H",
       "192.168.0.254",
       "-b",
-      "test-output-file-opn",
+      "test-output-file",
       "-d",
       "test/test-output",
       "-w"
@@ -884,23 +846,28 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     PfSense pfSense = PfSense();
 
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.json",
       "-t",
       "j",
       "-g",
       "p",
-      "-L",
-      "192.168.0.1",
-      "-H",
-      "192.168.0.254",
+      // "-L",
+      // "192.168.0.1",
+      // "-H",
+      // "192.168.0.254",
       "-b",
-      "test-output-file-pfs",
+      "test-output-file",
       "-d",
       "test/test-output",
       "-w"
     ];
     uprt.convertFileList(args);
+
+    expect(
+        pfSense.isFileValid(
+          "test/test-output/test-output-file-pfs.xml",
+        ),
+        true);
 
     String goodPfsense =
         """
@@ -985,11 +952,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
    """;
 
     expect(
-        pfSense.isFileValid(
-          "test/test-output/test-output-file-pfs.xml",
-        ),
-        true);
-    expect(
         pfSense.isFileValid("test/test-data/lease-list-infile-pfs.xml"), true);
     expect(pfSense.isFileValid("test/test-data/lease-list-infile.json"), false);
     expect(pfSense.isContentValid(fileContents: badPfsense), false);
@@ -997,24 +959,21 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     expect(pfSense.isContentValid(fileContents: goodPfsense), true);
   });
 
-  test('outputLength', () {
+  test('allFormats', () {
+    deleteFiles("test/test-output/*output*.*");
+    deleteFiles("test/test-output/*.log");
     Csv csv = Csv();
     Ddwrt ddwrt = Ddwrt();
     Json json = Json();
+
     Mikrotik mikrotik = Mikrotik();
     OpenWrt openwrt = OpenWrt();
-    PfSense pfsense = PfSense();
+    OpnSense opnsense = OpnSense();
+    PfSense pfSense = PfSense();
     List<String> args = <String>[
-      "-i",
       "test/test-data/lease-list-infile.csv",
-      "-t",
-      "c",
       "-g",
-      "j",
-      "-L",
-      "192.168.0.1",
-      "-H",
-      "192.168.0.254",
+      "cdjnmop",
       "-b",
       "test-output-file",
       "-d",
@@ -1023,7 +982,22 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
+    uprt.convertFileList(args);
 
+    /* test all output files*/
+    expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
+    expect(ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"), true);
+    expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"), true);
+
+    expect(
+        openwrt.isFileValid("test/test-output/test-output-file.openwrt"), true);
+    expect(opnsense.isFileValid("test/test-output/test-output-file-opn.xml"),
+        true);
+    expect(
+        pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"), true);
+
+    expect(json.isFileValid("test/test-output/test-output-file.json"), true);
+    /* test all for length*/
     expect(
         isCorrectLeaseMapLength(
             csv.getLease(
@@ -1066,7 +1040,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     expect(
         isCorrectLeaseMapLength(
-            pfsense.getLease(
+            pfSense.getLease(
                 fileContents: File("test/test-output/test-output-file-pfs.xml")
                     .readAsStringSync()),
             50),
@@ -1074,11 +1048,62 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     expect(
         isCorrectLeaseMapLength(
-            pfsense.getLease(
+            pfSense.getLease(
                 fileContents: File("test/test-output/test-output-file-opn.xml")
                     .readAsStringSync()),
             50),
         true);
+  });
+
+  test('log', () {
+    deleteFiles("test/test-output/*output*.*");
+    deleteFiles("test/test-output/*.log");
+
+    List<String> args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "cdjnmop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w",
+      "-l",
+    ];
+
+    g.argResults = g.cliArgs.getArgs(args);
+    uprt.convertFileList(args);
+
+    File logFile = File(g.argResults['log-file-path']);
+    String logFileContents = logFile.readAsStringSync();
+
+    expect(logFile.existsSync(), true);
+    expect(logFileContents.contains("uprt converting"), true);
+
+    deleteFiles("test/test-output/*output*.*");
+    logFile.deleteSync();
+
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "cdjnmop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w",
+      "-l",
+      "-P",
+      "test/test-output/uprt.log"
+    ];
+
+    g.argResults = g.cliArgs.getArgs(args);
+    uprt.convertFileList(args);
+    logFile = File(g.argResults['log-file-path']);
+    logFileContents = logFile.readAsStringSync();
+
+    expect(logFile.existsSync(), true);
+    expect(logFileContents.contains("uprt converting"), true);
   });
 }
 

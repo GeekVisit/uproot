@@ -20,12 +20,12 @@ Also supports the following file formats:
 
 ## Features
 
-* Automatic detection of input format based on extension and content; optionally you can specify the format
+* Detection of input format based on extension (can also manually specify the format)
 * Single input file can be simultaneously converted into multiple formats
 * Csv and Json input files
 * Validation Checks to avoid errors while importing:
-  * Validates all generated files against output format type
-  * Enforces IP range
+  * Validates all generated files against expected output type
+  * Enforces IP range (optional)
   * Requires each static lease to have an IP, Mac,and (except for Mikrotik RouterOS files), Host address
   * Excludes unnecessary duplicates from output
   * Excludes invalid ip4 and Mac addresses from output file

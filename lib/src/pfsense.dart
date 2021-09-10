@@ -165,7 +165,7 @@ class PfSense extends FileType {
           getLease(fileContents: fileContents, removeBadLeases: false);
 
       if (g.validateLeases
-          .containsBadLeases(leaseMap, g.fFormats.openwrt.formatName)) {
+          .containsBadLeases(leaseMap, g.fFormats.pfsense.formatName)) {
         return false;
       }
       g.validateLeases

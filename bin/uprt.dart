@@ -6,37 +6,35 @@
 //TODO: Add test for file globs/file exists
 //TODO: Test log files
 
-//TODO: NOW:
-//TODO: Fix tests
-
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
     arguments = <String>[
-      "test/test-data/*file.json",
-      "test/test-data/*file.csv",
-      // "-L",
-      "192.168.0.1",
-      "-H",
-      "192.168.0.254",
-//      "-t",
-      //    "c",
-      //"-b",
-      //"test-output-file",
-//      "-g",
-      //    "m",
-      //  "-d",
-      //"test/test-output",
-      //"-s",
-      // "myserver",
+//       "test/test-data/*file.json",
+//       "test/test-data/*file.csv",
+//       // "-L",
+//       "192.168.0.1",
+//       "-H",
+//       "192.168.0.254",
+// //      "-t",
+//       //    "c",
+//       //"-b",
+//       //"test-output-file",
+//       "-g",
+//       "m",
+//       //  "-d",
+//       //"test/test-output",
+//       //"-s",
+//       // "myserver",
 
-//      "c",
-      //   "cdjnmop",
-      "-w",
-      //"-v",
-      // "-l",
-      // "uprt-log-example.log"
+// //      "c",
+//       //   "cdjnmop",
+//       "-w",
+//       //"-v",
+//       // "-l",
+//       // "uprt-log-example.log"
+      "-V"
     ];
 
     Converter uprt = Converter();

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'dart:math';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'globals.dart' as g;
 
@@ -14,25 +16,35 @@ void printMsg(dynamic message,
     } else {
       stdout.writeln(message.toString().replaceFirst("Exception:", "").trim());
     }
+  }
 
-    //Write to Log
-    try {
-      if (g.logPath != "") {
-        File logFile = File(g.logPath);
+/* Print Stack Trace if Debug */
+  if (g.argResults['verbose-debug']) {
+    stdout.writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
+  }
+
+  //Write to Log
+  try {
+    if (g.argResults['log']) {
+      File logFile = File(g.logPath);
+      logFile.writeAsStringSync(
+          // ignore: lines_longer_than_80_chars
+          "$message  ${g.newL}",
+          mode: FileMode.append);
+      /* Log Stack Trace if Debug */
+      if (g.argResults['verbose-debug']) {
         logFile.writeAsStringSync(
-            // ignore: lines_longer_than_80_chars
-            "${"$message  ${g.newL} ${StackTrace.current}".toString().trim()}${g.newL}",
-            mode: FileMode.append);
+            "${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
       }
-    } on FormatException catch (e) {
-      if (!g.testRun) {
-        print("${e.message} (log file)");
-      }
-      rethrow;
-    } on Exception {
-      //print(e);
-      rethrow;
     }
+  } on FormatException catch (e) {
+    if (!g.testRun) {
+      print("${e.message} (log file)");
+    }
+    rethrow;
+  } on Exception {
+    //print(e);
+    rethrow;
   }
 }
 
@@ -98,5 +110,19 @@ bool isStringAValidFilePath(String testPath) {
   } on Exception catch (e) {
     printMsg(e, logOnly: true);
     return false;
+  }
+}
+
+// ignore: slash_for_doc_comments
+/** Deletes files, excepts shell expansion globs */
+void deleteFiles(String filesGlobToDelete) {
+  try {
+    Glob listOfFilesToDelete = Glob(filesGlobToDelete);
+
+    for (FileSystemEntity file in listOfFilesToDelete.listSync()) {
+      file.deleteSync();
+    }
+  } on Exception {
+    rethrow;
   }
 }

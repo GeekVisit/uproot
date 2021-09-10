@@ -75,7 +75,8 @@ class ValidateLeases {
       printMsg("IP out of range for $ipAddress", errMsg: true);
       return false;
     } else {
-      printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range");
+      printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
+          onlyIfVerbose: true);
     }
 
     addProcessedLease(macAddress, hostName, ipAddress);

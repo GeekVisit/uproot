@@ -11,12 +11,15 @@ class Converter {
 
   String outPath = "";
   List<String> outputFilesSaved = <String>[];
+
+  // ignore: slash_for_doc_comments
+  /** Main loop to convert all files on command line */
   void convertFileList(List<String> arguments) {
     try {
       initialize(arguments);
       g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
       for (String eachFilePath in g.inputFileList) {
-        g.inputFile = eachFilePath;
+        setInputFile(eachFilePath);
         toJson();
         toOutput();
       }
@@ -25,12 +28,24 @@ class Converter {
     }
   }
 
+  void setInputFile(String inputFilePath) {
+    try {
+      g.inputFile = inputFilePath;
+
+      g.baseName =
+          (g.argResults['base-name'] == null || g.argResults['base-name'] == "")
+              ? p.basenameWithoutExtension(g.inputFile)
+              : g.argResults['base-name'];
+
+      g.inputType = g.cliArgs.getInputType();
+    } on Exception {
+      return;
+    }
+  }
+
   void toJson() {
     try {
       Json json = Json();
-      setBaseName();
-
-      g.inputType = g.cliArgs.getInputType();
       printMsg("Converting Input File to Json temporary file..",
           onlyIfVerbose: true);
       switch (g.inputType) {
@@ -146,18 +161,10 @@ class Converter {
             mikrotik.isFileValid(outPath);
             printCompletedAll(g.fFormats.mikrotik.formatName);
             break;
-/* //TODO:  don't think i need this any more - test 
-          case 'M':
-            printMsg("""
-Missing required -g (generated type) option. 
-Run uprt without arguments to see usage.""",
-                errMsg: true);
-            cleanUp();
-            break;
-*/
+
           case 'n':
             OpnSense opnSense = OpnSense();
-            setOutPath(g.fFormats.opnsense.outputExt);
+            setOutPath("-opn.${g.fFormats.opnsense.outputExt}");
             saveOutPath(json.toOpnsense());
             opnSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.opnsense.formatName);
@@ -174,7 +181,7 @@ Run uprt without arguments to see usage.""",
 
           case 'p':
             PfSense pfSense = PfSense();
-            setOutPath(g.fFormats.json.outputExt);
+            setOutPath("-pfs.${g.fFormats.pfsense.outputExt}");
             saveOutPath(json.toPfsense());
             pfSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.pfsense.formatName);
@@ -210,6 +217,7 @@ Run uprt without arguments to see usage.""",
 // ignore: slash_for_doc_comments
 /** Builds output path for generated filed given the output extension */
   void setOutPath(String outputExt) {
+    // Sets output directory to g.dirname or if not specified then input dir
     g.dirOut = (g.argResults['directory-out'] == null ||
             g.argResults['directory-out'] == "")
         ? p.dirname(g.inputFile)
@@ -219,8 +227,10 @@ Run uprt without arguments to see usage.""",
       throw Exception("Output directory ${g.dirOut} does not exist. ");
     }
 
+    outputExt = (outputExt.contains(".")) ? outputExt : ".$outputExt";
+
     outPath =
-        p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}."
+        p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}"
             "$outputExt");
   }
 
@@ -276,19 +286,6 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
   static void cleanUp() {
     try {
       if (g.tempDir.existsSync()) g.tempDir.deleteSync(recursive: true);
-    } on Exception {
-      rethrow;
-    }
-  }
-
-  // ignore: slash_for_doc_comments
-  /**  Build basename of output files*/
-  void setBaseName() {
-    try {
-      g.baseName =
-          (g.argResults['base-name'] == null || g.argResults['base-name'] == "")
-              ? p.basenameWithoutExtension(g.inputFile)
-              : g.argResults['base-name'];
     } on Exception {
       rethrow;
     }
