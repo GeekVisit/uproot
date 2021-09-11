@@ -3,6 +3,7 @@ import 'ip.dart';
 import 'src.dart';
 
 class ValidateLeases {
+  static bool printedLowHighRangeWarning = false;
   static List<String> processedMac = <String>[],
       processedIp = <String>[],
       processedName = <String>[],
@@ -74,9 +75,10 @@ class ValidateLeases {
       badLeases.add("IP Outside Range: $ipAddress");
       printMsg("IP out of range for $ipAddress", errMsg: true);
       return false;
-    } else {
+    } else if (!printedLowHighRangeWarning) {
       printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
           onlyIfVerbose: true);
+      printedLowHighRangeWarning = true;
     }
 
     addProcessedLease(macAddress, hostName, ipAddress);
