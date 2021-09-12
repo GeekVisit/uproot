@@ -18,6 +18,9 @@ class Converter {
     try {
       initialize(arguments);
       g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
+
+
+      
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
         toJson();
@@ -30,6 +33,7 @@ class Converter {
 
   void setInputFile(String inputFilePath) {
     try {
+
       g.inputFile = inputFilePath;
 
       g.baseName =

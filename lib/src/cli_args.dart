@@ -112,7 +112,7 @@ Examples:
   }
 
   void checkArgs() {
-    //TODO - get rid of l and h
+
     try {
       checkIfOptionArgsAreGiven();
       checkForMissingMandatoryOptions(<String>["g"]);
@@ -149,8 +149,18 @@ Examples:
     try {
       List<String> inFiles = <String>[];
       for (dynamic e in g.argResults.rest) {
-        String fPath;
-        Glob(e).listSync().forEach((dynamic f) {
+        String fPath = "";
+
+        // converts globlist to absolute path, works with .. */
+        List<dynamic> globList = Glob(p.absolute(
+                p.normalize(p.absolute(e)).toString().replaceAll(r'\', r'/')))
+            .listSync();
+
+        if (globList.isEmpty) {
+          throw Exception("$globList not found");
+        }
+        // ignore: avoid_function_literals_in_foreach_calls
+        globList.forEach((dynamic f) {
           fPath = p.canonicalize(f.absolute.path);
           (File(fPath).existsSync())
               ? inFiles.add(fPath)

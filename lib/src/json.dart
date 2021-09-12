@@ -34,6 +34,7 @@ class Json extends FileType {
         }
         leaseMap[key] = valueList.toList();
         valueList.clear();
+        
       }
       if (removeBadLeases) {
         return g.validateLeases

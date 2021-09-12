@@ -1,27 +1,23 @@
 //Take out requirement to have hostnames and validate without
 //TODO: allow new static leases to be inserted into existing pfsense/opnsense XML doc
-//TODO: test directory input/outputs in production
 //TODO: Delete deprecated linter
-
-//TODO: Add test for file globs/file exists
-//TODO: Test log files
 
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    arguments = <String>[
-      "test/test-data/*.csv",
-      "-g",
-      "m",
-      "-v",
-      "v",
-      "-b",
-      "test-output-now",
-      "-l",
-      "-P",
-      "bin/uprt.log"
-    ];
+    // arguments = <String>[
+    //   "test/test-data/*.csv",
+    //   "-g",
+    //   "m",
+    //   //   "-v",
+    //   //   "v",
+    //   //   "-b",
+    //   //   "test-output-now",
+    //   //   "-l",
+    //   //   "-P",
+    //   //   "bin/uprt.log"
+    // ];
 
 // //       "test/test-data/*file.json",
 // //       "test/test-data/*file.csv",
