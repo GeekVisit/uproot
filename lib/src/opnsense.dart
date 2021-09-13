@@ -14,7 +14,7 @@ class OpnSense extends FileType {
 
   @override
   //Given a string this returns Maps of the a list of each lease
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -111,7 +111,7 @@ class OpnSense extends FileType {
       }
 
       dynamic leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.opnsense.formatName)) {
@@ -134,7 +134,7 @@ class OpnSense extends FileType {
     String inFileContents = File(g.inputFile).readAsStringSync();
 
     //get leases from opnsense file
-    Map<String, List<String>> lease = getLease(fileContents: inFileContents);
+    Map<String, List<String>> lease = getLeaseMap(fileContents: inFileContents);
 
     //convert leases to json format
     for (int x = 0; x < lease[g.lbHost]!.length; x++) {

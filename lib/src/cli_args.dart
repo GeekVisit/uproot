@@ -31,7 +31,7 @@ Directory to write files to, defaults to same directory as input file.""")
             mandatory: false,
             abbr: 't',
             help: "Input file type:   c (csv), d (ddwrt), j (json),"
-                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
+                "m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
                 "If this option is not used, uprt will determine file "
                 "type based on the following extensions: .csv, .ddwrt, "
                 ".json, .rsc (mikrotik), .xml (for opnsense and pfsense, "
@@ -40,8 +40,8 @@ Directory to write files to, defaults to same directory as input file.""")
             abbr: 'g',
             help: "Generated types may be multiple. Valid values include: "
                 // ignore: lines_longer_than_80_chars
-                " c (csv), d (ddwrt), j (json),"
-                "m (mikrotik), n (opnsense), o (openwrt), p (pfsense)"
+                " c (csv), d (DD-WRT), j (json),"
+                "m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
                 "Required")
         ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
 Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Output File""")
@@ -54,6 +54,11 @@ Creates Log file, if -P not set, then location is at '${p.join(Directory.systemT
             mandatory: false,
             defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
             help: "Full file path to log file.")
+        ..addOption("merge", abbr: 'M', mandatory: false, help: """
+Merge to file. Specify path to file to merge converted output. 
+Used to add static leases to an existing output file. 
+Works only with cvs, json, pfSense, and OPNsense
+""")
         ..addOption("server",
             mandatory: false,
             defaultsTo: "defconf",
@@ -112,7 +117,6 @@ Examples:
   }
 
   void checkArgs() {
-
     try {
       checkIfOptionArgsAreGiven();
       checkForMissingMandatoryOptions(<String>["g"]);
@@ -219,8 +223,8 @@ Examples:
 
 // ignore: slash_for_doc_comments
 /** Gets input type (j for json, etc) -
-// use specified format, if not specified, get from extension,
-//if xml look if contains opnsense */
+ use specified format, if not specified, get from extension,
+ if xml look if contains opnsense */
   String getInputType() {
     try {
       if (g.argResults['input-type'] != null) {
@@ -245,7 +249,10 @@ Examples:
     }
   }
 
-//determines whether xml file is opnsense or pfsense
+// ignore: slash_for_doc_comments
+/** Determines whether xml file is opnsense or pfsense 
+ * Returns "n" for opnsense and "p" for pfsense
+*/
 
   String xmlFirewallFormat() {
     return (File(g.inputFile).readAsStringSync().contains("<opnsense>"))

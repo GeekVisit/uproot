@@ -17,6 +17,14 @@ void main() {
   testUpRooted();
 }
 
+bool isCorrectLeaseMapLength(
+    Map<String, List<String>> leaseMap, int listLength) {
+  print("""
+List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
+  return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
+      (leaseMap[g.lbMac]?.length == listLength));
+}
+
 /// ******* DEFINE SOME TEST VALUES****************************
 ///
 void testUpRooted() {
@@ -50,14 +58,6 @@ void testUpRooted() {
   g.argResults = g.cliArgs.getArgs(args);
 
   ///*********** TEST METHODS */
-
-  bool isCorrectLeaseMapLength(
-      Map<String, List<String>> leaseMap, int listLength) {
-    print("""
-List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
-    return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
-        (leaseMap[g.lbMac]?.length == listLength));
-  }
 
   Ip ip = Ip();
 /**************** TESTS: *******************/
@@ -968,8 +968,20 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     validateAllOutputFromSourceFile(
       uprt,
       isCorrectLeaseMapLength,
-      "test/test-data/*.json",
+      "test/test-data/lease-list-infile.json",
     );
+  });
+  test('bad_json_files', () {
+    deleteFiles("test/test-output/*output*.*");
+    deleteFiles("test/test-output/*.log");
+    validateAllOutputFromSourceFile(
+      uprt,
+      isCorrectLeaseMapLength,
+      "test/test-data/lease-list-bad*.json",
+    );
+
+    validateAllOutputFromSourceFile(
+        uprt, isCorrectLeaseMapLength, "test/test-data/lease-list-bad*.json");
   });
 
   test('log', () {
@@ -1031,14 +1043,7 @@ void validateAllOutputFromSourceFile(
     String inputFilePath) {
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
-  Csv csv = Csv();
-  Ddwrt ddwrt = Ddwrt();
-  Json json = Json();
 
-  Mikrotik mikrotik = Mikrotik();
-  OpenWrt openwrt = OpenWrt();
-  OpnSense opnsense = OpnSense();
-  PfSense pfSense = PfSense();
   List<String> args = <String>[
     inputFilePath,
     "-g",
@@ -1054,74 +1059,100 @@ void validateAllOutputFromSourceFile(
   uprt.convertFileList(args);
 
   /* test all output files*/
-  expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
-  expect(ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"), true);
-  expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"), true);
-
-  expect(
-      openwrt.isFileValid("test/test-output/test-output-file.openwrt"), true);
-  expect(
-      opnsense.isFileValid("test/test-output/test-output-file-opn.xml"), true);
-  expect(
-      pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"), true);
-
-  expect(json.isFileValid("test/test-output/test-output-file.json"), true);
+  areOutputFilesValid(uprt, inputFilePath, true);
   /* test all for length*/
+}
+
+void areOutputFilesValid(
+    dynamic uprt,
+    String inputFilePath,
+    // ignore: avoid_positional_boolean_parameters
+    bool outputFileExpectedValidateValue) {
+  Csv csv = Csv();
+  Ddwrt ddwrt = Ddwrt();
+  Json json = Json();
+
+  Mikrotik mikrotik = Mikrotik();
+  OpenWrt openwrt = OpenWrt();
+  OpnSense opnsense = OpnSense();
+  PfSense pfSense = PfSense();
+
+  /* test all output files*/
+  expect(csv.isFileValid("test/test-output/test-output-file.csv"),
+      outputFileExpectedValidateValue);
+
+  expect(csv.isFileValid("test/test-output/test-output-file.csv"),
+      outputFileExpectedValidateValue);
+  expect(ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"),
+      outputFileExpectedValidateValue);
+  expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"),
+      outputFileExpectedValidateValue);
+
+  expect(openwrt.isFileValid("test/test-output/test-output-file.openwrt"),
+      outputFileExpectedValidateValue);
+  expect(opnsense.isFileValid("test/test-output/test-output-file-opn.xml"),
+      outputFileExpectedValidateValue);
+  expect(pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"),
+      outputFileExpectedValidateValue);
+
+  expect(json.isFileValid("test/test-output/test-output-file.json"),
+      outputFileExpectedValidateValue);
+
   expect(
       isCorrectLeaseMapLength(
-          csv.getLease(
+          csv.getLeaseMap(
               fileContents: File("test/test-output/test-output-file.csv")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          ddwrt.getLease(
+          ddwrt.getLeaseMap(
               fileContents: File("test/test-output/test-output-file.ddwrt")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          json.getLease(
+          json.getLeaseMap(
               fileContents: File("test/test-output/test-output-file.json")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          mikrotik.getLease(
+          mikrotik.getLeaseMap(
               fileContents: File("test/test-output/test-output-file.rsc")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          openwrt.getLease(
+          openwrt.getLeaseMap(
               fileLines: File("test/test-output/test-output-file.openwrt")
                   .readAsLinesSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          pfSense.getLease(
+          pfSense.getLeaseMap(
               fileContents: File("test/test-output/test-output-file-pfs.xml")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 
   expect(
       isCorrectLeaseMapLength(
-          pfSense.getLease(
+          pfSense.getLeaseMap(
               fileContents: File("test/test-output/test-output-file-opn.xml")
                   .readAsStringSync()),
           50),
-      true);
+      outputFileExpectedValidateValue);
 }
 
 /// Provides match for error message result when testing, argument

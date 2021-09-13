@@ -11,8 +11,8 @@ class PfSense extends FileType {
   String fileType = g.fFormats.pfsense.formatName;
 
   @override
-  //Given a string this returns Maps of the a list of each lease
-  Map<String, List<String>> getLease(
+  //Given a string this returns Maps of a list of each lease
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -162,7 +162,7 @@ class PfSense extends FileType {
       }
 
       dynamic leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.pfsense.formatName)) {
@@ -185,7 +185,7 @@ class PfSense extends FileType {
     String inFileContents = File(g.inputFile).readAsStringSync();
 
     //get leases from pfsense file
-    Map<String, List<String>> lease = getLease(fileContents: inFileContents);
+    Map<String, List<String>> lease = getLeaseMap(fileContents: inFileContents);
 
     //convert leases to json format
     for (int x = 0; x < lease[g.lbHost]!.length; x++) {

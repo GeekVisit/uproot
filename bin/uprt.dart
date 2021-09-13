@@ -1,5 +1,8 @@
 //Take out requirement to have hostnames and validate without
-//TODO: allow new static leases to be inserted into existing pfsense/opnsense XML doc
+//TODO: allow new static leases to be inserted into existing openwrt/ddwrt/pfsense/opnsense XML doc
+// USING -M for merge
+//TODO: make sure verbosity works properly
+//TODO: Cleanup tests
 //TODO: Delete deprecated linter
 
 import 'package:uprt/lib.dart';

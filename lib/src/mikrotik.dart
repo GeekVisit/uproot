@@ -7,7 +7,7 @@ class Mikrotik extends FileType {
 
   String fileType = g.fFormats.mikrotik.formatName;
 
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -58,7 +58,7 @@ class Mikrotik extends FileType {
           getLease(fileLines: importList, removeBadLeases: false); */
 
       Map<String, List<String>> leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.mikrotik.formatName)) {
@@ -121,7 +121,7 @@ class Mikrotik extends FileType {
     StringBuffer sbJson = StringBuffer();
 
     Map<String, List<String>?> leaseMap =
-        getLease(fileContents: File(g.inputFile).readAsStringSync());
+        getLeaseMap(fileContents: File(g.inputFile).readAsStringSync());
 
     return json.build(leaseMap, sbJson);
   }

@@ -32,7 +32,8 @@ class OpenWrt extends FileType {
       if (fileContents == "" && fileLines == null) {
         throw Exception("Missing Argument for isContentValid");
       }
-      dynamic leaseMap = getLease(fileLines: fileLines, removeBadLeases: false);
+      dynamic leaseMap =
+          getLeaseMap(fileLines: fileLines, removeBadLeases: false);
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.openwrt.formatName)) {
@@ -49,7 +50,7 @@ class OpenWrt extends FileType {
   }
 
   @override
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -123,7 +124,7 @@ class OpenWrt extends FileType {
     Json json = Json();
 
     Map<String, List<String>?> lease =
-        getLease(fileLines: File(g.inputFile).readAsLinesSync());
+        getLeaseMap(fileLines: File(g.inputFile).readAsLinesSync());
 
     json.build(lease, sbJson);
 

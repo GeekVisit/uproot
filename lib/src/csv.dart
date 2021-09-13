@@ -15,7 +15,7 @@ class Csv extends FileType {
   //
 
   @override
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -82,7 +82,7 @@ class Csv extends FileType {
     ValidateLeases.initialize();
     try {
       Map<String, List<String>> leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
       if (fileContents == "" && fileLines == null) {
         throw Exception("Missing Argument for isContentValid");
       }
@@ -105,8 +105,9 @@ class Csv extends FileType {
   String toJson() {
     Json json = Json();
     StringBuffer sbJson = StringBuffer();
+    //TODO Don't think i need this line - delete from others as well
     isFileValid(File(g.inputFile).absolute.path);
-    Map<String, List<String>> lease = getLease(
+    Map<String, List<String>> lease = getLeaseMap(
         fileContents: File(File(g.inputFile).absolute.path).readAsStringSync());
     return json.build(lease, sbJson);
   }

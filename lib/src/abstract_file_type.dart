@@ -10,7 +10,7 @@ abstract class FileType {
 
   String toJson();
 
-  Map<String, List<String>?> getLease(
+  Map<String, List<String>?> getLeaseMap(
       {String fileContents = "", List<String> fileLines});
 
   //Builds file from List of leases containing mac-address,host-name, ip address
@@ -27,7 +27,8 @@ abstract class FileType {
             onlyIfVerbose: true);
         return true;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""",
+        printMsg(
+            """$filePath is invalid format  for $fileType and/or has bad leases""",
             errMsg: true);
         return false;
       }

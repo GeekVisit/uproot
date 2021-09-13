@@ -9,7 +9,7 @@ class Json extends FileType {
   @override
   String fileType = g.fFormats.json.formatName;
 
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -34,7 +34,6 @@ class Json extends FileType {
         }
         leaseMap[key] = valueList.toList();
         valueList.clear();
-        
       }
       if (removeBadLeases) {
         return g.validateLeases
@@ -42,8 +41,8 @@ class Json extends FileType {
       } else {
         return leaseMap;
       }
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
+    } on Exception {
+      //   printMsg(e, errMsg: true);
       rethrow;
     }
   }
@@ -69,7 +68,7 @@ class Json extends FileType {
       }
 
       Map<String, List<String>> leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.json.formatName)) {
@@ -89,7 +88,7 @@ class Json extends FileType {
       Csv csv = Csv();
       StringBuffer sbCsv = StringBuffer();
       Map<String, List<String>> deviceList =
-          getLease(fileContents: getJsonFileContents());
+          getLeaseMap(fileContents: getJsonFileContents());
       csv.build(deviceList, sbCsv);
 
       //csv.csvAddColumnNamesAndRows(deviceList, sbCsv);
@@ -103,7 +102,7 @@ class Json extends FileType {
     Ddwrt ddwrt = Ddwrt();
     StringBuffer sbDdwrt = StringBuffer();
     Map<String, List<String>> deviceList =
-        getLease(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: getJsonFileContents());
     ddwrt.build(deviceList, sbDdwrt);
     return (sbDdwrt.toString());
   }
@@ -113,7 +112,7 @@ class Json extends FileType {
 
     StringBuffer sbOpenWrt = StringBuffer();
     Map<String, List<String>> deviceList =
-        getLease(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: getJsonFileContents());
     return openWrt.build(deviceList, sbOpenWrt);
   }
 
@@ -122,7 +121,7 @@ class Json extends FileType {
     StringBuffer sbMikrotik = StringBuffer();
 
     Map<String, List<String>> deviceList =
-        getLease(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: getJsonFileContents());
 
     return mikrotik.build(deviceList, sbMikrotik);
   }
@@ -133,7 +132,7 @@ class Json extends FileType {
     String inFileContents = File(g.inputFile).readAsStringSync();
 
     Map<String, List<String>> deviceList =
-        getLease(fileContents: inFileContents);
+        getLeaseMap(fileContents: inFileContents);
 
     return build(deviceList, sbJson);
   }
@@ -156,7 +155,7 @@ class Json extends FileType {
     StringBuffer sbPfsense = StringBuffer();
 
     Map<String, List<String>> deviceList =
-        getLease(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: getJsonFileContents());
 
     return pfSense.build(deviceList, sbPfsense);
   }
@@ -166,7 +165,7 @@ class Json extends FileType {
     StringBuffer sbOpnsense = StringBuffer();
 
     Map<String, List<String>> deviceList =
-        getLease(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: getJsonFileContents());
 
     return opnSense.build(deviceList, sbOpnsense);
   }

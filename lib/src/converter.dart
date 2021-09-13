@@ -19,8 +19,6 @@ class Converter {
       initialize(arguments);
       g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
 
-
-      
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
         toJson();
@@ -33,7 +31,6 @@ class Converter {
 
   void setInputFile(String inputFilePath) {
     try {
-
       g.inputFile = inputFilePath;
 
       g.baseName =
@@ -55,6 +52,7 @@ class Converter {
       switch (g.inputType) {
         case 'c':
           Csv csv = Csv();
+          //TODO - check if i need this line if not delete from all:
           csv.isFileValid(File(g.inputFile).absolute.path);
           saveFile(csv.toJson(), g.tempJsonOutFile.path);
           printCompletedTmpJson("Csv");
@@ -70,14 +68,23 @@ class Converter {
         case 'j':
           File inFile = File(File(g.inputFile).absolute.path);
           try {
-            json.isFileValid(File(g.inputFile).absolute.path);
-            inFile.copySync(g.tempJsonOutFile.path);
+            if (json.isFileValid(File(g.inputFile).absolute.path)) {
+              inFile.copySync(g.tempJsonOutFile.path);
+            } else {
+              String outputContents = json.toJson();
+              if (json.isContentValid(fileContents: outputContents)) {
+                saveFile(outputContents, g.tempJsonOutFile.path);
+                printCompletedTmpJson("json");
+              } else {
+                printCompletedTmpJson("json", success: false);
+              }
+            }
           } on FileSystemException {
             g.tempDir = Directory.systemTemp.createTempSync("uprt_");
             g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
             inFile.copySync(g.tempJsonOutFile.path);
           }
-          printCompletedTmpJson("json");
+
           break;
 
         case 'm':
@@ -128,6 +135,10 @@ class Converter {
 
       /**  split type argument regardless of comma separator
     */
+      if (!g.tempJsonOutFile.existsSync()) {
+        throw Exception(
+            """"Temporary json file failed to generate. Input file likely corrupt and/or ${g.tempDir} not writeable. Please fix and try again.""");
+      }
 
       List<String> types =
           g.cliArgs.getArgListOfMultipleOptions(g.argResults['generate-type']);
@@ -153,8 +164,13 @@ class Converter {
           case 'j':
             setOutPath(g.fFormats.json.outputExt);
             //outPath may change if needs saveFile needs to avoid overwriting
-            g.tempJsonOutFile.copySync(outPath);
-            printCompletedAll(g.fFormats.json.formatName);
+            if (g.tempJsonOutFile.existsSync()) {
+              g.tempJsonOutFile.copySync(outPath);
+              printCompletedAll(g.fFormats.json.formatName);
+            } else {
+              printCompletedAll(g.fFormats.json.formatName, success: false);
+            }
+
             break;
 
           case 'm':
@@ -199,8 +215,8 @@ class Converter {
             exit(1);
         }
       }
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
+    } on Exception {
+      //  printMsg(e, errMsg: true);
       rethrow;
     }
   }
@@ -238,22 +254,25 @@ class Converter {
             "$outputExt");
   }
 
-  void printCompletedAll(String fileType) {
+  void printCompletedAll(String fileType, {bool success = true}) {
     String displaySourceFile = (g.argResults['verbose'])
         ? p.canonicalize(g.inputFile)
         : p.basename(g.inputFile);
     String displayTargetFile = (g.argResults['verbose'])
         ? p.canonicalize(outPath)
         : p.basename(outPath);
+    String successResult = (success) ? "successful" : "failed";
 
     printMsg("""
-$displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => $fileType) is completed.""");
+$displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => $fileType) $successResult.""");
   }
 
-  void printCompletedTmpJson(String fileType) {
-    printMsg(
-        """$fileType to temporary Json ${p.basename(g.tempJsonOutFile.path)} is completed.""",
-        onlyIfVerbose: true);
+  void printCompletedTmpJson(String fileType, {bool success = true}) {
+    String message = (success)
+        ? """$fileType to temporary Json ${p.basename(g.tempJsonOutFile.path)} is completed."""
+        : """Input file invalid format - unable to convert $fileType to temporary Json ${p.basename(g.tempJsonOutFile.path)}.""";
+
+    printMsg(message, onlyIfVerbose: true);
   }
 
 // ignore: slash_for_doc_comments
