@@ -5,6 +5,10 @@
 //TODO: Cleanup tests
 //TODO: Delete deprecated linter
 
+//DONE (for commit message): 
+// imported validators package and replaced own ip check with package method
+// added hostname validation check
+
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {

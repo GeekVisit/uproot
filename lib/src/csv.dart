@@ -57,7 +57,7 @@ class Csv extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.csv.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.csv.formatName);
       } else {
         return leaseMap;
       }

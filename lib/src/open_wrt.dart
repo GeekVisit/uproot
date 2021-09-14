@@ -94,7 +94,7 @@ class OpenWrt extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.openwrt.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.openwrt.formatName);
       } else {
         return leaseMap;
       }

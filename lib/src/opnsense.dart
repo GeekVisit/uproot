@@ -49,7 +49,7 @@ class OpnSense extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.opnsense.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.opnsense.formatName);
       } else {
         return leaseMap;
       }

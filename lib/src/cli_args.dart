@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
+import 'package:validators/validators.dart';
 import 'globals.dart' as g;
 import 'src.dart';
 
@@ -135,11 +136,9 @@ Examples:
 
   void validateIpRangeOptions() {
     try {
-      Ip ip = Ip();
-
       (g.argResults['ip-high-address'] != null &&
               g.argResults['ip-low-address'] != null &&
-              !ip.isIp4(g.argResults['ip-low-address']))
+              !isIP(g.argResults['ip-low-address'], 4))
           ? throw Exception("Ip Range Limit(s) are invalid Ip4 addresses.")
           : "";
     } on Exception {

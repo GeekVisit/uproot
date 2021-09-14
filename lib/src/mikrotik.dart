@@ -25,7 +25,7 @@ class Mikrotik extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.mikrotik.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.mikrotik.formatName);
       } else {
         return leaseMap;
       }

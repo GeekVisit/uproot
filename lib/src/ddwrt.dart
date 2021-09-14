@@ -34,7 +34,8 @@ class Ddwrt extends FileType {
         List<String> leaseProperty = lease[x].split('=');
 
         if (leaseProperty.length < 3) {
-          throw Exception("Corrupt DDwrt File, lease component mismatch. ");
+          printMsg("Bad Lease: ${leaseProperty.join(" ")} Skipping ...");
+          continue;
         }
 
         leaseMap[g.lbMac]!.add(leaseProperty[macIdx]);
@@ -44,7 +45,7 @@ class Ddwrt extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.ddwrt.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.ddwrt.formatName);
       } else {
         return leaseMap;
       }

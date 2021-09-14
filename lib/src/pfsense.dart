@@ -47,7 +47,7 @@ class PfSense extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.pfsense.formatName);
+            .getGoodLeaseMap(leaseMap, g.fFormats.pfsense.formatName);
       } else {
         return leaseMap;
       }

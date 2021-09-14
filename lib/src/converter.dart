@@ -60,24 +60,23 @@ class Converter {
 
         case 'd':
           Ddwrt ddwrt = Ddwrt();
-          ddwrt.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(ddwrt.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("Ddwrt");
+          if (ddwrt.isFileValid(File(g.inputFile).absolute.path)) {
+            saveFile(ddwrt.toJson(), g.tempJsonOutFile.path);
+            printCompletedTmpJson("Ddwrt", success: true);
+          } else {
+            printCompletedTmpJson("Ddwrt", success: false);
+          }
           break;
 
         case 'j':
           File inFile = File(File(g.inputFile).absolute.path);
           try {
-            if (json.isFileValid(File(g.inputFile).absolute.path)) {
-              inFile.copySync(g.tempJsonOutFile.path);
+            String outputContents = json.toJson();
+            if (outputContents != "") {
+              saveFile(outputContents, g.tempJsonOutFile.path);
+              printCompletedTmpJson("json");
             } else {
-              String outputContents = json.toJson();
-              if (json.isContentValid(fileContents: outputContents)) {
-                saveFile(outputContents, g.tempJsonOutFile.path);
-                printCompletedTmpJson("json");
-              } else {
-                printCompletedTmpJson("json", success: false);
-              }
+              printCompletedTmpJson("json", success: false);
             }
           } on FileSystemException {
             g.tempDir = Directory.systemTemp.createTempSync("uprt_");

@@ -19,7 +19,7 @@ class Json extends FileType {
     //
 
     try {
-      Map<String, List<String>> leaseMap = <String, List<String>>{};
+      Map<String, List<String>> rawLeaseMap = <String, List<String>>{};
       List<String> valueList = <String>[];
       if (fileContents == "") {
         throw Exception("Missing json fileContents for getLease");
@@ -30,16 +30,18 @@ class Json extends FileType {
       //picks out host-name, mac-address and ip-address from deviceList->Map
       for (String key in <String>[g.lbMac, g.lbHost, g.lbIp]) {
         for (Map<String, dynamic> jsonLease in deviceList) {
+          jsonLease[key] = (jsonLease[key] == null) ? "" : jsonLease[key];
           valueList.add(jsonLease[key]);
         }
-        leaseMap[key] = valueList.toList();
+
+        rawLeaseMap[key] = valueList.toList();
         valueList.clear();
       }
       if (removeBadLeases) {
         return g.validateLeases
-            .getValidLeaseMap(leaseMap, g.fFormats.json.formatName);
+            .getGoodLeaseMap(rawLeaseMap, g.fFormats.json.formatName);
       } else {
-        return leaseMap;
+        return rawLeaseMap;
       }
     } on Exception {
       //   printMsg(e, errMsg: true);
@@ -134,7 +136,9 @@ class Json extends FileType {
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: inFileContents);
 
-    return build(deviceList, sbJson);
+    return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
+        ? build(deviceList, sbJson)
+        : "";
   }
 
   //Get contents of json file, or temporary json file if none given
