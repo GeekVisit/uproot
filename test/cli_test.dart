@@ -960,43 +960,59 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
-
+    testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.csv", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.json", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.ddwrt", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.openwrt", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-opn.xml", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-pfs.xml", uprt, 50);
-    testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
   });
-  test('bad_json_files', () {
+  test('bad_input_files', () {
     List<String> args = <String>[
-      "test/test-data/lease-list-bad-all-data.json", //all leases bad, results in emtpy input
+      "", //Input file argument replaced in test methods
       "-g",
       "cdjnmop",
       "-b",
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
+      "-v"
     ];
 
-    Converter.cleanUp();
-    g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-    g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+    // Files totally bad
+    testExceptionOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
+        uprt, "Temporary json file failed to generate");
 
-    deleteFiles("test/test-output/*output*.*");
-    deleteFiles("test/test-output/*.log");
-    g.argResults = g.cliArgs.getArgs(args);
-    expect(() => uprt.convertFileList(args),
-        checkErrorMessage("Temporary json file failed to generate"));
+    testExceptionOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
+        uprt, "Temporary json file failed to generate");
+
+    testExceptionOnGenerate(
+        args,
+        "test/test-data/lease-list-bad-address-data.json",
+        uprt,
+        "Temporary json file failed to generate");
+
+    //Partially bad files
+    testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
+
+    testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
 
     testConvertFile(
         args, "test/test-data/lease-list-bad-host-data.json", uprt, 10);
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-mac-data.json", uprt, 10);
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-address-data.json", uprt, 10);
   });
 
   test('log', () {
@@ -1051,14 +1067,32 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
   });
 }
 
+/* Runs tests on output file and expeted length given an input file*/
 void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
-    int expectedLeaseLength) {
+    int expectedGoodLeasesInFile) {
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
+  Converter.cleanUp();
+  g.tempDir = Directory.systemTemp.createTempSync("uprt_");
+  g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
   uprt.convertFileList(args);
-  testOutputFiles(testExpectedLeaseLength: expectedLeaseLength);
+  testOutputFiles(testExpectedLeaseLength: expectedGoodLeasesInFile);
+}
+
+void testExceptionOnGenerate(List<String> args, String inputFileToTest,
+    Converter uprt, String exceptionMessage) {
+  deleteFiles("test/test-output/*output*.*");
+  deleteFiles("test/test-output/*.log");
+  Converter.cleanUp();
+  g.tempDir = Directory.systemTemp.createTempSync("uprt_");
+  g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+
+  args[0] = inputFileToTest;
+  g.argResults = g.cliArgs.getArgs(args);
+  expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
 }
 
 void testOutputFiles(

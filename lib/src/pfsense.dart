@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:xml/xml.dart';
 import 'globals.dart' as g;
 import 'src.dart';
@@ -112,7 +111,7 @@ class PfSense extends FileType {
       String leaseTags = leaseXml;
       String tmpLeaseTags;
 
-      for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
+      for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
         tmpLeaseTags = leaseTags;
 
         tmpLeaseTags = tmpLeaseTags.replaceAll(
@@ -139,7 +138,7 @@ class PfSense extends FileType {
       // ignore: unused_local_variable
       XmlDocument tmpLeaseTags = leaseTags;
 
-      for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
+      for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
         tmpLeaseTags = leaseTags;
 
         XmlElement? tmpLeaseTag = tmpLeaseTags.firstElementChild;
@@ -176,25 +175,5 @@ class PfSense extends FileType {
       printMsg(e, errMsg: true);
       return false;
     }
-  }
-
-  @override
-  //Converts Pfsense to Json, returns json string
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(g.inputFile).readAsStringSync();
-
-    //get leases from pfsense file
-    Map<String, List<String>> lease = getLeaseMap(fileContents: inFileContents);
-
-    //convert leases to json format
-    for (int x = 0; x < lease[g.lbHost]!.length; x++) {
-      if (sbJson.isNotEmpty) sbJson.write(',');
-
-      sbJson.write('{ "g.lbMac" : "${lease[g.lbMac]![x]}",'
-          ' "g.lbHost" : "${lease[g.lbHost]![x]}", "g.lbIp" : '
-          '"${lease[g.lbIp]![x]}" }');
-    }
-    return "[ ${sbJson.toString()} ]";
   }
 }

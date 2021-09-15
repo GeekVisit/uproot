@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'globals.dart' as g;
 import 'src.dart';
 
@@ -18,10 +17,21 @@ class Mikrotik extends FileType {
       List<String> fileLines = extractLeaseMatches(fileContents);
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        g.lbHost: extractLeaseParam(fileLines, "name"),
-        g.lbMac: extractLeaseParam(fileLines, g.lbMac),
-        g.lbIp: extractLeaseParam(fileLines, g.lbIp)
+        g.lbHost: <String>[],
+        g.lbMac: <String>[],
+        g.lbIp: <String>[]
       };
+
+      leaseMap[g.lbHost] = extractLeaseParam(fileLines, "name");
+      leaseMap[g.lbMac] = extractLeaseParam(fileLines, g.lbMac);
+      leaseMap[g.lbIp] = extractLeaseParam(fileLines, g.lbIp);
+
+      //fill up empty host names with empty strings
+      if (leaseMap[g.lbHost]!.isEmpty) {
+        for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
+          leaseMap[g.lbHost]!.add("");
+        }
+      }
 
       if (removeBadLeases) {
         return g.validateLeases
@@ -36,7 +46,7 @@ class Mikrotik extends FileType {
   }
 
   String build(Map<String, List<String>?> deviceList, StringBuffer sbMikrotik) {
-    for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
+    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbMikrotik.write(
           """\nadd mac-address=${deviceList[g.lbMac]?[x]} address=${deviceList[g.lbIp]?[x]} server=${g.argResults['server']}""");
     }
@@ -113,17 +123,6 @@ class Mikrotik extends FileType {
       printMsg(e, errMsg: true);
       rethrow;
     }
-  }
-
-  @override
-  String toJson() {
-    Json json = Json();
-    StringBuffer sbJson = StringBuffer();
-
-    Map<String, List<String>?> leaseMap =
-        getLeaseMap(fileContents: File(g.inputFile).readAsStringSync());
-
-    return json.build(leaseMap, sbJson);
   }
 
   //

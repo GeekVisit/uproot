@@ -104,25 +104,25 @@ class ValidateLeases {
   bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
     try {
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
-        printMsg("Error - no valid leases in file.");
         return true;
       }
 
       if (leaseMap[g.lbMac]!.length != leaseMap[g.lbIp]!.length) {
         printMsg(
+            // ignore: lines_longer_than_80_chars
             "File is Corrupt - Mac Addresses do not match number of ip addresses.");
         return true;
       }
 
       for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
         if (!g.validateLeases.isLeaseValid(leaseMap, i, fileType)) {
+          printBadLeases();
           return true;
         }
       }
       printBadLeases();
       return false;
     } on Exception {
-      ;
       printBadLeases();
       return true;
     }
@@ -151,28 +151,29 @@ class ValidateLeases {
       g.lbIp: <String>[],
     };
 
+    int totalBadLeases = 0;
     try {
       if (areAllLeaseMapValuesEmpty(rawLeaseMap)) {
-        printMsg("Error - no valid leases");
+        printMsg("Error - no valid leases in file.");
         return rawLeaseMap;
       }
 
       for (int i = 0; i < rawLeaseMap[g.lbMac]!.length; i++) {
         if (g.validateLeases.isLeaseValid(rawLeaseMap, i, fileType)) {
-          //if (!g.validateLeases.isLeaseValid(leaseMap, i, fileType)) {
-          //  leaseMap.keys.forEach(((dynamic e) => leaseMap[e]!.removeAt(i)));
+          goodLeaseMap[g.lbMac]!.add(rawLeaseMap[g.lbMac]![i].trim());
 
-          goodLeaseMap[g.lbMac]!.add(rawLeaseMap[g.lbMac]![i]);
+          (fileType == "Mikrotik")
+              ? goodLeaseMap[g.lbHost]!.add("")
+              : goodLeaseMap[g.lbHost]!.add(rawLeaseMap[g.lbHost]![i].trim());
 
-          (fileType != "Mikrotik")
-              ? goodLeaseMap[g.lbHost]!.add(rawLeaseMap[g.lbHost]![i])
-              : "";
-
-          goodLeaseMap[g.lbIp]!.add(rawLeaseMap[g.lbIp]![i]);
+          goodLeaseMap[g.lbIp]!.add(rawLeaseMap[g.lbIp]![i].trim());
 
           //  continue;
         } else {
-          print("Excluding invalid lease from output file: "
+          totalBadLeases++;
+          print(
+              // ignore: lines_longer_than_80_chars
+              "Excluding invalid lease from output file (total bad leases: $totalBadLeases): "
               """
 ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]![i]}""");
         }

@@ -21,11 +21,12 @@ class Converter {
 
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
-        toJson();
+        printMsg("Converting ${p.basename(eachFilePath)}...");
+        toTmpJson();
         toOutput();
       }
     } on Exception {
-      rethrow;
+       rethrow;
     }
   }
 
@@ -44,74 +45,39 @@ class Converter {
     }
   }
 
-  void toJson() {
+  void toTmpJson() {
     try {
-      Json json = Json();
       printMsg("Converting Input File to Json temporary file..",
           onlyIfVerbose: true);
       switch (g.inputType) {
         case 'c':
-          Csv csv = Csv();
-          //TODO - check if i need this line if not delete from all:
-          csv.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(csv.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("Csv");
+          convertFileTypeToTmpJsonFile(Csv(), "Csv");
+
           break;
 
         case 'd':
-          Ddwrt ddwrt = Ddwrt();
-          if (ddwrt.isFileValid(File(g.inputFile).absolute.path)) {
-            saveFile(ddwrt.toJson(), g.tempJsonOutFile.path);
-            printCompletedTmpJson("Ddwrt", success: true);
-          } else {
-            printCompletedTmpJson("Ddwrt", success: false);
-          }
+          convertFileTypeToTmpJsonFile(Ddwrt(), "Ddwrt");
           break;
 
         case 'j':
-          File inFile = File(File(g.inputFile).absolute.path);
-          try {
-            String outputContents = json.toJson();
-            if (outputContents != "") {
-              saveFile(outputContents, g.tempJsonOutFile.path);
-              printCompletedTmpJson("json");
-            } else {
-              printCompletedTmpJson("json", success: false);
-            }
-          } on FileSystemException {
-            g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-            g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
-            inFile.copySync(g.tempJsonOutFile.path);
-          }
+          convertFileTypeToTmpJsonFile(Json(), "Json");
 
           break;
 
         case 'm':
-          Mikrotik mikrotik = Mikrotik();
-          mikrotik.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(mikrotik.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("Mikrotik");
+          convertFileTypeToTmpJsonFile(Mikrotik(), "Mikrotik");
           break;
 
         case 'n':
-          OpnSense opnSense = OpnSense();
-          opnSense.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(opnSense.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("Opnsense");
+          convertFileTypeToTmpJsonFile(OpnSense(), "Opnsense");
           break;
 
         case 'o':
-          OpenWrt openWrt = OpenWrt();
-          openWrt.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(openWrt.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("OpenWrt");
+          convertFileTypeToTmpJsonFile(OpenWrt(), "OpenWrt");
           break;
 
         case 'p':
-          PfSense pfSense = PfSense();
-          pfSense.isFileValid(File(g.inputFile).absolute.path);
-          saveFile(pfSense.toJson(), g.tempJsonOutFile.path);
-          printCompletedTmpJson("Pfsense");
+          convertFileTypeToTmpJsonFile(PfSense(), "Pfsense");
           break;
 
         default:
@@ -119,6 +85,21 @@ class Converter {
           sleep(Duration(seconds: 1));
           g.cliArgs.displayHelp();
           exit(1);
+      }
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  void convertFileTypeToTmpJsonFile(
+      FileType formatToConvert, String formatType) {
+    try {
+      String outputContents = formatToConvert.toJson();
+      if (outputContents != "") {
+        saveFile(outputContents, g.tempJsonOutFile.path);
+        printCompletedTmpJson(formatType, success: true);
+      } else {
+        printCompletedTmpJson(formatType, success: false);
       }
     } on Exception {
       rethrow;
@@ -136,7 +117,7 @@ class Converter {
     */
       if (!g.tempJsonOutFile.existsSync()) {
         throw Exception(
-            """"Temporary json file failed to generate. Input file likely corrupt and/or ${g.tempDir} not writeable. Please fix and try again.""");
+            """"Temporary json file failed to generate. Input file ${g.inputFile} likely corrupt and/or ${g.tempDir} not writeable. Please fix and try again.""");
       }
 
       List<String> types =
@@ -176,7 +157,6 @@ class Converter {
             Mikrotik mikrotik = Mikrotik();
             setOutPath(g.fFormats.mikrotik.outputExt);
             saveOutPath(json.toMikroTik());
-            //outPath may change if needs saveFile needs to avoid overwriting
             mikrotik.isFileValid(outPath);
             printCompletedAll(g.fFormats.mikrotik.formatName);
             break;
@@ -214,8 +194,13 @@ class Converter {
             exit(1);
         }
       }
-    } on Exception {
+    } on Exception catch (e) {
       //  printMsg(e, errMsg: true);
+      if (e.toString().contains("Temporary json file failed to generate.")) {
+        printMsg(e);
+        if (g.testRun) rethrow;
+        return;
+      }
       rethrow;
     }
   }

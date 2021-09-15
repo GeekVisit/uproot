@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'globals.dart' as g;
 import 'src.dart';
 
@@ -57,7 +56,7 @@ class Ddwrt extends FileType {
   }
 
   String build(Map<String, List<String>?> deviceList, StringBuffer sbDdwrt) {
-    for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
+    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbDdwrt.write(
           """${deviceList[g.lbMac]?[x]}=${deviceList[g.lbHost]?[x]}=${deviceList[g.lbIp]?[x]}=1440 """);
     }
@@ -86,25 +85,5 @@ class Ddwrt extends FileType {
       printMsg(e, errMsg: true);
       return false;
     }
-  }
-
-  @override
-  //Converts DDwrt to Json, returns json string
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(g.inputFile).readAsStringSync();
-
-    //get leases from ddwrt file
-    Map<String, List<String>> lease = getLeaseMap(fileContents: inFileContents);
-
-    //convert leases to json format
-    for (int x = 0; x < lease[g.lbHost]!.length; x++) {
-      if (sbJson.isNotEmpty) sbJson.write(',');
-
-      sbJson.write('{ g.lbMac : "${lease[g.lbMac]![x]}",'
-          ' g.lbHost : "${lease[g.lbHost]![x]}", g.lbIp : '
-          '"${lease[g.lbIp]![x]}" }');
-    }
-    return "[ ${sbJson.toString()} ]";
   }
 }

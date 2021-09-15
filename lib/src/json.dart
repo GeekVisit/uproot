@@ -50,8 +50,9 @@ class Json extends FileType {
   }
 
   String build(Map<String, List<String>?> deviceList, StringBuffer sbJson) {
-    for (int i = 0; i < deviceList[g.lbHost]!.length; i++) {
+    for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
       if (sbJson.isNotEmpty) sbJson.write(',');
+      
       sbJson.write('''
 { "host-name" : "${deviceList[g.lbHost]![i]}", "mac-address" : "${deviceList[g.lbMac]![i]}", "address" : "${deviceList[g.lbIp]![i]}" }''');
     }
@@ -128,18 +129,7 @@ class Json extends FileType {
     return mikrotik.build(deviceList, sbMikrotik);
   }
 
-  @override
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(g.inputFile).readAsStringSync();
 
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: inFileContents);
-
-    return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
-        ? build(deviceList, sbJson)
-        : "";
-  }
 
   //Get contents of json file, or temporary json file if none given
   String getJsonFileContents([String jsonFilePath = 'tempJsonOutFilePath']) {

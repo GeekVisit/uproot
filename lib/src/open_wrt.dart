@@ -15,7 +15,7 @@ class OpenWrt extends FileType {
             onlyIfVerbose: true);
         return true;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""",
+        printMsg("""$filePath is invalid format for $fileType)""",
             errMsg: true);
         return false;
       }
@@ -106,7 +106,7 @@ class OpenWrt extends FileType {
 
   @override
   String build(Map<String, List<String>?> deviceList, StringBuffer sbOpenwrt) {
-    for (int x = 0; x < deviceList[g.lbHost]!.length; x++) {
+    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbOpenwrt.write("""config host
              option mac \'${deviceList[g.lbMac]?[x]}\'
              option name \'${deviceList[g.lbHost]?[x]}\'
@@ -118,7 +118,9 @@ class OpenWrt extends FileType {
     //verify whether file is a valid openwrt configuration file
   }
 
-  @override
+  // ignore: slash_for_doc_comments
+  /** Converts openwrt to json - getLeaseMap args are different 
+   * from abstract class*/
   String toJson() {
     StringBuffer sbJson = StringBuffer();
     Json json = Json();

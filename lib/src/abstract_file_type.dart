@@ -2,15 +2,29 @@
 import 'dart:io';
 
 import 'file_ops.dart';
+import 'globals.dart' as g;
+import 'json.dart';
 
 abstract class FileType {
   //Returns a Map of static Leases in form of
 
   abstract String fileType;
 
-  String toJson();
+  String toJson() {
+    StringBuffer sbJson = StringBuffer();
+    Json json = Json();
+    String inFileContents = File(g.inputFile).readAsStringSync();
 
-  Map<String, List<String>?> getLeaseMap(
+    //get leases from ddwrt file
+    Map<String, List<String>> deviceList =
+        getLeaseMap(fileContents: inFileContents);
+
+    return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
+        ? json.build(deviceList, sbJson)
+        : "";
+  }
+
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "", List<String> fileLines});
 
   //Builds file from List of leases containing mac-address,host-name, ip address
@@ -28,7 +42,7 @@ abstract class FileType {
         return true;
       } else {
         printMsg(
-            """$filePath is invalid format  for $fileType and/or has bad leases""",
+            """$filePath is invalid format for $fileType and/or has bad leases""",
             errMsg: true);
         return false;
       }

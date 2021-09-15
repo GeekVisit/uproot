@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+
 
 import 'globals.dart' as g;
 import 'src.dart';
@@ -69,7 +69,7 @@ class Csv extends FileType {
   @override
   String build(Map<String, List<String>?> deviceList, StringBuffer sbCsv) {
     sbCsv.write("host-name, mac-address, address\n");
-    for (int i = 0; i < deviceList[g.lbHost]!.length; i++) {
+    for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
       sbCsv.write(
           // ignore: lines_longer_than_80_chars
           "${deviceList[g.lbHost]![i]},${deviceList[g.lbMac]![i]},${deviceList[g.lbIp]![i]}\n");
@@ -99,17 +99,6 @@ class Csv extends FileType {
 
       return false;
     }
-  }
-
-  @override
-  String toJson() {
-    Json json = Json();
-    StringBuffer sbJson = StringBuffer();
-    //TODO Don't think i need this line - delete from others as well
-    isFileValid(File(g.inputFile).absolute.path);
-    Map<String, List<String>> lease = getLeaseMap(
-        fileContents: File(File(g.inputFile).absolute.path).readAsStringSync());
-    return json.build(lease, sbJson);
   }
 
   void csvAddColumnNamesAndRows(List<dynamic> deviceList, StringBuffer sbCsv) {

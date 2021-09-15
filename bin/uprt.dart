@@ -5,7 +5,7 @@
 //TODO: Cleanup tests
 //TODO: Delete deprecated linter
 
-//DONE (for commit message): 
+//DONE (for commit message):
 // imported validators package and replaced own ip check with package method
 // added hostname validation check
 
@@ -55,7 +55,7 @@ void main(List<String> arguments) {
     Converter uprt = Converter();
     uprt.convertFileList(arguments);
   } on Exception catch (e) {
-    handleExceptions(e);
+    if (testRun) handleExceptions(e);
     // ignore: avoid_catching_errors
   } on Error catch (e) {
     displayFatalError(e);
