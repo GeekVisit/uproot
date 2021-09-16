@@ -44,7 +44,7 @@ class Ddwrt extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.ddwrt.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.ddwrt.formatName);
       } else {
         return leaseMap;
       }
@@ -55,7 +55,8 @@ class Ddwrt extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbDdwrt) {
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sbDdwrt = StringBuffer();
     for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbDdwrt.write(
           """${deviceList[g.lbMac]?[x]}=${deviceList[g.lbHost]?[x]}=${deviceList[g.lbIp]?[x]}=1440 """);
@@ -66,7 +67,7 @@ class Ddwrt extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("Missing Argument for getLease");
       }

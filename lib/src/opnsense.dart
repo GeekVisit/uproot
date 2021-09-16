@@ -47,7 +47,7 @@ class OpnSense extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.opnsense.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.opnsense.formatName);
       } else {
         return leaseMap;
       }
@@ -58,8 +58,9 @@ class OpnSense extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbOpnsense) {
+  String build(Map<String, List<String>?> deviceList) {
     try {
+      StringBuffer sbOpnsense = StringBuffer();
       String preLeaseXml = '''<?xml version="1.0"?>
 <opnsense>
 <dhcpd>
@@ -103,7 +104,7 @@ class OpnSense extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("Missing Argument for getLease");
       }

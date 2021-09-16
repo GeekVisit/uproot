@@ -35,7 +35,7 @@ class Mikrotik extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.mikrotik.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.mikrotik.formatName);
       } else {
         return leaseMap;
       }
@@ -45,7 +45,8 @@ class Mikrotik extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbMikrotik) {
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sbMikrotik = StringBuffer();
     for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbMikrotik.write(
           """\nadd mac-address=${deviceList[g.lbMac]?[x]} address=${deviceList[g.lbIp]?[x]} server=${g.argResults['server']}""");
@@ -56,7 +57,7 @@ class Mikrotik extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("File Contents is Empty");
       }

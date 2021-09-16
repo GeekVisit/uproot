@@ -39,7 +39,7 @@ class Json extends FileType {
       }
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(rawLeaseMap, g.fFormats.json.formatName);
+            .removeBadLeases(rawLeaseMap, g.fFormats.json.formatName);
       } else {
         return rawLeaseMap;
       }
@@ -49,10 +49,13 @@ class Json extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbJson) {
+  String build(
+    Map<String, List<String>?> deviceList,
+  ) {
+    StringBuffer sbJson = StringBuffer();
     for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
       if (sbJson.isNotEmpty) sbJson.write(',');
-      
+
       sbJson.write('''
 { "host-name" : "${deviceList[g.lbHost]![i]}", "mac-address" : "${deviceList[g.lbMac]![i]}", "address" : "${deviceList[g.lbIp]![i]}" }''');
     }
@@ -60,7 +63,6 @@ class Json extends FileType {
   }
 
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
-    ValidateLeases.initialize();
     try {
       if (fileContents == "") {
         throw Exception("No argument provided for json.isContentProvided");
@@ -87,81 +89,47 @@ class Json extends FileType {
   }
 
   String toCsv() {
-    try {
-      Csv csv = Csv();
-      StringBuffer sbCsv = StringBuffer();
-      Map<String, List<String>> deviceList =
-          getLeaseMap(fileContents: getJsonFileContents());
-      csv.build(deviceList, sbCsv);
+    Map<String, List<String>> deviceList =
+        getLeaseMap(fileContents: getJsonFileContents());
 
-      //csv.csvAddColumnNamesAndRows(deviceList, sbCsv);
-      return sbCsv.toString();
-    } on FormatException catch (e) {
-      throw Exception("Badly Formatted Json File: $e");
-    }
+    deviceList = Csv().mergeIfOpted(deviceList);
+    return Csv().build(deviceList);
   }
 
   String toDdwrt() {
-    Ddwrt ddwrt = Ddwrt();
-    StringBuffer sbDdwrt = StringBuffer();
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: getJsonFileContents());
-    ddwrt.build(deviceList, sbDdwrt);
-    return (sbDdwrt.toString());
+    deviceList = Ddwrt().mergeIfOpted(deviceList);
+
+    return Ddwrt().build(deviceList);
   }
 
   String toOpenWrt() {
-    OpenWrt openWrt = OpenWrt();
-
-    StringBuffer sbOpenWrt = StringBuffer();
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: getJsonFileContents());
-    return openWrt.build(deviceList, sbOpenWrt);
+    deviceList = OpenWrt().mergeIfOpted(deviceList);
+    return OpenWrt().build(deviceList);
   }
 
   String toMikroTik() {
-    Mikrotik mikrotik = Mikrotik();
-    StringBuffer sbMikrotik = StringBuffer();
-
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: getJsonFileContents());
-
-    return mikrotik.build(deviceList, sbMikrotik);
-  }
-
-
-
-  //Get contents of json file, or temporary json file if none given
-  String getJsonFileContents([String jsonFilePath = 'tempJsonOutFilePath']) {
-    //
-    //
-    //This defaults to the global temporary file path,
-    //otherwise user defined path
-    jsonFilePath = (jsonFilePath == "tempJsonOutFilePath")
-        ? g.tempJsonOutFile.path
-        : jsonFilePath;
-
-    return File(jsonFilePath).readAsStringSync();
+    deviceList = Mikrotik().mergeIfOpted(deviceList);
+    return Mikrotik().build(deviceList);
   }
 
   String toPfsense() {
-    PfSense pfSense = PfSense();
-    StringBuffer sbPfsense = StringBuffer();
-
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: getJsonFileContents());
-
-    return pfSense.build(deviceList, sbPfsense);
+    deviceList = PfSense().mergeIfOpted(deviceList);
+    return PfSense().build(deviceList);
   }
 
-  String toOpnsense() {
-    OpnSense opnSense = OpnSense();
-    StringBuffer sbOpnsense = StringBuffer();
-
+  String toOpnSense() {
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: getJsonFileContents());
-
-    return opnSense.build(deviceList, sbOpnsense);
+    deviceList = OpnSense().mergeIfOpted(deviceList);
+    return OpnSense().build(deviceList);
   }
 
   bool isJson(String string) {
@@ -172,5 +140,19 @@ class Json extends FileType {
     } on FormatException {
       return false;
     }
+  }
+
+// ignore: slash_for_doc_comments
+/** Get contents of json file, or temporary json file if none given */
+  String getJsonFileContents([String jsonFilePath = 'tempJsonOutFilePath']) {
+    //
+    //
+    //This defaults to the global temporary file path,
+    //otherwise user defined path
+    jsonFilePath = (jsonFilePath == "tempJsonOutFilePath")
+        ? g.tempJsonOutFile.path
+        : jsonFilePath;
+
+    return File(jsonFilePath).readAsStringSync();
   }
 }

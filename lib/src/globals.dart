@@ -83,16 +83,6 @@ extension FileFormatProps on fFormats {
   String get formatName => formatNames[this]!;
 }
 
-Map<String, String> conversionTypes = <String, String>{
-  fFormats.csv.abbrev: fFormats.csv.formatName,
-  fFormats.ddwrt.abbrev: fFormats.ddwrt.formatName,
-  fFormats.json.abbrev: fFormats.json.formatName,
-  fFormats.mikrotik.abbrev: fFormats.mikrotik.formatName,
-  fFormats.openwrt.abbrev: fFormats.openwrt.formatName,
-  fFormats.opnsense.abbrev: fFormats.opnsense.formatName,
-  fFormats.pfsense.abbrev: fFormats.pfsense.formatName,
-};
-
 ValidateLeases validateLeases = ValidateLeases();
 
 const String lbMac = 'mac-address';

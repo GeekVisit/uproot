@@ -10,6 +10,9 @@ class Converter {
   /** Main loop - process each file argument */
 
   String outPath = "";
+
+  // ignore: slash_for_doc_comments
+  /** Output files that have been saved to prevent overwriting */
   List<String> outputFilesSaved = <String>[];
 
   // ignore: slash_for_doc_comments
@@ -26,7 +29,7 @@ class Converter {
         toOutput();
       }
     } on Exception {
-       rethrow;
+      rethrow;
     }
   }
 
@@ -39,7 +42,7 @@ class Converter {
               ? p.basenameWithoutExtension(g.inputFile)
               : g.argResults['base-name'];
 
-      g.inputType = g.cliArgs.getInputType();
+      g.inputType = g.cliArgs.getFormatTypeOfFile();
     } on Exception {
       return;
     }
@@ -164,7 +167,7 @@ class Converter {
           case 'n':
             OpnSense opnSense = OpnSense();
             setOutPath("-opn.${g.fFormats.opnsense.outputExt}");
-            saveOutPath(json.toOpnsense());
+            saveOutPath(json.toOpnSense());
             opnSense.isFileValid(outPath);
             printCompletedAll(g.fFormats.opnsense.formatName);
 
@@ -293,8 +296,8 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
   static void cleanUp() {
     try {
       if (g.tempDir.existsSync()) g.tempDir.deleteSync(recursive: true);
-    } on Exception {
-      rethrow;
+    } on Exception catch(e) {
+      print(e);
     }
   }
 } //end Class

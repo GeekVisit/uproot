@@ -1,31 +1,39 @@
 //Take out requirement to have hostnames and validate without
-//TODO: allow new static leases to be inserted into existing openwrt/ddwrt/pfsense/opnsense XML doc
 // USING -M for merge
 //TODO: make sure verbosity works properly
-//TODO: Cleanup tests
 //TODO: Delete deprecated linter
-
-//DONE (for commit message):
-// imported validators package and replaced own ip check with package method
-// added hostname validation check
+//TODO: Not giving error messages when options are wrong when interpreting/using dart
+//TODO: (now):
+//Insert into existing file for:
+// .json, csv,  opn, pfs, ddwrt, openwrt, rsc,
 
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    // arguments = <String>[
-    //   "test/test-data/*.csv",
-    //   "-g",
-    //   "m",
-    //   //   "-v",
-    //   //   "v",
-    //   //   "-b",
-    //   //   "test-output-now",
-    //   //   "-l",
-    //   //   "-P",
-    //   //   "bin/uprt.log"
-    // ];
+    arguments = <String>[
+      //   "test/test-data/*.csv",
+      //   "-g",
+      //   "m",
+      //   //   "-v",
+      //   //   "v",
+      //   //   "-b",
+      //   //   "test-output-now",
+      //   //   "-l",
+      //   //   "-P",
+      //   //   "bin/uprt.log"
+      // ];
 
+      "test/test-data/lease-list-bad-infile.csv",
+      "-g",
+      "c",
+      "-m",
+      "test/test-data/lease-list-infile.csv",
+      "-d",
+      "test/test-output",
+      "-b",
+      "example-merge",
+      "-w",
 // //       "test/test-data/*file.json",
 // //       "test/test-data/*file.csv",
 // //       // "-L",
@@ -38,28 +46,31 @@ void main(List<String> arguments) {
 // //       //"test-output-file",
 // //       "-g",
 // //       "m",
-// //       //  "-d",
-// //       //"test/test-output",
+
 // //       //"-s",
 // //       // "myserver",
 
 // // //      "c",
 // //       //   "cdjnmop",
-// //       "-w",
+
 // //       //"-v",
 // //       // "-l",
 // //       // "uprt-log-example.log"
 //     //"-V"
-//     ];
+    ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);
   } on Exception catch (e) {
-    if (testRun) handleExceptions(e);
+    if (!testRun) handleExceptions(e);
     // ignore: avoid_catching_errors
   } on Error catch (e) {
     displayFatalError(e);
   } finally {
-    Converter.cleanUp();
+    try {
+      Converter.cleanUp();
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 }

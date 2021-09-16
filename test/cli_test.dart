@@ -133,31 +133,29 @@ void testUpRooted() {
     g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
     uprt.setInputFile(g.inputFileList[0]);
 
-    expect(g.cliArgs.getInputType(), "c");
+    expect(g.cliArgs.getFormatTypeOfFile(), "c");
 
     uprt.setInputFile("test/test-data/lease-list-infile.ddwrt");
-    expect(g.cliArgs.getInputType(), "d");
+    expect(g.cliArgs.getFormatTypeOfFile(), "d");
 
     uprt.setInputFile("test/test-data/lease-list-infile.json");
-    expect(g.cliArgs.getInputType(), "j");
+    expect(g.cliArgs.getFormatTypeOfFile(), "j");
 
     uprt.setInputFile("test/test-data/lease-list-infile.rsc");
-    expect(g.cliArgs.getInputType(), "m");
+    expect(g.cliArgs.getFormatTypeOfFile(), "m");
 
     uprt.setInputFile("test/test-data/lease-list-infile.openwrt");
-    expect(g.cliArgs.getInputType(), "o");
+    expect(g.cliArgs.getFormatTypeOfFile(), "o");
 
     uprt.setInputFile("test/test-data/lease-list-infile-opn.xml");
-    expect(g.cliArgs.getInputType(), "n");
+    expect(g.cliArgs.getFormatTypeOfFile(), "n");
 
     uprt.setInputFile("test/test-data/lease-list-infile-pfs.xml");
-    expect(g.cliArgs.getInputType(), "p");
+    expect(g.cliArgs.getFormatTypeOfFile(), "p");
 
     uprt.setInputFile("test/test-data/lease-list-infile.dd");
-    expect(
-        () => g.cliArgs.getInputType(),
-        checkErrorMessage(
-            ("Unable to determine file type, please specify using -t")));
+    expect(() => g.cliArgs.getFormatTypeOfFile(),
+        checkErrorMessage(("Unable to determine file type")));
 
 /* Test Mandatory */
 
@@ -995,7 +993,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
         "Temporary json file failed to generate");
 
     //Partially bad files
-    testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 47);
+    testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
 
     testConvertFile(
         args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
@@ -1012,7 +1010,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
         args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-host-data.json", uprt, 10);
+        args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
   });
 
   test('log', () {

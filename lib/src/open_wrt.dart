@@ -28,7 +28,7 @@ class OpenWrt extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "" && fileLines == null) {
         throw Exception("Missing Argument for isContentValid");
       }
@@ -94,7 +94,7 @@ class OpenWrt extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.openwrt.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.openwrt.formatName);
       } else {
         return leaseMap;
       }
@@ -105,7 +105,8 @@ class OpenWrt extends FileType {
   }
 
   @override
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbOpenwrt) {
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sbOpenwrt = StringBuffer();
     for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbOpenwrt.write("""config host
              option mac \'${deviceList[g.lbMac]?[x]}\'
@@ -114,22 +115,19 @@ class OpenWrt extends FileType {
    """);
     }
     return sbOpenwrt.toString();
-
-    //verify whether file is a valid openwrt configuration file
   }
 
   // ignore: slash_for_doc_comments
-  /** Converts openwrt to json - getLeaseMap args are different 
-   * from abstract class*/
+  /** Converts openwrt to json - 
+   * NOTE: This requires override as getLeaseMap args are different 
+   * from abstract class! */
+  @override
   String toJson() {
-    StringBuffer sbJson = StringBuffer();
     Json json = Json();
 
     Map<String, List<String>?> lease =
         getLeaseMap(fileLines: File(g.inputFile).readAsLinesSync());
 
-    json.build(lease, sbJson);
-
-    return "[ ${sbJson.toString()} ]";
+    return json.build(lease);
   }
 }

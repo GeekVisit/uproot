@@ -1,17 +1,24 @@
 import 'dart:io';
 
+import '../lib.dart';
+
 import 'file_ops.dart';
 
 void handleExceptions(dynamic e) {
   try {
-    throw (e);
-  } on FileSystemException catch (e) {
-    displayFatalFileSystemException(e);
-  } on FormatException catch (e) {
-    printMsg(e.message, errMsg: true);
+    try {
+      throw (e);
+    } on FileSystemException catch (e) {
+      displayFatalFileSystemException(e);
+    } on FormatException catch (e) {
+      printMsg(e.message.toString(), errMsg: true);
+    } on Exception catch (e) {
+      displayFatalException(e);
+      // ignore: avoid_catching_errors
+    }
   } on Exception catch (e) {
-    displayFatalException(e);
-    // ignore: avoid_catching_errors
+    printMsg(e, onlyIfVerbose: true, logOnly: true);
+    rethrow;
   }
 }
 

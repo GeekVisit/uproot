@@ -19,21 +19,18 @@ class ValidateLeases {
   }
 
 /* Check if already processed, if so mark as duplicate */
-  bool isDuplicate(String mac, String host, String ip) {
+  bool isDuplicate(String mac, String host, String ip, StringBuffer sb) {
     String reasonFailed;
 
     reasonFailed = processedMac.contains(mac)
         ? "Mac Duplicate"
-        : processedName.contains(host)
+        : processedName.contains(host) && host != ""
             ? "Name Duplicate"
             : processedIp.contains(ip)
                 ? "IP Duplicate"
                 : "";
 
-    (reasonFailed.isNotEmpty)
-        ? badLeases.add(
-            """${g.newL} $reasonFailed for lease: address=$ip mac-address=$mac name=$host""")
-        : "";
+    (reasonFailed.isNotEmpty) ? sb.write("""($reasonFailed)""") : "";
 
     return (reasonFailed.isNotEmpty);
   }
@@ -44,6 +41,9 @@ class ValidateLeases {
       String macAddress = leaseMap[g.lbMac]![i],
           ipAddress = leaseMap[g.lbIp]![i];
       String hostName;
+      StringBuffer badLeaseBuffer = StringBuffer();
+      bool returnValue = true;
+
       if (fileType != g.fFormats.mikrotik.formatName &&
           i < leaseMap[g.lbHost].length) {
         hostName = leaseMap[g.lbHost]![i];
@@ -51,27 +51,25 @@ class ValidateLeases {
         hostName = "";
       }
 
-      ValidateLeases.initialize();
       Ip ip = Ip();
-      String leaseValues = "mac-address=$macAddress address=$ipAddress";
 
       if (!ip.isMacAddress(macAddress)) {
-        badLeases.add("$macAddress is not a valid Mac Address");
-        //   printMsg("$macAddress is not a valid Mac Address", errMsg: true);
+        badLeaseBuffer.write("(mac Address Not Valid)");
+        returnValue = false;
       }
 
       if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
-        badLeases.add("Hostname is Not A Valid Host Name: $leaseValues ");
+        badLeaseBuffer.write("(hostname is Not Valid)");
+        returnValue = false;
       }
 
       if (!isIP(ipAddress, 4)) {
-        badLeases.add("Number is Not A Valid IP 4 Address: $leaseValues ");
-        // printMsg("IP $ipAddress is not a valid IP4 Address.", errMsg: true);
+        badLeaseBuffer.write("(ip4 Address Not Valid)");
+        returnValue = false;
       }
 
-      if (isDuplicate(macAddress, hostName, ipAddress)) {
-        badLeases.add("Duplicate lease for $ipAddress");
-        //printMsg("Duplicate lease for $ipAddress.", errMsg: true);
+      if (isDuplicate(macAddress, hostName, ipAddress, badLeaseBuffer)) {
+        returnValue = false;
       }
 
       if ((g.argResults['ip-low-address'] != null &&
@@ -81,27 +79,27 @@ class ValidateLeases {
             g.argResults['ip-low-address'],
             g.argResults['ip-high-address'],
           )) {
-        badLeases.add("IP Outside Range: $ipAddress");
-        //printMsg("IP out of range for $ipAddress", errMsg: true);
-        return false;
+        badLeaseBuffer.write("(ip outside range)");
+        returnValue = false;
       } else if (!printedLowHighRangeWarning) {
         printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
             onlyIfVerbose: true);
         printedLowHighRangeWarning = true;
       }
 
-      if (badLeases.isNotEmpty) {
-        return false;
+      if (badLeaseBuffer.isNotEmpty) {
+        badLeases.add(badLeaseBuffer.toString());
+        badLeaseBuffer.clear();
       }
-
       addProcessedLease(macAddress, hostName, ipAddress);
-      return true;
+      return returnValue;
     } on Exception {
       return false;
     }
   }
 
   bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
+    ValidateLeases.clearProcessedLeases();
     try {
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
         return true;
@@ -134,8 +132,8 @@ class ValidateLeases {
     }
   }
 
-  /* Initializes Static Properties */
-  static void initialize() {
+  /* Clear Bad and Processed Leases */
+  static void clearProcessedLeases() {
     //set static variables to nothing
     ValidateLeases.processedMac = <String>[];
     ValidateLeases.processedName = <String>[];
@@ -143,14 +141,14 @@ class ValidateLeases {
     ValidateLeases.badLeases = <String>[];
   }
 
-  Map<String, List<String>> getGoodLeaseMap(
+  Map<String, List<String>> removeBadLeases(
       Map<String, List<String>> rawLeaseMap, String fileType) {
     Map<String, List<String>> goodLeaseMap = <String, List<String>>{
       g.lbMac: <String>[],
       g.lbHost: <String>[],
       g.lbIp: <String>[],
     };
-
+    ValidateLeases.clearProcessedLeases();
     int totalBadLeases = 0;
     try {
       if (areAllLeaseMapValuesEmpty(rawLeaseMap)) {
@@ -170,14 +168,21 @@ class ValidateLeases {
 
           //  continue;
         } else {
-          totalBadLeases++;
-          print(
+          printMsg(
+
               // ignore: lines_longer_than_80_chars
-              "Excluding invalid lease from output file (total bad leases: $totalBadLeases): "
+              "Excluding invalid lease from output (total bad leases ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}: "
               """
 ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]![i]}""");
+          totalBadLeases++;
         }
       }
+      if (totalBadLeases > 0) {
+        printMsg(
+            "$totalBadLeases/${rawLeaseMap[g.lbMac]!.length} bad leases excluded from output file");
+      }
+
+      ValidateLeases.clearProcessedLeases();
       return goodLeaseMap;
     } on Exception {
       rethrow;
@@ -189,7 +194,7 @@ ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]!
       // if all of lists in leaseMap entries are empty, i.e., have 0 length
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
         throw Exception(
-            """File ${g.inputFile} is empty of Leases or is not a ${g.conversionTypes[g.inputType]} format.""");
+            """File ${g.inputFile} is empty of Leases or is not a ${g.typeOptionToName[g.inputType]} format.""");
       }
       if ((leaseMap[g.lbMac]?.length != leaseMap[g.lbIp]?.length)) {
         throw Exception("Corrupt $fileType file, each Lease must have an "

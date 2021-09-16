@@ -55,11 +55,9 @@ Creates Log file, if -P not set, then location is at '${p.join(Directory.systemT
             mandatory: false,
             defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
             help: "Full file path to log file.")
-        ..addOption("merge", abbr: 'M', mandatory: false, help: """
+        ..addOption("merge", abbr: 'm', mandatory: false, help: """
 Merge to file. Specify path to file to merge converted output. 
-Used to add static leases to an existing output file. 
-Works only with cvs, json, pfSense, and OPNsense
-""")
+Used to add static leases to an existing output file.""")
         ..addOption("server",
             mandatory: false,
             defaultsTo: "defconf",
@@ -86,7 +84,11 @@ Verbosity - debug level verbosity""")
       }
 
       return parser.parse(arguments);
-    } on FormatException {
+    } on FormatException catch (e) {
+      if (!testRun) {
+        print(e);
+        exit(1);
+      }
       rethrow;
     } on Exception {
       rethrow;
@@ -221,26 +223,33 @@ Examples:
   }
 
 // ignore: slash_for_doc_comments
-/** Gets input type (j for json, etc) -
+/** Gets format type (j for json, etc) -
  use specified format, if not specified, get from extension,
- if xml look if contains opnsense */
-  String getInputType() {
+ if xml look if contains opnsense 
+ Returns empty string if unable to be determined. */
+  String getFormatTypeOfFile([String filePath = ""]) {
     try {
-      if (g.argResults['input-type'] != null) {
+      if (filePath == "") {
+        filePath = g.inputFile;
+      }
+      if (filePath == g.inputFile && g.argResults['input-type'] != null) {
         return g.argResults['input-type']!;
       }
 
-      String inputExt = p.extension(g.inputFile).replaceAll(".", "");
+      String fileExtension = p.extension(filePath).replaceAll(".", "");
 
-      if (inputExt == "xml") {
+      if (fileExtension == "xml") {
         return xmlFirewallFormat(); //determines whether opnsense or pfsense
       } else {
-        if (g.extToTypes.containsKey(inputExt)) {
+        if (g.extToTypes.containsKey(fileExtension)) {
           return g.extToTypes[
-              inputExt]!; //returns type option associated w/extension
+              fileExtension]!; //returns type option associated w/extension
         } else {
-          throw Exception(
-              """Unable to determine file type, please specify using -t""");
+          throw Exception("""Unable to determine file type" +
+               (filePath == g.inputFile) 
+               ? "Please specify for input files using -t" 
+               : "" 
+               """);
         }
       }
     } on Exception {

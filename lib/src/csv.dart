@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'globals.dart' as g;
 import 'src.dart';
 
@@ -11,8 +10,7 @@ class Csv extends FileType {
 
   String fileType = g.fFormats.csv.formatName;
 
-  //Returns Lease map containing list of hostnames, macs, etc.
-  //
+
 
   @override
   Map<String, List<String>> getLeaseMap(
@@ -57,7 +55,7 @@ class Csv extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.csv.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.csv.formatName);
       } else {
         return leaseMap;
       }
@@ -67,19 +65,21 @@ class Csv extends FileType {
   }
 
   @override
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbCsv) {
-    sbCsv.write("host-name, mac-address, address\n");
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sb = StringBuffer();
+
+    sb.write("host-name, mac-address, address\n");
     for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
-      sbCsv.write(
+      sb.write(
           // ignore: lines_longer_than_80_chars
           "${deviceList[g.lbHost]![i]},${deviceList[g.lbMac]![i]},${deviceList[g.lbIp]![i]}\n");
     }
-    return sbCsv.toString();
+    return sb.toString();
   }
 
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
-    ValidateLeases.initialize();
+
     try {
       Map<String, List<String>> leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);

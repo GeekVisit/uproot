@@ -46,7 +46,7 @@ class PfSense extends FileType {
 
       if (removeBadLeases) {
         return g.validateLeases
-            .getGoodLeaseMap(leaseMap, g.fFormats.pfsense.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.pfsense.formatName);
       } else {
         return leaseMap;
       }
@@ -57,8 +57,9 @@ class PfSense extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbPfsense) {
+  String build(Map<String, List<String>?> deviceList) {
     try {
+      StringBuffer sbPfsense = StringBuffer();
       String preLeaseXml = '''<dhcpd>
 	<lan>
 		<range>
@@ -155,7 +156,7 @@ class PfSense extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("Missing Argument for getLease");
       }

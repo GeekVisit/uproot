@@ -6,15 +6,19 @@ import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'globals.dart' as g;
 
-void printMsg(dynamic message,
-    {bool errMsg = false, bool onlyIfVerbose = false, bool logOnly = false}) {
+void printMsg(
+  dynamic msg, {
+  bool errMsg = false,
+  bool onlyIfVerbose = false,
+  bool logOnly = false,
+}) {
   if (errMsg) {
-    stderr.writeln(message.toString().replaceFirst("Exception:", "").trim());
+    stderr.writeln(msg.toString().replaceFirst("Exception:", "").trim());
   } else if (!logOnly) {
     if (onlyIfVerbose) {
-      (g.argResults['verbose']) ? stdout.writeln(message) : "";
+      (g.argResults['verbose']) ? stdout.writeln(msg) : "";
     } else {
-      stdout.writeln(message.toString().replaceFirst("Exception:", "").trim());
+      stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
     }
   }
 
@@ -29,7 +33,7 @@ void printMsg(dynamic message,
       File logFile = File(g.logPath);
       logFile.writeAsStringSync(
           // ignore: lines_longer_than_80_chars
-          "$message  ${g.newL}",
+          "$msg  ${g.newL}",
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
@@ -122,6 +126,14 @@ void deleteFiles(String filesGlobToDelete) {
     for (FileSystemEntity file in listOfFilesToDelete.listSync()) {
       file.deleteSync();
     }
+  } on Exception {
+    rethrow;
+  }
+}
+
+String getGoodPath(String fPath) {
+  try {
+    return p.canonicalize(File(fPath).absolute.path);
   } on Exception {
     rethrow;
   }
