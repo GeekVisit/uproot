@@ -1072,7 +1072,7 @@ void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
   g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-  g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+  g.tempJsonOutFile = getTmpJsonFile("tmpJsonFile");
 
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
@@ -1086,7 +1086,7 @@ void testExceptionOnGenerate(List<String> args, String inputFileToTest,
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
   g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-  g.tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+  g.tempJsonOutFile = getTmpJsonFile("tmpJsonFile");
 
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);

@@ -8,7 +8,7 @@ import 'validate_leases.dart';
 List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
-File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+File tempJsonOutFile = getTmpJsonFile("tmpJsonFile");
 
 String dirOut = argResults['directory-out'];
 

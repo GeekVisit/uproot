@@ -94,21 +94,6 @@ class Converter {
     }
   }
 
-  void convertFileTypeToTmpJsonFile(
-      FileType formatToConvert, String formatType) {
-    try {
-      String outputContents = formatToConvert.toJson();
-      if (outputContents != "") {
-        saveFile(outputContents, g.tempJsonOutFile.path);
-        printCompletedTmpJson(formatType, success: true);
-      } else {
-        printCompletedTmpJson(formatType, success: false);
-      }
-    } on Exception {
-      rethrow;
-    }
-  }
-
   void toOutput() {
     try {
       Json json = Json();
@@ -129,19 +114,13 @@ class Converter {
       for (dynamic each_type in types) {
         switch (each_type) {
           case 'c':
-            Csv csv = Csv();
-            setOutPath(g.fFormats.csv.outputExt);
-            saveOutPath(json.toCsv());
-            csv.isFileValid(outPath);
-            printCompletedAll(g.fFormats.csv.formatName);
+            saveAndValidateOutFile(json.toCsv(), Csv(), g.fFormats.csv.abbrev,
+                g.fFormats.csv.outputExt);
             break;
 
           case 'd':
-            Ddwrt ddwrt = Ddwrt();
-            setOutPath(g.fFormats.ddwrt.outputExt);
-            saveOutPath(json.toDdwrt());
-            ddwrt.isFileValid(outPath);
-            printCompletedAll(g.fFormats.ddwrt.formatName);
+            saveAndValidateOutFile(json.toDdwrt(), Ddwrt(),
+                g.fFormats.ddwrt.abbrev, g.fFormats.ddwrt.outputExt);
             break;
 
           case 'j':
@@ -157,36 +136,30 @@ class Converter {
             break;
 
           case 'm':
-            Mikrotik mikrotik = Mikrotik();
-            setOutPath(g.fFormats.mikrotik.outputExt);
-            saveOutPath(json.toMikroTik());
-            mikrotik.isFileValid(outPath);
-            printCompletedAll(g.fFormats.mikrotik.formatName);
+            saveAndValidateOutFile(json.toMikroTik(), Mikrotik(),
+                g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.outputExt);
             break;
 
           case 'n':
-            OpnSense opnSense = OpnSense();
-            setOutPath("-opn.${g.fFormats.opnsense.outputExt}");
-            saveOutPath(json.toOpnSense());
-            opnSense.isFileValid(outPath);
-            printCompletedAll(g.fFormats.opnsense.formatName);
+            saveAndValidateOutFile(
+                json.toOpnSense(),
+                OpnSense(),
+                g.fFormats.opnsense.abbrev,
+                "-opn.${g.fFormats.opnsense.outputExt}");
 
             break;
 
           case 'o':
-            OpenWrt openWrt = OpenWrt();
-            setOutPath(g.fFormats.openwrt.outputExt);
-            saveOutPath(json.toOpenWrt());
-            openWrt.isFileValid(outPath);
-            printCompletedAll(g.fFormats.openwrt.formatName);
+            saveAndValidateOutFile(json.toOpenWrt(), OpenWrt(),
+                g.fFormats.openwrt.abbrev, g.fFormats.openwrt.outputExt);
             break;
 
           case 'p':
-            PfSense pfSense = PfSense();
-            setOutPath("-pfs.${g.fFormats.pfsense.outputExt}");
-            saveOutPath(json.toPfsense());
-            pfSense.isFileValid(outPath);
-            printCompletedAll(g.fFormats.pfsense.formatName);
+            saveAndValidateOutFile(
+                json.toPfsense(),
+                PfSense(),
+                g.fFormats.pfsense.abbrev,
+                "-pfs.${g.fFormats.opnsense.outputExt}");
 
             break;
 
@@ -208,17 +181,47 @@ class Converter {
     }
   }
 
+// ignore: slash_for_doc_comments
+/** Save converted contents to outFile path and check if valid */
+  void saveAndValidateOutFile(
+      String fileContents, FileType ftClass, String formatName, String ext) {
+    setOutPath(ext);
+
+    printCompletedAll(formatName,
+        success: (saveToOutPath(fileContents) && ftClass.isFileValid(outPath)));
+  }
+
+  void convertFileTypeToTmpJsonFile(
+      FileType formatToConvert, String formatType) {
+    try {
+      String outputContents = formatToConvert.toJson();
+      if (outputContents != "") {
+        saveFile(outputContents, g.tempJsonOutFile.path);
+        printCompletedTmpJson(formatType, success: true);
+      } else {
+        printCompletedTmpJson(formatType, success: false);
+      }
+    } on Exception {
+      rethrow;
+    }
+  }
+
   // ignore: slash_for_doc_comments
   /** Saves Converted Output file */
-  void saveOutPath(String outContents) {
+  bool saveToOutPath(String outContents) {
     /** Don't save over files previously saved in same run if happen to have
      *  same name, overrides write-over command line option*/
-    bool overWrite = (outputFilesSaved.contains(outPath))
-        ? false
-        : g.argResults['write-over'];
+    try {
+      bool overWrite = (outputFilesSaved.contains(outPath))
+          ? false
+          : g.argResults['write-over'];
 
-    outPath = saveFile(outContents, outPath, overWrite: overWrite);
-    outputFilesSaved.add(outPath);
+      outPath = saveFile(outContents, outPath, overWrite: overWrite);
+      outputFilesSaved.add(outPath);
+      return true;
+    } on Exception {
+      return false;
+    }
   }
 
 // ignore: slash_for_doc_comments
@@ -296,7 +299,7 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
   static void cleanUp() {
     try {
       if (g.tempDir.existsSync()) g.tempDir.deleteSync(recursive: true);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       print(e);
     }
   }

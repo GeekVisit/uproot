@@ -79,7 +79,7 @@ String saveFile(String contents, String savePath, {bool overWrite = false}) {
 
 ///  Returns temporary filepath for temporary uprt conversion file
 
-File getTmpIntermedConvFile(String baseName, {String extension = ".tmp"}) {
+File getTmpJsonFile(String baseName, {String extension = ".tmp"}) {
   // ignore: unused_local_variable
   int x = 1;
   File temp =
@@ -137,4 +137,10 @@ String getGoodPath(String fPath) {
   } on Exception {
     rethrow;
   }
+}
+
+// ignore: slash_for_doc_comments
+/** Get contents of json file, or temporary json file if none given */
+String getFileContents(String filePath) {
+  return File(filePath).readAsStringSync();
 }

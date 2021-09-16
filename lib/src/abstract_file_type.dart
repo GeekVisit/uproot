@@ -16,8 +16,6 @@ abstract class FileType {
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: inFileContents);
 
-    deviceList = json.mergeIfOpted(deviceList);
-
     return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
         ? json.build(deviceList)
         : "";
@@ -59,7 +57,8 @@ abstract class FileType {
   // ignore: slash_for_doc_comments
   /** Merge Lease Map with Map of A Second File (Merge File Target)
    * In case of conflict of Macs or host name, the lease with the lesser ip 
-   * controls, if same ip, then the one in the mergeTarget file is replaced with 
+   * controls, if same ip, then the one in the mergeTarget file 
+   * is replaced with 
    * the lease for that ip in the input file
    * 
    * Returns Lease Map of Merge
@@ -75,6 +74,7 @@ abstract class FileType {
     dynamic mergeTargetFileType =
         g.typeOptionToName[g.cliArgs.getFormatTypeOfFile(mergeTargetPath)];
 
+    printMsg("Processing merge file $mergeTargetPath ...");
     mergeTargetLeaseMap = mergeLeaseMaps(inputFileLeaseMap,
         getLeaseMap(fileContents: File(mergeTargetPath).readAsStringSync()));
 

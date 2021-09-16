@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import '../lib.dart';
 
@@ -90,7 +89,7 @@ class Json extends FileType {
 
   String toCsv() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
 
     deviceList = Csv().mergeIfOpted(deviceList);
     return Csv().build(deviceList);
@@ -98,36 +97,52 @@ class Json extends FileType {
 
   String toDdwrt() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
     deviceList = Ddwrt().mergeIfOpted(deviceList);
 
     return Ddwrt().build(deviceList);
   }
 
+  // String toJsonMerge() {
+  //   //needs to be worked on - WIP TODO:
+  //   /String inFileContents = File(g.inputFile).readAsStringSync();
+
+  //   Map<String, List<String>> deviceList =
+  //       getLeaseMap(fileContents: inFileContents);
+
+  //   if (fileType == "Json") {
+  //     deviceList = mergeIfOpted(deviceList);
+  //   }
+
+  //   return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
+  //       ? build(deviceList)
+  //       : "";
+  // }
+
   String toOpenWrt() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
     deviceList = OpenWrt().mergeIfOpted(deviceList);
     return OpenWrt().build(deviceList);
   }
 
   String toMikroTik() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
     deviceList = Mikrotik().mergeIfOpted(deviceList);
     return Mikrotik().build(deviceList);
   }
 
   String toPfsense() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
     deviceList = PfSense().mergeIfOpted(deviceList);
     return PfSense().build(deviceList);
   }
 
   String toOpnSense() {
     Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: getJsonFileContents());
+        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
     deviceList = OpnSense().mergeIfOpted(deviceList);
     return OpnSense().build(deviceList);
   }
@@ -140,19 +155,5 @@ class Json extends FileType {
     } on FormatException {
       return false;
     }
-  }
-
-// ignore: slash_for_doc_comments
-/** Get contents of json file, or temporary json file if none given */
-  String getJsonFileContents([String jsonFilePath = 'tempJsonOutFilePath']) {
-    //
-    //
-    //This defaults to the global temporary file path,
-    //otherwise user defined path
-    jsonFilePath = (jsonFilePath == "tempJsonOutFilePath")
-        ? g.tempJsonOutFile.path
-        : jsonFilePath;
-
-    return File(jsonFilePath).readAsStringSync();
   }
 }
