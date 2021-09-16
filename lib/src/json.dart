@@ -88,63 +88,41 @@ class Json extends FileType {
   }
 
   String toCsv() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-
-    deviceList = Csv().mergeIfOpted(deviceList);
-    return Csv().build(deviceList);
+    return Csv().build(getSourceLeaseMap(Csv()));
   }
 
   String toDdwrt() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-    deviceList = Ddwrt().mergeIfOpted(deviceList);
-
-    return Ddwrt().build(deviceList);
+    return Ddwrt().build(getSourceLeaseMap(Ddwrt()));
   }
 
-  // String toJsonMerge() {
-  //   //needs to be worked on - WIP TODO:
-  //   /String inFileContents = File(g.inputFile).readAsStringSync();
-
-  //   Map<String, List<String>> deviceList =
-  //       getLeaseMap(fileContents: inFileContents);
-
-  //   if (fileType == "Json") {
-  //     deviceList = mergeIfOpted(deviceList);
-  //   }
-
-  //   return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
-  //       ? build(deviceList)
-  //       : "";
-  // }
+  String toJson() {
+    return Json().build(getSourceLeaseMap(Json()));
+  }
 
   String toOpenWrt() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-    deviceList = OpenWrt().mergeIfOpted(deviceList);
-    return OpenWrt().build(deviceList);
+    return OpenWrt().build(getSourceLeaseMap(OpenWrt()));
   }
 
   String toMikroTik() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-    deviceList = Mikrotik().mergeIfOpted(deviceList);
-    return Mikrotik().build(deviceList);
+    return Mikrotik().build(getSourceLeaseMap(Mikrotik()));
   }
 
   String toPfsense() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-    deviceList = PfSense().mergeIfOpted(deviceList);
-    return PfSense().build(deviceList);
+    return PfSense().build(getSourceLeaseMap(PfSense()));
   }
 
   String toOpnSense() {
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: g.tempJsonOutFile.readAsStringSync());
-    deviceList = OpnSense().mergeIfOpted(deviceList);
-    return OpnSense().build(deviceList);
+    return OpnSense().build(getSourceLeaseMap(OpnSense()));
+  }
+
+  // ignore: slash_for_doc_comments
+  /** Gets the temporary LeaseMap from json file and Merge if Option Given 
+   * Don't need to Remove Bad Lease as Removed in Temporary Json
+  */
+  Map<String, List<String>> getSourceLeaseMap(FileType fType) {
+    return fType.mergeIfOpted(getLeaseMap(
+        fileContents: g.tempJsonOutFile.readAsStringSync(),
+        removeBadLeases: false));
   }
 
   bool isJson(String string) {

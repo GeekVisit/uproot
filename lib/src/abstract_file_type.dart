@@ -9,15 +9,14 @@ abstract class FileType {
 
   abstract String fileType;
 
-  String toJson() {
-    Json json = Json();
+  String toTmpJson() {
     String inFileContents = File(g.inputFile).readAsStringSync();
 
     Map<String, List<String>> deviceList =
         getLeaseMap(fileContents: inFileContents);
 
     return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
-        ? json.build(deviceList)
+        ? Json().build(deviceList)
         : "";
   }
 

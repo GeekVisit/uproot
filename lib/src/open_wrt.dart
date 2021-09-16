@@ -122,7 +122,7 @@ class OpenWrt extends FileType {
    * NOTE: This requires override as getLeaseMap args are different 
    * from abstract class! */
   @override
-  String toJson() {
+  String toTmpJson() {
     Json json = Json();
 
     Map<String, List<String>?> lease =
