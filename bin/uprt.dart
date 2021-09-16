@@ -3,7 +3,9 @@
 //TODO: make sure verbosity works properly
 //TODO: Delete deprecated linter
 //TODO: Not giving error messages when options are wrong when interpreting/using dart
+//TODO: do away with use of temporary json file and convert directly
 //TODO: (now):
+//TODO: Ignore -g for merge - always m
 //Insert into existing file for:
 // .json, csv,  opn, pfs, ddwrt, openwrt, rsc,
 
@@ -24,11 +26,11 @@ void main(List<String> arguments) {
       //   //   "bin/uprt.log"
       // ];
 
-      "test/test-data/lease-list-bad-infile.csv",
+      "test/test-data/lease-list-bad-infile.ddwrt",
       "-g",
-      "c",
+      "d",
       "-m",
-      "test/test-data/lease-list-infile.csv",
+      "test/test-data/lease-list-infile.ddwrt",
       "-d",
       "test/test-output",
       "-b",

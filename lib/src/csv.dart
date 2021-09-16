@@ -10,8 +10,6 @@ class Csv extends FileType {
 
   String fileType = g.fFormats.csv.formatName;
 
-
-
   @override
   Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
@@ -42,7 +40,7 @@ class Csv extends FileType {
             "CSV File is wrong format - must have 3 columns containing "
             "(g.lbHost, g.lbMac, g.lbIp). ",
             errMsg: true);
-        throw Exception("Error: CSV Wrong Format");
+        throw Exception("CSV Wrong Format");
       }
 
       for (int i = 1; i < csvRows.length; i++) {
@@ -79,7 +77,6 @@ class Csv extends FileType {
 
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
-
     try {
       Map<String, List<String>> leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);

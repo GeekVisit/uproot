@@ -124,15 +124,6 @@ class Converter {
             break;
 
           case 'j':
-            // setOutPath(g.fFormats.json.outputExt);
-            // //outPath may change if needs saveFile needs to avoid overwriting
-            // if (g.tempJsonOutFile.existsSync()) {
-            //   g.tempJsonOutFile.copySync(outPath);
-            //   printCompletedAll(g.fFormats.json.formatName);
-            // } else {
-            //   printCompletedAll(g.fFormats.json.formatName, success: false);
-            // }
-
             saveAndValidateOutFile(json.toJson(), Json(),
                 g.fFormats.json.abbrev, g.fFormats.json.outputExt);
             break;
@@ -187,10 +178,14 @@ class Converter {
 /** Save converted contents to outFile path and check if valid */
   void saveAndValidateOutFile(
       String fileContents, FileType ftClass, String formatName, String ext) {
-    setOutPath(ext);
-
-    printCompletedAll(formatName,
-        success: (saveToOutPath(fileContents) && ftClass.isFileValid(outPath)));
+    try {
+      setOutPath(ext);
+      printCompletedAll(formatName,
+          success:
+              (saveToOutPath(fileContents) && ftClass.isFileValid(outPath)));
+    } on Exception {
+      rethrow;
+    }
   }
 
   void convertFileTypeToTmpJsonFile(
@@ -198,7 +193,7 @@ class Converter {
     try {
       String outputContents = formatToConvert.toTmpJson();
       if (outputContents != "") {
-        saveFile(outputContents, g.tempJsonOutFile.path);
+        //  saveFile(outputContents, g.tempJsonOutFile.path);
         printCompletedTmpJson(formatType, success: true);
       } else {
         printCompletedTmpJson(formatType, success: false);
