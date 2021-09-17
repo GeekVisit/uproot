@@ -77,9 +77,10 @@ String saveFile(String contents, String savePath, {bool overWrite = false}) {
   }
 }
 
-///  Returns temporary filepath for temporary uprt conversion file
+/// Returns temporary filepath for temporary uprt file
+/// 2021-09 Deprecated currently, may not need */
 
-File getTmpJsonFile(String baseName, {String extension = ".tmp"}) {
+File getTmpFile(String baseName, {String extension = ".tmp"}) {
   // ignore: unused_local_variable
   int x = 1;
   File temp =

@@ -135,18 +135,4 @@ class OpenWrt extends FileType {
     }
     return sbOpenwrt.toString();
   }
-
-  // ignore: slash_for_doc_comments
-  /** Converts openwrt to json - 
-   * NOTE: This requires override as getLeaseMap args are different 
-   * from abstract class! */
-  @override
-  String toTmpJson() {
-    Json json = Json();
-
-    Map<String, List<String>?> lease =
-        getLeaseMap(fileLines: File(g.inputFile).readAsLinesSync());
-
-    return json.build(lease);
-  }
 }

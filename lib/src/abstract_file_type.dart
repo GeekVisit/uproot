@@ -9,17 +9,6 @@ abstract class FileType {
 
   abstract String fileType;
 
-  String toTmpJson() {
-    String inFileContents = File(g.inputFile).readAsStringSync();
-
-    Map<String, List<String>> deviceList =
-        getLeaseMap(fileContents: inFileContents);
-
-    return !g.validateLeases.areAllLeaseMapValuesEmpty(deviceList)
-        ? Json().build(deviceList)
-        : "";
-  }
-
 // ignore: slash_for_doc_comments
 /** Gets Map of Static Leases from file contents
    Removes Bad Leases by Default */

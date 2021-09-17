@@ -48,57 +48,9 @@ class Converter {
     }
   }
 
-  void toTmpJson() {
-    try {
-      printMsg("Converting Input File to Json temporary file..",
-          onlyIfVerbose: true);
-      switch (g.inputType) {
-        case 'c':
-          convertFileTypeToTmpJsonFile(Csv(), "Csv");
-
-          break;
-
-        case 'd':
-          convertFileTypeToTmpJsonFile(Ddwrt(), "Ddwrt");
-          break;
-
-        case 'j':
-          convertFileTypeToTmpJsonFile(Json(), "Json");
-
-          break;
-
-        case 'm':
-          convertFileTypeToTmpJsonFile(Mikrotik(), "Mikrotik");
-          break;
-
-        case 'n':
-          convertFileTypeToTmpJsonFile(OpnSense(), "Opnsense");
-          break;
-
-        case 'o':
-          convertFileTypeToTmpJsonFile(OpenWrt(), "OpenWrt");
-          break;
-
-        case 'p':
-          convertFileTypeToTmpJsonFile(PfSense(), "Pfsense");
-          break;
-
-        default:
-          printMsg("Incorrect input type: ${g.inputType}", errMsg: true);
-          sleep(Duration(seconds: 1));
-          g.cliArgs.displayHelp();
-          exit(1);
-      }
-    } on Exception {
-      rethrow;
-    }
-  }
-
   void toOutput() {
     try {
-      /**  split type argument regardless of comma separator
-    */
-
+      /**  split type argument regardless of comma separator*/
       List<String> outputTypes =
           g.cliArgs.getArgListOfMultipleOptions(g.argResults['generate-type']);
 
@@ -179,21 +131,6 @@ class Converter {
     }
   }
 
-  void convertFileTypeToTmpJsonFile(
-      FileType formatToConvert, String sourceFormatType) {
-    try {
-      String outputContents = formatToConvert.toTmpJson();
-      if (outputContents != "") {
-        saveFile(outputContents, g.tempJsonOutFile.path);
-        printCompletedTmpJson(sourceFormatType, success: true);
-      } else {
-        printCompletedTmpJson(sourceFormatType, success: false);
-      }
-    } on Exception {
-      rethrow;
-    }
-  }
-
   // ignore: slash_for_doc_comments
   /** Saves Converted Output file */
   bool saveToOutPath(String outContents) {
@@ -245,13 +182,6 @@ class Converter {
 $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]} $successResult).""");
   }
 
-  void printCompletedTmpJson(String fileType, {bool success = true}) {
-    String message = (success)
-        ? """$fileType to temporary Json ${p.basename(g.tempJsonOutFile.path)} is completed."""
-        : """Input file invalid format - unable to convert $fileType to temporary Json ${p.basename(g.tempJsonOutFile.path)}.""";
-
-    printMsg(message, onlyIfVerbose: true);
-  }
 
 // ignore: slash_for_doc_comments
 /** Initializes programs - does some validation of arguments 

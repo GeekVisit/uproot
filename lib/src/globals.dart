@@ -4,7 +4,7 @@ import '../lib.dart';
 List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
-File tempJsonOutFile = getTmpJsonFile("tmpJsonFile");
+
 
 String dirOut = argResults['directory-out'];
 
