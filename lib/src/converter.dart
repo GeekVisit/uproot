@@ -193,7 +193,7 @@ class Converter {
     try {
       String outputContents = formatToConvert.toTmpJson();
       if (outputContents != "") {
-        //  saveFile(outputContents, g.tempJsonOutFile.path);
+        saveFile(outputContents, g.tempJsonOutFile.path);
         printCompletedTmpJson(formatType, success: true);
       } else {
         printCompletedTmpJson(formatType, success: false);

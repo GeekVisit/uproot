@@ -1,3 +1,7 @@
+//Try to follow this convention:
+
+//https://nvie.com/posts/a-successful-git-branching-model
+
 //Take out requirement to have hostnames and validate without
 // USING -M for merge
 //TODO: make sure verbosity works properly
@@ -8,6 +12,8 @@
 //TODO: Ignore -g for merge - always m
 //Insert into existing file for:
 // .json, csv,  opn, pfs, ddwrt, openwrt, rsc,
+
+//TODO: allow new static leases to be inserted into existing pfsense XML doc
 
 import 'package:uprt/lib.dart';
 
