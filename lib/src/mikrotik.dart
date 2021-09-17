@@ -1,31 +1,41 @@
-import 'dart:io';
-import 'globals.dart';
+import 'globals.dart' as g;
 import 'src.dart';
 
 class Mikrotik extends FileType {
   //
 
-  String fileType = fFormats.mikrotik.formatName;
+  String fileType = g.fFormats.mikrotik.formatName;
 
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     if (fileContents == "" && fileLines == null) {
-      throw Exception("Missing Argument for getLease");
+      throw Exception("Missing Argument for getLeaseMap in Mikrotik");
     }
     try {
       List<String> fileLines = extractLeaseMatches(fileContents);
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        lbHost: extractLeaseParam(fileLines, "name"),
-        lbMac: extractLeaseParam(fileLines, lbMac),
-        lbIp: extractLeaseParam(fileLines, lbIp)
+        g.lbHost: <String>[],
+        g.lbMac: <String>[],
+        g.lbIp: <String>[]
       };
 
+      leaseMap[g.lbHost] = extractLeaseParam(fileLines, "name");
+      leaseMap[g.lbMac] = extractLeaseParam(fileLines, g.lbMac);
+      leaseMap[g.lbIp] = extractLeaseParam(fileLines, g.lbIp);
+
+      //fill up empty host names with empty strings
+      if (leaseMap[g.lbHost]!.isEmpty) {
+        for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
+          leaseMap[g.lbHost]!.add("");
+        }
+      }
+
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.mikrotik.formatName);
+        return g.validateLeases
+            .removeBadLeases(leaseMap, g.fFormats.mikrotik.formatName);
       } else {
         return leaseMap;
       }
@@ -35,10 +45,11 @@ class Mikrotik extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbMikrotik) {
-    for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sbMikrotik = StringBuffer();
+    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbMikrotik.write(
-          """\nadd mac-address=${deviceList[lbMac]?[x]} name=${deviceList[lbHost]?[x]} address=${deviceList[lbIp]?[x]} server=defconf""");
+          """\nadd mac-address=${deviceList[g.lbMac]?[x]} address=${deviceList[g.lbIp]?[x]} server=${g.argResults['server']}""");
     }
     return "/ip dhcp-server lease\n${sbMikrotik.toString().trim()}";
   }
@@ -46,7 +57,7 @@ class Mikrotik extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("File Contents is Empty");
       }
@@ -58,13 +69,15 @@ class Mikrotik extends FileType {
           getLease(fileLines: importList, removeBadLeases: false); */
 
       Map<String, List<String>> leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.mikrotik.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.mikrotik.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.mikrotik.formatName);
 
       return true;
     } on Exception catch (e) {
@@ -95,8 +108,8 @@ class Mikrotik extends FileType {
       List<String> leaseParamList = <String>[];
 
       List<dynamic> param = importList!
-          .where((dynamic element) => (paramType == lbIp
-              ? element.contains(lbIp) && !element.contains(lbMac)
+          .where((dynamic element) => (paramType == g.lbIp
+              ? element.contains(g.lbIp) && !element.contains(g.lbMac)
               : element.contains(paramType)))
           //.where((dynamic element) => (element.contains(paramType)))
           .map((dynamic e) => (e.split("=")))
@@ -111,17 +124,6 @@ class Mikrotik extends FileType {
       printMsg(e, errMsg: true);
       rethrow;
     }
-  }
-
-  @override
-  String toJson() {
-    Json json = Json();
-    StringBuffer sbJson = StringBuffer();
-
-    Map<String, List<String>?> leaseMap = getLease(
-        fileContents: File(argResults['input-file']).readAsStringSync());
-
-    return json.build(leaseMap, sbJson);
   }
 
   //

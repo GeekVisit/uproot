@@ -1,17 +1,18 @@
-import 'dart:io';
 import 'package:xml/xml.dart';
-import '../lib.dart';
+
+import 'globals.dart' as g;
+import 'src.dart';
 
 class OpnSense extends FileType {
   //
   //this is the appearance of the properties in the file (Mac comes first, etc.)
   static const int macIdx = 0, hostIdx = 1, ipIdx = 2;
 
-  String fileType = fFormats.opnsense.formatName;
+  String fileType = g.fFormats.opnsense.formatName;
 
   @override
   //Given a string this returns Maps of the a list of each lease
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -19,34 +20,33 @@ class OpnSense extends FileType {
 
     try {
       if (fileContents == "") {
-        throw Exception(
-            "Missing Argument for getLease, input file may be corrupt");
+        throw Exception("Missing Argument for getLeaseMap in OpnSense");
       }
 
       final XmlDocument opnsenseDoc = XmlDocument.parse(fileContents);
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        lbMac: <String>[],
-        lbHost: <String>[],
-        lbIp: <String>[],
+        g.lbMac: <String>[],
+        g.lbHost: <String>[],
+        g.lbIp: <String>[],
       };
 
-      leaseMap[lbMac] = opnsenseDoc
+      leaseMap[g.lbMac] = opnsenseDoc
           .findAllElements('mac')
           .map((dynamic e) => e.innerText.toString())
           .toList();
-      leaseMap[lbHost] = opnsenseDoc
+      leaseMap[g.lbHost] = opnsenseDoc
           .findAllElements('hostname')
           .map((dynamic e) => e.innerText.toString())
           .toList();
-      leaseMap[lbIp] = opnsenseDoc
+      leaseMap[g.lbIp] = opnsenseDoc
           .findAllElements('ipaddr')
           .map((dynamic e) => e.innerText.toString())
           .toList();
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.opnsense.formatName);
+        return g.validateLeases
+            .removeBadLeases(leaseMap, g.fFormats.opnsense.formatName);
       } else {
         return leaseMap;
       }
@@ -57,33 +57,19 @@ class OpnSense extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbOpnsense) {
+  String build(Map<String, List<String>?> deviceList) {
     try {
+      StringBuffer sbOpnsense = StringBuffer();
       String preLeaseXml = '''<?xml version="1.0"?>
 <opnsense>
 <dhcpd>
-    <lan>
-      <enable>1</enable>
-      <ddnsdomainalgorithm>hmac-md5</ddnsdomainalgorithm>
-      <numberoptions>
-        <item/>
-      </numberoptions>
-      <range>
-        <from></from>
-        <to></to>
-      </range>
-      <winsserver/>
-      <dnsserver/>
-      <ntpserver/>''';
+    <lan>''';
 
       String leaseXml = '''
  		      <staticmap>
         <mac></mac>
         <ipaddr></ipaddr>
-        <hostname></hostname>
-        <winsserver/>
-        <dnsserver/>
-        <ntpserver/>
+        <hostname></hostname>        
       </staticmap>''';
 
       String postLeaseXml = '''
@@ -91,23 +77,18 @@ class OpnSense extends FileType {
   </dhcpd>
   </opnsense>''';
 
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<from></from>", "<from>${argResults['ip-low-address']}</from>");
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<to></to>", "<to>${argResults['ip-high-address']}</to>");
-
       String leaseTags = leaseXml;
       String tmpLeaseTags;
 
-      for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+      for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
         tmpLeaseTags = leaseTags;
 
         tmpLeaseTags = tmpLeaseTags.replaceAll(
-            "<mac></mac>", "<mac>${deviceList[lbMac]![x]}</mac>");
+            "<mac></mac>", "<mac>${deviceList[g.lbMac]![x]}</mac>");
         tmpLeaseTags = tmpLeaseTags.replaceAll("<hostname></hostname>",
-            "<hostname>${deviceList[lbHost]![x]}</hostname>");
+            "<hostname>${deviceList[g.lbHost]![x]}</hostname>");
         tmpLeaseTags = tmpLeaseTags.replaceAll(
-            "<ipaddr></ipaddr>", "<ipaddr>${deviceList[lbIp]![x]}</ipaddr>");
+            "<ipaddr></ipaddr>", "<ipaddr>${deviceList[g.lbIp]![x]}</ipaddr>");
 
         sbOpnsense.write("\n$tmpLeaseTags");
       }
@@ -122,43 +103,25 @@ class OpnSense extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for getLeaseMap in OpnSense");
       }
 
       dynamic leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.opnsense.formatName)) {
         return false;
       }
-      validateLeases.validateLeaseList(leaseMap, fFormats.opnsense.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.opnsense.formatName);
 
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
       return false;
     }
-  }
-
-  @override
-  //Converts Opnsense to Json, returns json string
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(argResults['input-file']).readAsStringSync();
-
-    //get leases from opnsense file
-    Map<String, List<String>> lease = getLease(fileContents: inFileContents);
-
-    //convert leases to json format
-    for (int x = 0; x < lease[lbHost]!.length; x++) {
-      if (sbJson.isNotEmpty) sbJson.write(',');
-
-      sbJson.write('{ "$lbMac" : "${lease[lbMac]![x]}",'
-          ' "$lbHost" : "${lease[lbHost]![x]}", "$lbIp" : '
-          '"${lease[lbIp]![x]}" }');
-    }
-    return "[ ${sbJson.toString()} ]";
   }
 }

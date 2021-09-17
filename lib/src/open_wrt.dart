@@ -1,8 +1,10 @@
 import 'dart:io';
-import '../lib.dart';
+
+import 'globals.dart' as g;
+import 'src.dart';
 
 class OpenWrt extends FileType {
-  String fileType = fFormats.openwrt.formatName;
+  String fileType = g.fFormats.openwrt.formatName;
 
   @override
   bool isFileValid(String filePath) {
@@ -13,7 +15,8 @@ class OpenWrt extends FileType {
             onlyIfVerbose: true);
         return true;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""", errMsg: true);
+        printMsg("""$filePath is invalid format for $fileType)""",
+            errMsg: true);
         return false;
       }
     } on Exception catch (e) {
@@ -25,17 +28,29 @@ class OpenWrt extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for isContentValid");
+      ValidateLeases.clearProcessedLeases();
+      if (fileContents != "" && fileLines == null) {
+        fileLines = fileContents
+            .split("\n")
+            // ignore: always_specify_types
+            .map((e) => e.trim())
+            .where((dynamic e) => e.length != 0)
+            .toList();
       }
-      dynamic leaseMap = getLease(fileLines: fileLines, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (fileLines == null) {
+        throw Exception("Missing Argument for isContentValid OpenWrt");
+      }
+      dynamic leaseMap =
+          getLeaseMap(fileLines: fileLines, removeBadLeases: false);
+
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.openwrt.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.openwrt.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.openwrt.formatName);
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
@@ -44,14 +59,24 @@ class OpenWrt extends FileType {
   }
 
   @override
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     try {
-      if (fileLines == null) {
-        throw Exception("Missing Argument for getLease");
+      if (fileLines == null && fileContents != "") {
+        fileLines = fileContents
+            .split("\n")
+            // ignore: always_specify_types
+            .map((e) => e.trim())
+            .where((dynamic e) => e.length != 0)
+            .toList();
       }
+
+      if (fileLines == null) {
+        throw Exception("Missing Argument for getLeaseMap in OpenWrt");
+      }
+
       Map<String, List<String>> leaseMap = <String, List<String>>{};
 
       //Match string between single quotes
@@ -59,9 +84,9 @@ class OpenWrt extends FileType {
       //
 
       Map<String, String> searchParams = <String, String>{
-        lbMac: "option mac",
-        lbHost: "option name",
-        lbIp: "option ip",
+        g.lbMac: "option mac",
+        g.lbHost: "option name",
+        g.lbIp: "option ip",
       };
       List<dynamic> tmp = <dynamic>[];
       List<String> tmp2 = <String>[];
@@ -71,7 +96,7 @@ class OpenWrt extends FileType {
       //3) add value to tmp list
       //4) equate the leaseMap[paramName] = temporary list
       searchParams.forEach((dynamic paramName, dynamic filter) {
-        tmp = fileLines
+        tmp = fileLines!
             .where((dynamic element) => element.contains(filter))
             .toList()
             .map((dynamic e) => exp.firstMatch(e))
@@ -87,8 +112,8 @@ class OpenWrt extends FileType {
       });
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.openwrt.formatName);
+        return g.validateLeases
+            .removeBadLeases(leaseMap, g.fFormats.openwrt.formatName);
       } else {
         return leaseMap;
       }
@@ -99,29 +124,15 @@ class OpenWrt extends FileType {
   }
 
   @override
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbOpenwrt) {
-    for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sbOpenwrt = StringBuffer();
+    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
       sbOpenwrt.write("""config host
-             option mac \'${deviceList[lbMac]?[x]}\'
-             option name \'${deviceList[lbHost]?[x]}\'
-             option ip \'${deviceList[lbIp]?[x]}\'
+             option mac \'${deviceList[g.lbMac]?[x]}\'
+             option name \'${deviceList[g.lbHost]?[x]}\'
+             option ip \'${deviceList[g.lbIp]?[x]}\'
    """);
     }
     return sbOpenwrt.toString();
-
-    //verify whether file is a valid openwrt configuration file
-  }
-
-  @override
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    Json json = Json();
-
-    Map<String, List<String>?> lease =
-        getLease(fileLines: File(argResults['input-file']).readAsLinesSync());
-
-    json.build(lease, sbJson);
-
-    return "[ ${sbJson.toString()} ]";
   }
 }

@@ -1,82 +1,93 @@
 import 'dart:io';
 
 import 'dart:math';
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
-import '../lib.dart';
-import 'globals.dart';
+import 'globals.dart' as g;
 
-void printMsg(dynamic message,
-    {bool errMsg = false, bool onlyIfVerbose = false, bool logOnly = false}) {
+void printMsg(
+  dynamic msg, {
+  bool errMsg = false,
+  bool onlyIfVerbose = false,
+  bool logOnly = false,
+}) {
   if (errMsg) {
-    stderr.writeln(message.toString().replaceFirst("Exception:", "").trim());
+    stderr.writeln(msg.toString().replaceFirst("Exception:", "").trim());
   } else if (!logOnly) {
     if (onlyIfVerbose) {
-      (argResults['verbose']) ? stdout.writeln(message) : "";
+      (g.argResults['verbose']) ? stdout.writeln(msg) : "";
     } else {
-      stdout.writeln(message.toString().replaceFirst("Exception:", "").trim());
+      stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
     }
+  }
 
-    //Write to Log
-    try {
-      if (logPath != "") {
-        File logFile = File(logPath);
+/* Print Stack Trace if Debug */
+  if (g.argResults['verbose-debug']) {
+    stdout.writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
+  }
+
+  //Write to Log
+  try {
+    if (g.argResults['log']) {
+      File logFile = File(g.logPath);
+      logFile.writeAsStringSync(
+          // ignore: lines_longer_than_80_chars
+          "$msg  ${g.newL}",
+          mode: FileMode.append);
+      /* Log Stack Trace if Debug */
+      if (g.argResults['verbose-debug']) {
         logFile.writeAsStringSync(
-            "${"$message  $newL ${StackTrace.current}".toString().trim()}$newL",
-            mode: FileMode.append);
+            "${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
       }
-    } on FormatException catch (e) {
-      if (!testRun) {
-        print("${e.message} (log file)");
-      }
-      rethrow;
-    } on Exception {
-      //print(e);
-      rethrow;
     }
+  } on FormatException catch (e) {
+    if (!g.testRun) {
+      print("${e.message} (log file)");
+    }
+    rethrow;
+  } on Exception {
+    //print(e);
+    rethrow;
   }
 }
 
-String saveOutFile(String outContents, String outputPath,
-    {bool overWrite = false}) {
+String saveFile(String contents, String savePath, {bool overWrite = false}) {
   try {
     int x = 1;
-    File outputFile = File(outputPath);
-    String outputBaseFileName = p.basenameWithoutExtension(outputFile.path);
-    String ext = p.extension(outputFile.path);
+    File fileToSave = File(savePath);
+    String fileToSaveBaseName = p.basenameWithoutExtension(savePath);
+    String ext = p.extension(savePath);
 
     if (!overWrite) {
-      while (outputFile.existsSync()) {
-        outputFile = File(p.join(p.dirname(outputPath),
-            "$outputBaseFileName(${x.toString().padLeft(2, '0')})$ext"));
+      while (fileToSave.existsSync()) {
+        fileToSave = File(p.join(p.dirname(savePath),
+            "$fileToSaveBaseName(${x.toString().padLeft(2, '0')})$ext"));
         x++;
       }
     }
 
-    outputFile.writeAsStringSync(outContents.trim());
+    fileToSave.writeAsStringSync(contents.trim());
 
     //return name of file saved as may change if exists and didn't overwrite
-    return outputFile.absolute.path;
+    return fileToSave.absolute.path;
   } on Exception catch (e) {
     printMsg(e, errMsg: true);
     rethrow;
   }
 }
 
-void saveFile(String contents, String filePath) {
-  File saveFile = File(filePath);
-  saveFile.writeAsStringSync;
-}
+/// Returns temporary filepath for temporary uprt file
+/// 2021-09 Deprecated currently, may not need */
 
-///  Returns temporary filepath for temporary uprt conversion file
-
-File getTmpIntermedConvFile(String baseName, {String extension = ".tmp"}) {
+File getTmpFile(String baseName, {String extension = ".tmp"}) {
   // ignore: unused_local_variable
   int x = 1;
   File temp =
-      File(p.join(tempDir.path, "${argResults['base-name']}$extension"));
+      File(p.join(g.tempDir.path, "${g.argResults['base-name']}$extension"));
 
   while (temp.existsSync()) {
-    temp = File(p.join(tempDir.path,
+    temp = File(p.join(g.tempDir.path,
         "uprt_$baseName\_${getRandomString(6)}$extension".replaceAll("'", "")));
     x++;
   }
@@ -105,4 +116,32 @@ bool isStringAValidFilePath(String testPath) {
     printMsg(e, logOnly: true);
     return false;
   }
+}
+
+// ignore: slash_for_doc_comments
+/** Deletes files, excepts shell expansion globs */
+void deleteFiles(String filesGlobToDelete) {
+  try {
+    Glob listOfFilesToDelete = Glob(filesGlobToDelete);
+
+    for (FileSystemEntity file in listOfFilesToDelete.listSync()) {
+      file.deleteSync();
+    }
+  } on Exception {
+    rethrow;
+  }
+}
+
+String getGoodPath(String fPath) {
+  try {
+    return p.canonicalize(File(fPath).absolute.path);
+  } on Exception {
+    rethrow;
+  }
+}
+
+// ignore: slash_for_doc_comments
+/** Get contents of json file, or temporary json file if none given */
+String getFileContents(String filePath) {
+  return File(filePath).readAsStringSync();
 }

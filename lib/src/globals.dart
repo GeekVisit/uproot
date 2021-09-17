@@ -1,31 +1,26 @@
 import 'dart:io';
+import '../lib.dart';
 
-import 'package:path/path.dart' as p;
-
-import 'cli_args.dart';
-
-import 'file_ops.dart';
-import 'meta.dart';
-import 'validate_leases.dart';
+List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
-File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+
+
 String dirOut = argResults['directory-out'];
-//Output directory with basename attached
-String basePath = File(p.join(dirOut, argResults['base-name'])).absolute.path;
 
+List<String> inputFileList = <String>[];
+String inputFile = "";
 String inputType = "j";
+String baseName = "";
 
-Map<String, String> outputPathNames = <String, String>{
-  "${fFormats.openwrt.formatName}": "$basePath.${fFormats.openwrt.outputExt}",
-  "${fFormats.ddwrt.formatName}": "$basePath.${fFormats.ddwrt.outputExt}",
-  "${fFormats.mikrotik.formatName}": "$basePath.${fFormats.mikrotik.outputExt}",
-  "${fFormats.json.formatName}": "$basePath.${fFormats.json.outputExt}",
-  "${fFormats.csv.formatName}": "$basePath.${fFormats.csv.outputExt}",
-  "${fFormats.pfsense.formatName}":
-      "$basePath-pfs.${fFormats.pfsense.outputExt}",
-  "${fFormats.opnsense.formatName}":
-      "$basePath-opn.${fFormats.opnsense.outputExt}",
+Map<String, FileType> inputTypeCl = <String, FileType>{
+  fFormats.csv.abbrev: Csv(),
+  fFormats.ddwrt.abbrev: Ddwrt(),
+  fFormats.json.abbrev: Json(),
+  fFormats.mikrotik.abbrev: Mikrotik(),
+  fFormats.openwrt.abbrev: OpenWrt(),
+  fFormats.pfsense.abbrev: PfSense(),
+  fFormats.opnsense.abbrev: OpnSense(),
 };
 
 Map<String, String> typeOptionToName = <String, String>{
@@ -89,30 +84,10 @@ extension FileFormatProps on fFormats {
     fFormats.pfsense: 'pfSense',
   };
 
-  static final Map<dynamic, String> outPutPathName = <dynamic, String>{
-    fFormats.csv: "$basePath.${fFormats.csv.outputExt}",
-    fFormats.ddwrt: "$basePath.${fFormats.ddwrt.outputExt}",
-    fFormats.json: "$basePath.${fFormats.json.outputExt}",
-    fFormats.mikrotik: "$basePath.${fFormats.mikrotik.outputExt}",
-    fFormats.openwrt: "$basePath.${fFormats.openwrt.outputExt}",
-    fFormats.opnsense: "$basePath.${fFormats.opnsense.outputExt}",
-    fFormats.pfsense: "$basePath.${fFormats.pfsense.outputExt}",
-  };
-
   String get abbrev => abbrevs[this]!;
   String get outputExt => outputExts[this]!;
   String get formatName => formatNames[this]!;
 }
-
-Map<String, String> conversionTypes = <String, String>{
-  fFormats.csv.abbrev: fFormats.csv.formatName,
-  fFormats.ddwrt.abbrev: fFormats.ddwrt.formatName,
-  fFormats.json.abbrev: fFormats.json.formatName,
-  fFormats.mikrotik.abbrev: fFormats.mikrotik.formatName,
-  fFormats.openwrt.abbrev: fFormats.openwrt.formatName,
-  fFormats.opnsense.abbrev: fFormats.opnsense.formatName,
-  fFormats.pfsense.abbrev: fFormats.pfsense.formatName,
-};
 
 ValidateLeases validateLeases = ValidateLeases();
 
@@ -127,5 +102,11 @@ String logPath = "";
 
 bool testRun = false;
 
-Meta meta = Meta();
 String newL = (Platform.isWindows) ? "\r\n" : newL = "\n";
+
+// ignore: avoid_classes_with_only_static_members
+class MetaCheck {
+  static int match = 0;
+  static int mismatch = 1;
+  static int runningAsBinary = 2;
+}

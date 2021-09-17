@@ -1,17 +1,17 @@
-import 'dart:io';
 import 'package:xml/xml.dart';
-import '../lib.dart';
+import 'globals.dart' as g;
+import 'src.dart';
 
 class PfSense extends FileType {
   //
   //this is the appearance of the properties in the file (Mac comes first, etc.)
   static const int macIdx = 0, hostIdx = 1, ipIdx = 2;
 
-  String fileType = fFormats.pfsense.formatName;
+  String fileType = g.fFormats.pfsense.formatName;
 
   @override
-  //Given a string this returns Maps of the a list of each lease
-  Map<String, List<String>> getLease(
+  //Given a string this returns Maps of a list of each lease
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -20,33 +20,33 @@ class PfSense extends FileType {
     try {
       if (fileContents == "") {
         throw Exception(
-            "Missing Argument for getLease, input file may be corrupt");
+            "Missing Argument for getLeaseMap in pfSense");
       }
 
       final XmlDocument pfsenseDoc = XmlDocument.parse(fileContents);
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        lbMac: <String>[],
-        lbHost: <String>[],
-        lbIp: <String>[],
+        g.lbMac: <String>[],
+        g.lbHost: <String>[],
+        g.lbIp: <String>[],
       };
 
-      leaseMap[lbMac] = pfsenseDoc
+      leaseMap[g.lbMac] = pfsenseDoc
           .findAllElements('mac')
           .map((dynamic e) => e.innerText.toString())
           .toList();
-      leaseMap[lbHost] = pfsenseDoc
+      leaseMap[g.lbHost] = pfsenseDoc
           .findAllElements('hostname')
           .map((dynamic e) => e.innerText.toString())
           .toList();
-      leaseMap[lbIp] = pfsenseDoc
+      leaseMap[g.lbIp] = pfsenseDoc
           .findAllElements('ipaddr')
           .map((dynamic e) => e.innerText.toString())
           .toList();
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.pfsense.formatName);
+        return g.validateLeases
+            .removeBadLeases(leaseMap, g.fFormats.pfsense.formatName);
       } else {
         return leaseMap;
       }
@@ -57,8 +57,9 @@ class PfSense extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbPfsense) {
+  String build(Map<String, List<String>?> deviceList) {
     try {
+      StringBuffer sbPfsense = StringBuffer();
       String preLeaseXml = '''<dhcpd>
 	<lan>
 		<range>
@@ -101,23 +102,25 @@ class PfSense extends FileType {
   </lan>
 </dhcpd>''';
 
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<from></from>", "<from>${argResults['ip-low-address']}</from>");
-      preLeaseXml = preLeaseXml.replaceAll(
-          "<to></to>", "<to>${argResults['ip-high-address']}</to>");
-
+      if (g.argResults['ip-low-address'] != null &&
+          g.argResults['ip-high-address'] != null) {
+        preLeaseXml = preLeaseXml.replaceAll(
+            "<from></from>", "<from>${g.argResults['ip-low-address']}</from>");
+        preLeaseXml = preLeaseXml.replaceAll(
+            "<to></to>", "<to>${g.argResults['ip-high-address']}</to>");
+      }
       String leaseTags = leaseXml;
       String tmpLeaseTags;
 
-      for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+      for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
         tmpLeaseTags = leaseTags;
 
         tmpLeaseTags = tmpLeaseTags.replaceAll(
-            "<mac></mac>", "<mac>${deviceList[lbMac]![x]}</mac>");
+            "<mac></mac>", "<mac>${deviceList[g.lbMac]![x]}</mac>");
         tmpLeaseTags = tmpLeaseTags.replaceAll("<hostname></hostname>",
-            "<hostname>${deviceList[lbHost]![x]}</hostname>");
+            "<hostname>${deviceList[g.lbHost]![x]}</hostname>");
         tmpLeaseTags = tmpLeaseTags.replaceAll(
-            "<ipaddr></ipaddr>", "<ipaddr>${deviceList[lbIp]![x]}</ipaddr>");
+            "<ipaddr></ipaddr>", "<ipaddr>${deviceList[g.lbIp]![x]}</ipaddr>");
 
         sbPfsense.write("\n$tmpLeaseTags");
       }
@@ -136,13 +139,14 @@ class PfSense extends FileType {
       // ignore: unused_local_variable
       XmlDocument tmpLeaseTags = leaseTags;
 
-      for (int x = 0; x < deviceList[lbHost]!.length; x++) {
+      for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
         tmpLeaseTags = leaseTags;
 
         XmlElement? tmpLeaseTag = tmpLeaseTags.firstElementChild;
-        tmpLeaseTag!.getElement("mac")!.innerText = deviceList[lbMac]![x];
-        tmpLeaseTag.getElement("hostname")!.innerText = deviceList[lbHost]![x];
-        tmpLeaseTag.getElement("ipaddr")!.innerText = deviceList[lbIp]![x];
+        tmpLeaseTag!.getElement("mac")!.innerText = deviceList[g.lbMac]![x];
+        tmpLeaseTag.getElement("hostname")!.innerText = 
+        deviceList[g.lbHost]![x];
+        tmpLeaseTag.getElement("ipaddr")!.innerText = deviceList[g.lbIp]![x];
 
         sbPfsense.write("\n$tmpLeaseTag");
       }
@@ -152,43 +156,25 @@ class PfSense extends FileType {
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
-      ValidateLeases.initialize();
+      ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
         throw Exception("Missing Argument for getLease");
       }
 
       dynamic leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
 
-      if (validateLeases.containsBadLeases(leaseMap)) {
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.pfsense.formatName)) {
         return false;
       }
-      validateLeases.validateLeaseList(leaseMap, fFormats.pfsense.formatName);
+      g.validateLeases
+          .validateLeaseList(leaseMap, g.fFormats.pfsense.formatName);
 
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
       return false;
     }
-  }
-
-  @override
-  //Converts Pfsense to Json, returns json string
-  String toJson() {
-    StringBuffer sbJson = StringBuffer();
-    String inFileContents = File(argResults['input-file']).readAsStringSync();
-
-    //get leases from pfsense file
-    Map<String, List<String>> lease = getLease(fileContents: inFileContents);
-
-    //convert leases to json format
-    for (int x = 0; x < lease[lbHost]!.length; x++) {
-      if (sbJson.isNotEmpty) sbJson.write(',');
-
-      sbJson.write('{ "$lbMac" : "${lease[lbMac]![x]}",'
-          ' "$lbHost" : "${lease[lbHost]![x]}", "$lbIp" : '
-          '"${lease[lbIp]![x]}" }');
-    }
-    return "[ ${sbJson.toString()} ]";
   }
 }

@@ -5,15 +5,15 @@ add mac-address=C4:4D:02:A0:E1:96 address=192.168.0.3 server=defconf
 add mac-address=7F:B7:26:C3:A8:D3 address=192.168.0.4 server=defconf
 add mac-address=FC:D6:B5:48:65:3D address=192.168.0.5 server=defconf
 add mac-address=F4:34:E2:3A:F9:30 address=192.168.0.6 server=defconf
-add mac-address=89:2A:F0:C5:2A:30 address=192.168.0.7 server=defconf
+add mac-address=❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙 address=192.168.0.7 server=defconf
 add mac-address=A1:C6:4E:4A:E6:96 address=192.168.0.8 server=defconf
 add mac-address=D1:F4:18:48:A9:C0 address=192.168.0.9 server=defconf
-add mac-address=56:A5:2B:40:39:7F address=192.168.0.10 server=defconf
+add mac-address=56:A5:2B:40:39:7F address="❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙" server=defconf
 add mac-address=28:5B:98:CD:B5:34 address=192.168.0.11 server=defconf
 add mac-address=61:88:68:5E:86:7A address=192.168.0.12 server=defconf
 add mac-address=90:69:74:25:F0:49 address=192.168.0.13 server=defconf
 add mac-address=D6:55:91:F0:F2:89 address=192.168.0.14 server=defconf
-add mac-address=90:83:FA:69:F2:74 address=192.168.0.15 server=defconf
+add mac-address='❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙' address=192.168.0.15 server=defconf
 add mac-address=BD:E0:4D:82:D1:8E address=192.168.0.16 server=defconf
 add mac-address=9F:53:D9:17:4E:06 address=192.168.0.17 server=defconf
 add mac-address=79:F3:07:D9:69:30 address=192.168.0.18 server=defconf

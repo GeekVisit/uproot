@@ -1,20 +1,24 @@
 // ignore: unused_import
 import 'dart:io';
 
-import 'file_ops.dart';
+import '../lib.dart';
+import 'globals.dart' as g;
 
 abstract class FileType {
   //Returns a Map of static Leases in form of
 
   abstract String fileType;
 
-  String toJson();
-
-  Map<String, List<String>?> getLease(
-      {String fileContents = "", List<String> fileLines});
+// ignore: slash_for_doc_comments
+/** Gets Map of Static Leases from file contents
+   Removes Bad Leases by Default */
+  Map<String, List<String>> getLeaseMap(
+      {String fileContents = "",
+      List<String> fileLines,
+      bool removeBadLeases = true});
 
   //Builds file from List of leases containing mac-address,host-name, ip address
-  String build(Map<String, List<String>?> deviceList, StringBuffer buildOutput);
+  String build(Map<String, List<String>?> deviceList);
 
 //Verify whether string is a valid format
   bool isContentValid({String fileContents = "", List<String> fileLines});
@@ -22,17 +26,14 @@ abstract class FileType {
 //Verify whether file is a valid configuration file for format
   bool isFileValid(String filePath) {
     try {
-      if (isContentValid(fileContents: File(filePath).readAsStringSync())) {
-        printMsg("""$filePath is valid format for $fileType""",
-            onlyIfVerbose: true);
-        return true;
+      return (isContentValid(fileContents: File(filePath).readAsStringSync()));
+    } on Exception catch (e) {
+      if (g.testRun) {
+        rethrow;
       } else {
-        printMsg("""$filePath is invalid format for $fileType)}""", errMsg: true);
+        printMsg(e, errMsg: true);
         return false;
       }
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
-      return false;
     }
   }
 }

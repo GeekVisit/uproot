@@ -1,8 +1,11 @@
-import '../lib.dart';
+import 'package:validators/validators.dart';
 
+import 'globals.dart' as g;
 import 'ip.dart';
+import 'src.dart';
 
 class ValidateLeases {
+  static bool printedLowHighRangeWarning = false;
   static List<String> processedMac = <String>[],
       processedIp = <String>[],
       processedName = <String>[],
@@ -16,93 +19,127 @@ class ValidateLeases {
   }
 
 /* Check if already processed, if so mark as duplicate */
-  bool isDuplicate(String mac, String host, String ip) {
+  bool isDuplicate(String mac, String host, String ip, StringBuffer sb) {
     String reasonFailed;
 
     reasonFailed = processedMac.contains(mac)
         ? "Mac Duplicate"
-        : processedName.contains(host)
+        : processedName.contains(host) && host != ""
             ? "Name Duplicate"
             : processedIp.contains(ip)
                 ? "IP Duplicate"
                 : "";
 
     (reasonFailed.isNotEmpty)
-        ? badLeases.add(
-            """$newL $reasonFailed for lease: address=$ip mac-address=$mac name=$host""")
+        ? sb.write("${(sb.isNotEmpty) ? "," : ""}$reasonFailed")
         : "";
 
     return (reasonFailed.isNotEmpty);
   }
 
-  //Checks if ip is valid, within range and not a duplicate before adding
-  bool isLeaseValid(String macAddress, String hostName, String ipAddress) {
-    ValidateLeases.initialize();
-    Ip ip = Ip();
-    String leaseValues =
-        "mac-address=$macAddress name=$hostName address=$ipAddress";
-
-    if (!ip.isMacAddress(macAddress)) {
-      printMsg("$macAddress is not a valid Mac Address", errMsg: true);
-      return false;
-    }
-
-    if (!ip.isIp4(ipAddress)) {
-      badLeases.add("Number is Not A Valid IP 4Address: $leaseValues ");
-      printMsg("IP $ipAddress is not a valid IP4 Address.", errMsg: true);
-      return false;
-    } else if (!ip.isWithinRange(
-      ipAddress,
-      argResults['ip-low-address'],
-      argResults['ip-high-address'],
-    )) {
-      badLeases.add("IP Outside Range: $ipAddress");
-      printMsg("IP out of range for $ipAddress", errMsg: true);
-      return false;
-    } else if (isDuplicate(macAddress, hostName, ipAddress)) {
-      printMsg("Duplicate lease for $ipAddress.", errMsg: true);
-      return false;
-    }
-
-    addProcessedLease(macAddress, hostName, ipAddress);
-    return true;
-  }
-
-  bool containsBadLeases(Map<String, List<String>> leaseMap) {
+  /* Checks Validity of Mac, Ip, and Hostname for a particular lease */
+  bool isLeaseValid(Map<String, dynamic> leaseMap, int i, String fileType) {
     try {
-      bool returnValue = false;
-      if (leaseMap[lbMac] == null ||
-          leaseMap[lbHost] == null ||
-          leaseMap[lbIp] == null) throw Exception("Error - no valid leases");
+      String macAddress = leaseMap[g.lbMac]![i],
+          ipAddress = leaseMap[g.lbIp]![i];
+      String hostName;
+      StringBuffer badLeaseBuffer = StringBuffer();
+      bool returnValue = true;
 
-      if (leaseMap[lbMac]!.length != leaseMap[lbHost]!.length ||
-          leaseMap[lbMac]!.length != leaseMap[lbIp]!.length) {
-        throw Exception(
-            "Mac Addresses do not match number of host names and/or ip addresses. Make sure you have a host name defined for each static lease.");
+      if (fileType != g.fFormats.mikrotik.formatName &&
+          i < leaseMap[g.lbHost].length) {
+        hostName = leaseMap[g.lbHost]![i];
+      } else {
+        hostName = "";
       }
 
-      for (int i = 0; i < leaseMap[lbMac]!.length; i++) {
-        if (!validateLeases.isLeaseValid(
-            leaseMap[lbMac]![i], leaseMap[lbHost]![i], leaseMap[lbIp]![i])) {
-          returnValue = true;
+      Ip ip = Ip();
+
+      if (!ip.isMacAddress(macAddress)) {
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
+        returnValue = false;
+      }
+
+      if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
+        returnValue = false;
+      }
+
+      if (!isIP(ipAddress, 4)) {
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}ip4 Address Not Valid");
+        returnValue = false;
+      }
+
+      if (isDuplicate(macAddress, hostName, ipAddress, badLeaseBuffer)) {
+        returnValue = false;
+      }
+
+      if ((g.argResults['ip-low-address'] != null &&
+              g.argResults['ip-high-address'] != null) &&
+          !ip.isWithinRange(
+            ipAddress,
+            g.argResults['ip-low-address'],
+            g.argResults['ip-high-address'],
+          )) {
+        badLeaseBuffer.write("${(badLeaseBuffer.isNotEmpty) ? "," : ""}"
+            "ip Address Outside Range");
+        returnValue = false;
+      } else if (!printedLowHighRangeWarning) {
+        printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
+            onlyIfVerbose: true);
+        printedLowHighRangeWarning = true;
+      }
+
+      if (badLeaseBuffer.isNotEmpty) {
+        badLeases.add(badLeaseBuffer.toString());
+        badLeaseBuffer.clear();
+      }
+      addProcessedLease(macAddress, hostName, ipAddress);
+      return returnValue;
+    } on Exception {
+      return false;
+    }
+  }
+
+  bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
+    ValidateLeases.clearProcessedLeases();
+    try {
+      if (areAllLeaseMapValuesEmpty(leaseMap)) {
+        return true;
+      }
+
+      if (leaseMap[g.lbMac]!.length != leaseMap[g.lbIp]!.length) {
+        printMsg(
+            // ignore: lines_longer_than_80_chars
+            "File is Corrupt - Mac Addresses do not match number of ip addresses.");
+        return true;
+      }
+
+      for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
+        if (!g.validateLeases.isLeaseValid(leaseMap, i, fileType)) {
+          printBadLeases();
+          return true;
         }
       }
       printBadLeases();
-      return returnValue;
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
+      return false;
+    } on Exception {
       printBadLeases();
       return true;
     }
   }
 
   void printBadLeases() {
-    if (ValidateLeases.badLeases.isNotEmpty) {
-      printMsg(ValidateLeases.badLeases.join(), errMsg: true);
+    if (badLeases.isNotEmpty) {
+      printMsg(badLeases.join(), errMsg: true);
     }
   }
 
-  static void initialize() {
+  /* Clear Bad and Processed Leases */
+  static void clearProcessedLeases() {
     //set static variables to nothing
     ValidateLeases.processedMac = <String>[];
     ValidateLeases.processedName = <String>[];
@@ -111,58 +148,88 @@ class ValidateLeases {
   }
 
   Map<String, List<String>> removeBadLeases(
-      Map<String, List<String>> leaseMap) {
-    if (leaseMap[lbMac] == null ||
-        leaseMap[lbHost] == null ||
-        leaseMap[lbIp] == null) throw Exception("Error - no valid leases");
-
-    for (int i = 0; i < leaseMap[lbMac]!.length; i++) {
-      if (!validateLeases.isLeaseValid(
-          leaseMap[lbMac]![i], leaseMap[lbHost]![i], leaseMap[lbIp]![i])) {
-        leaseMap[lbMac]!.removeAt(i);
-        leaseMap[lbHost]!.removeAt(i);
-        leaseMap[lbIp]!.removeAt(i);
-        continue;
+      Map<String, List<String>> rawLeaseMap, String fileType) {
+    Map<String, List<String>> goodLeaseMap = <String, List<String>>{
+      g.lbMac: <String>[],
+      g.lbHost: <String>[],
+      g.lbIp: <String>[],
+    };
+    ValidateLeases.clearProcessedLeases();
+    int totalBadLeases = 0;
+    try {
+      if (areAllLeaseMapValuesEmpty(rawLeaseMap)) {
+        printMsg("Error - no valid leases in file.");
+        return rawLeaseMap;
       }
-    }
 
-    return leaseMap;
+      for (int i = 0; i < rawLeaseMap[g.lbMac]!.length; i++) {
+        if (g.validateLeases.isLeaseValid(rawLeaseMap, i, fileType)) {
+          goodLeaseMap[g.lbMac]!.add(rawLeaseMap[g.lbMac]![i].trim());
+
+          (fileType == "Mikrotik")
+              ? goodLeaseMap[g.lbHost]!.add("")
+              : goodLeaseMap[g.lbHost]!.add(rawLeaseMap[g.lbHost]![i].trim());
+
+          goodLeaseMap[g.lbIp]!.add(rawLeaseMap[g.lbIp]![i].trim());
+
+          //  continue;
+        } else {
+          printMsg(
+
+              // ignore: lines_longer_than_80_chars
+              "Excluding lease from target file (total bad leases: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}: "
+              """
+${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]![i]}""");
+          totalBadLeases++;
+        }
+      }
+
+      (totalBadLeases == rawLeaseMap[g.lbMac]!.length)
+          ? throw Exception(
+              """Unable to generate target format file, source file format is corrupt or all of its static leases are invalid.""")
+          : printMsg(
+              "Finished Scanning source files for leases, found ${rawLeaseMap[g.lbMac]!.length - totalBadLeases}/${rawLeaseMap[g.lbMac]!.length} valid leases in source file.");
+
+      ValidateLeases.clearProcessedLeases();
+      return goodLeaseMap;
+    } on Exception catch (e) {
+      if (e.toString().contains("Unable to generate target format")) {
+        if (g.testRun) {
+          rethrow;
+        } else {
+          printMsg(e, errMsg: true);
+        }
+      }
+
+      rethrow;
+    }
   }
 
   bool validateLeaseList(Map<String, List<String>?> leaseMap, String fileType) {
     try {
-      if (leaseMap[lbMac]!.isEmpty &&
-          leaseMap[lbHost]!.isEmpty &&
-          leaseMap[lbIp]!.isEmpty) {
+      // if all of lists in leaseMap entries are empty, i.e., have 0 length
+      if (areAllLeaseMapValuesEmpty(leaseMap)) {
         throw Exception(
-            """File ${argResults['input-file']} is empty of Leases or is not a ${conversionTypes[inputType]} format.""");
+            """File ${g.inputFile} is empty of Leases or is not a ${g.typeOptionToName[g.inputType]} format.""");
       }
-      if ((leaseMap[lbMac]?.length != leaseMap[lbHost]?.length) ||
-          (leaseMap[lbMac]?.length != leaseMap[lbIp]?.length)) {
-        throw Exception(
-            "Corrupt $fileType file, each Lease must have a host-name, "
-            "ip_address and mac-address.");
+      if ((leaseMap[g.lbMac]?.length != leaseMap[g.lbIp]?.length)) {
+        throw Exception("Corrupt $fileType file, each Lease must have an "
+            "ip address and mac address.");
       }
 
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
-      rethrow;
+      return false;
     }
   }
 
-  //Deletes bad leases, also validates lease
-  Map<String, List<String>> getValidLeaseMap(
-      Map<String, List<String>> leaseMap, String fileType) {
-    try {
-      leaseMap = removeBadLeases(leaseMap);
-
-      validateLeaseList(leaseMap, fileType);
-      printBadLeases();
-      return leaseMap;
-    } on Exception {
-      rethrow;
-    }
+  //** checks if all values of Lease Map are Empty Lists */
+  bool areAllLeaseMapValuesEmpty(Map<String, List<String>?> leaseMap) {
+    return (leaseMap.values
+            .toList()
+            .fold(0, (dynamic t, dynamic e) => t + e.length)) ==
+        0;
   }
 }
 
