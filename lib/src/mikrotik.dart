@@ -11,7 +11,7 @@ class Mikrotik extends FileType {
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     if (fileContents == "" && fileLines == null) {
-      throw Exception("Missing Argument for getLease");
+      throw Exception("Missing Argument for getLeaseMap in Mikrotik");
     }
     try {
       List<String> fileLines = extractLeaseMatches(fileContents);

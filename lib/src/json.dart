@@ -87,43 +87,7 @@ class Json extends FileType {
     }
   }
 
-  String toCsv() {
-    return Csv().build(getSourceLeaseMap(Csv()));
-  }
 
-  String toDdwrt() {
-    return Ddwrt().build(getSourceLeaseMap(Ddwrt()));
-  }
-
-  String toJson() {
-    return Json().build(getSourceLeaseMap(Json()));
-  }
-
-  String toOpenWrt() {
-    return OpenWrt().build(getSourceLeaseMap(OpenWrt()));
-  }
-
-  String toMikroTik() {
-    return Mikrotik().build(getSourceLeaseMap(Mikrotik()));
-  }
-
-  String toPfsense() {
-    return PfSense().build(getSourceLeaseMap(PfSense()));
-  }
-
-  String toOpnSense() {
-    return OpnSense().build(getSourceLeaseMap(OpnSense()));
-  }
-
-  // ignore: slash_for_doc_comments
-  /** Gets the temporary LeaseMap from json file and Merge if Option Given 
-   * Don't need to Remove Bad Lease as Removed in Temporary Json
-  */
-  Map<String, List<String>> getSourceLeaseMap(FileType fType) {
-    return fType.mergeIfOpted(getLeaseMap(
-        fileContents: g.tempJsonOutFile.readAsStringSync(),
-        removeBadLeases: false));
-  }
 
   bool isJson(String string) {
     try {

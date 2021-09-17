@@ -1,9 +1,5 @@
 import 'dart:io';
-
-import 'cli_args.dart';
-
-import 'file_ops.dart';
-import 'validate_leases.dart';
+import '../lib.dart';
 
 List<String> arguments = <String>[];
 
@@ -16,6 +12,16 @@ List<String> inputFileList = <String>[];
 String inputFile = "";
 String inputType = "j";
 String baseName = "";
+
+Map<String, FileType> inputTypeCl = <String, FileType>{
+  fFormats.csv.abbrev: Csv(),
+  fFormats.ddwrt.abbrev: Ddwrt(),
+  fFormats.json.abbrev: Json(),
+  fFormats.mikrotik.abbrev: Mikrotik(),
+  fFormats.openwrt.abbrev: OpenWrt(),
+  fFormats.pfsense.abbrev: PfSense(),
+  fFormats.opnsense.abbrev: OpnSense(),
+};
 
 Map<String, String> typeOptionToName = <String, String>{
   fFormats.csv.abbrev: fFormats.csv.formatName,

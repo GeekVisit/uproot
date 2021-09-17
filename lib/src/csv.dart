@@ -21,7 +21,7 @@ class Csv extends FileType {
 
       fileContents = fileContents.trim();
       if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for getLeaseMap in Csv");
       }
 
       Map<String, List<String>> leaseMap = <String, List<String>>{

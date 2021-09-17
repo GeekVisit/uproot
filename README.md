@@ -72,7 +72,7 @@ Below is the latest help (version 2021.09.001):
 
 **uprt** (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
-A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
+A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
 
 **Usage:**
 -L, --ip-low-address     Ip4 Lowest Address of Network Range

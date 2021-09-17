@@ -29,8 +29,17 @@ class OpenWrt extends FileType {
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
       ValidateLeases.clearProcessedLeases();
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for isContentValid");
+      if (fileContents != "" && fileLines == null) {
+        fileLines = fileContents
+            .split("\n")
+            // ignore: always_specify_types
+            .map((e) => e.trim())
+            .where((dynamic e) => e.length != 0)
+            .toList();
+      }
+
+      if (fileLines == null) {
+        throw Exception("Missing Argument for isContentValid OpenWrt");
       }
       dynamic leaseMap =
           getLeaseMap(fileLines: fileLines, removeBadLeases: false);
@@ -55,9 +64,19 @@ class OpenWrt extends FileType {
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     try {
-      if (fileLines == null) {
-        throw Exception("Missing Argument for getLease");
+      if (fileLines == null && fileContents != "") {
+        fileLines = fileContents
+            .split("\n")
+            // ignore: always_specify_types
+            .map((e) => e.trim())
+            .where((dynamic e) => e.length != 0)
+            .toList();
       }
+
+      if (fileLines == null) {
+        throw Exception("Missing Argument for getLeaseMap in OpenWrt");
+      }
+
       Map<String, List<String>> leaseMap = <String, List<String>>{};
 
       //Match string between single quotes
@@ -77,7 +96,7 @@ class OpenWrt extends FileType {
       //3) add value to tmp list
       //4) equate the leaseMap[paramName] = temporary list
       searchParams.forEach((dynamic paramName, dynamic filter) {
-        tmp = fileLines
+        tmp = fileLines!
             .where((dynamic element) => element.contains(filter))
             .toList()
             .map((dynamic e) => exp.firstMatch(e))

@@ -25,7 +25,7 @@ class Converter {
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
         printMsg("Converting ${p.basename(eachFilePath)}...");
-        toTmpJson();
+
         toOutput();
       }
     } on Exception {
@@ -96,46 +96,37 @@ class Converter {
 
   void toOutput() {
     try {
-      Json json = Json();
-
-      printMsg("Converting Temporary json File to Output Formats..",
-          onlyIfVerbose: true);
-
       /**  split type argument regardless of comma separator
     */
-      if (!g.tempJsonOutFile.existsSync()) {
-        throw Exception(
-            """"Temporary json file failed to generate. Input file ${g.inputFile} likely corrupt and/or ${g.tempDir} not writeable. Please fix and try again.""");
-      }
 
-      List<String> types =
+      List<String> outputTypes =
           g.cliArgs.getArgListOfMultipleOptions(g.argResults['generate-type']);
 
-      for (dynamic each_type in types) {
-        switch (each_type) {
+      for (dynamic eachOutputType in outputTypes) {
+        switch (eachOutputType) {
           case 'c':
-            saveAndValidateOutFile(json.toCsv(), Csv(), g.fFormats.csv.abbrev,
+            saveAndValidateOutFile(toCsv(), Csv(), g.fFormats.csv.abbrev,
                 g.fFormats.csv.outputExt);
             break;
 
           case 'd':
-            saveAndValidateOutFile(json.toDdwrt(), Ddwrt(),
-                g.fFormats.ddwrt.abbrev, g.fFormats.ddwrt.outputExt);
+            saveAndValidateOutFile(toDdwrt(), Ddwrt(), g.fFormats.ddwrt.abbrev,
+                g.fFormats.ddwrt.outputExt);
             break;
 
           case 'j':
-            saveAndValidateOutFile(json.toJson(), Json(),
-                g.fFormats.json.abbrev, g.fFormats.json.outputExt);
+            saveAndValidateOutFile(toJson(), Json(), g.fFormats.json.abbrev,
+                g.fFormats.json.outputExt);
             break;
 
           case 'm':
-            saveAndValidateOutFile(json.toMikroTik(), Mikrotik(),
+            saveAndValidateOutFile(toMikroTik(), Mikrotik(),
                 g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.outputExt);
             break;
 
           case 'n':
             saveAndValidateOutFile(
-                json.toOpnSense(),
+                toOpnSense(),
                 OpnSense(),
                 g.fFormats.opnsense.abbrev,
                 "-opn.${g.fFormats.opnsense.outputExt}");
@@ -143,13 +134,13 @@ class Converter {
             break;
 
           case 'o':
-            saveAndValidateOutFile(json.toOpenWrt(), OpenWrt(),
+            saveAndValidateOutFile(toOpenWrt(), OpenWrt(),
                 g.fFormats.openwrt.abbrev, g.fFormats.openwrt.outputExt);
             break;
 
           case 'p':
             saveAndValidateOutFile(
-                json.toPfsense(),
+                toPfsense(),
                 PfSense(),
                 g.fFormats.pfsense.abbrev,
                 "-pfs.${g.fFormats.opnsense.outputExt}");
@@ -157,15 +148,14 @@ class Converter {
             break;
 
           default:
-            printMsg("Incorrect Output type: $each_type.", errMsg: true);
+            printMsg("Incorrect Output type: $eachOutputType.", errMsg: true);
             sleep(Duration(seconds: 1));
             g.cliArgs.displayHelp();
             exit(1);
         }
       }
     } on Exception catch (e) {
-      //  printMsg(e, errMsg: true);
-      if (e.toString().contains("Temporary json file failed to generate.")) {
+      if (e.toString().contains("is invalid format")) {
         printMsg(e);
         if (g.testRun) rethrow;
         return;
@@ -176,27 +166,28 @@ class Converter {
 
 // ignore: slash_for_doc_comments
 /** Save converted contents to outFile path and check if valid */
-  void saveAndValidateOutFile(
-      String fileContents, FileType ftClass, String formatName, String ext) {
+  void saveAndValidateOutFile(String fileContents, FileType outputClass,
+      String outputFormatName, String outputExt) {
     try {
-      setOutPath(ext);
-      printCompletedAll(formatName,
-          success:
-              (saveToOutPath(fileContents) && ftClass.isFileValid(outPath)));
+      setOutPath(outputExt);
+      printCompletedAll(outputFormatName,
+          success: (fileContents != "" &&
+              outputClass.isContentValid(fileContents: fileContents) &&
+              saveToOutPath(fileContents)));
     } on Exception {
       rethrow;
     }
   }
 
   void convertFileTypeToTmpJsonFile(
-      FileType formatToConvert, String formatType) {
+      FileType formatToConvert, String sourceFormatType) {
     try {
       String outputContents = formatToConvert.toTmpJson();
       if (outputContents != "") {
         saveFile(outputContents, g.tempJsonOutFile.path);
-        printCompletedTmpJson(formatType, success: true);
+        printCompletedTmpJson(sourceFormatType, success: true);
       } else {
-        printCompletedTmpJson(formatType, success: false);
+        printCompletedTmpJson(sourceFormatType, success: false);
       }
     } on Exception {
       rethrow;
@@ -251,7 +242,7 @@ class Converter {
     String successResult = (success) ? "successful" : "failed";
 
     printMsg("""
-$displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => $fileType) $successResult.""");
+$displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]} $successResult).""");
   }
 
   void printCompletedTmpJson(String fileType, {bool success = true}) {
@@ -300,4 +291,152 @@ $displaySourceFile =>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =>
       print(e);
     }
   }
-} //end Class
+
+// ignore: slash_for_doc_comments
+  /** Gets the temporary LeaseMap from json file and Merge if Option Given 
+  */
+  Map<String, List<String>> getSourceLeaseMap() {
+    Map<String, List<String>> inputLeaseMap = g.inputTypeCl[g.inputType]!
+        .getLeaseMap(
+            fileContents: getFileContents(g.inputFile),
+            fileLines: File(g.inputFile).readAsLinesSync(),
+            removeBadLeases: true);
+
+    return (g.argResults['merge'] != null)
+        ? <String, List<String>>{
+            ...mergeLeaseMapWithFile(
+                inputLeaseMap, getGoodPath(g.argResults['merge']))
+          }
+        : inputLeaseMap;
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds Csv String from input File and Merge File */
+  String toCsv() {
+    return Csv().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds Ddwrt String from input File and Merge File */
+  String toDdwrt() {
+    return Ddwrt().build(getSourceLeaseMap());
+  }
+// ignore: slash_for_doc_comments
+/**  Builds Json String from input & merge file */
+
+  String toJson() {
+    return Json().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds OpenWrt String from input and merge File */
+  String toOpenWrt() {
+    return OpenWrt().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds Mikrotik String from input and merge File */
+  String toMikroTik() {
+    return Mikrotik().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds OpnSense from input and merge File */
+
+  String toPfsense() {
+    return PfSense().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Builds OpnSense String from OpnSense File and Merge File */
+  String toOpnSense() {
+    return OpnSense().build(getSourceLeaseMap());
+  }
+
+// ignore: slash_for_doc_comments
+/**  Merges two LeaseMaps, optionally sorts them 
+ * Second LeaseMap takes precedence  */
+
+  Map<String, List<String>> mergeLeaseMaps(
+      Map<String, List<String>> leaseMap1, Map<String, List<String>> leaseMap2,
+      {bool sort = true}) {
+    try {
+      List<String> leaseList1 = flattenLeaseMap(leaseMap1, sort: sort);
+      List<String> leaseList2 = flattenLeaseMap(leaseMap2, sort: sort);
+      leaseList1.addAll(leaseList2);
+      if (sort) leaseList1.sort();
+      return explodeLeaseList(leaseList1);
+    } on Exception {
+      rethrow;
+    }
+  }
+
+// ignore: slash_for_doc_comments
+/** Takes List created by flattenLeaseMap and returns LeaseMap  */
+
+  Map<String, List<String>> explodeLeaseList(List<String> leaseList) {
+    Map<String, List<String>> leaseMap = <String, List<String>>{
+      g.lbMac: <String>[],
+      g.lbHost: <String>[],
+      g.lbIp: <String>[],
+    };
+
+    for (String eachLease in leaseList) {
+      List<String> tmpLease = eachLease.split("|");
+      leaseMap[g.lbIp]!.add(tmpLease[3]);
+      leaseMap[g.lbMac]!.add(tmpLease[1]);
+      leaseMap[g.lbHost]!.add(tmpLease[2]);
+    }
+    return leaseMap;
+  }
+
+// ignore: slash_for_doc_comments
+/** Converts LeaseMap to a LeaseList consisting of long strings, each string 
+ * consisting of fields separated by |. 
+ * 4 Fields in string: IP converted to a normalized number string, mac, host, 
+ * and ip address. Strings are sorted on first field */
+  List<String> flattenLeaseMap(Map<String, List<String>> leaseMap,
+      {bool sort = true}) {
+    Ip ip = Ip();
+    List<String> leaseList = <String>[];
+    for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
+      leaseList.add("${ip.ipStrToNum(leaseMap[g.lbIp]![i]).toString()}|"
+          "${leaseMap[g.lbMac]![i]}|"
+          "${leaseMap[g.lbHost]![i]}|"
+          "${leaseMap[g.lbIp]![i]}");
+    }
+    if (sort) leaseList.sort();
+    return leaseList;
+  }
+
+// ignore: slash_for_doc_comments
+/** Merge Lease Map with Map of A Second File (Merge File Target)
+   * In case of conflict of Macs or host name, the lease with the lesser ip 
+   * controls, if same ip, then the one in the mergeTarget file 
+   * is replaced with 
+   * the lease for that ip in the input file
+   * 
+   * Returns Lease Map of Merge
+   */
+  Map<String, List<String>> mergeLeaseMapWithFile(
+      Map<String, List<String>> inputFileLeaseMap, String mergeTargetPath) {
+    Map<String, List<String>> mergeTargetLeaseMap = <String, List<String>>{
+      g.lbMac: <String>[],
+      g.lbHost: <String>[],
+      g.lbIp: <String>[],
+    };
+
+    dynamic mergeTargetFileType =
+        g.typeOptionToName[g.cliArgs.getFormatTypeOfFile(mergeTargetPath)];
+
+    printMsg("Processing merge file $mergeTargetPath ...");
+    mergeTargetLeaseMap = mergeLeaseMaps(
+        inputFileLeaseMap,
+        g.inputTypeCl[mergeTargetFileType]!.getLeaseMap(
+            fileContents: File(mergeTargetPath).readAsStringSync()));
+
+    /* Remove duplicate lease **/
+    return validateLeases.removeBadLeases(
+        mergeTargetLeaseMap, mergeTargetFileType);
+  }
+}

@@ -45,9 +45,9 @@ Directory to write files to, defaults to same directory as input file.""")
                 "m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
                 "Required")
         ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
-Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Output File""")
+Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
         ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
-Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Output File""")
+Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File""")
         ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
 Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
         ..addOption("log-file-path",

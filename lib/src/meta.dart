@@ -5,7 +5,7 @@ Map<String, String> meta = <String, String>{
   "name": "uprt",
   "description":
       // ignore: lines_longer_than_80_chars
-      "A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.",  
+      "A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.",  
   "version":"2021.09.001",
 };
   

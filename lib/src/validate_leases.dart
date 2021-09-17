@@ -30,7 +30,9 @@ class ValidateLeases {
                 ? "IP Duplicate"
                 : "";
 
-    (reasonFailed.isNotEmpty) ? sb.write("""($reasonFailed)""") : "";
+    (reasonFailed.isNotEmpty)
+        ? sb.write("${(sb.isNotEmpty) ? "," : ""}$reasonFailed")
+        : "";
 
     return (reasonFailed.isNotEmpty);
   }
@@ -54,17 +56,20 @@ class ValidateLeases {
       Ip ip = Ip();
 
       if (!ip.isMacAddress(macAddress)) {
-        badLeaseBuffer.write("(mac Address Not Valid)");
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
         returnValue = false;
       }
 
       if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
-        badLeaseBuffer.write("(hostname is Not Valid)");
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
         returnValue = false;
       }
 
       if (!isIP(ipAddress, 4)) {
-        badLeaseBuffer.write("(ip4 Address Not Valid)");
+        badLeaseBuffer.write(
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}ip4 Address Not Valid");
         returnValue = false;
       }
 
@@ -79,7 +84,8 @@ class ValidateLeases {
             g.argResults['ip-low-address'],
             g.argResults['ip-high-address'],
           )) {
-        badLeaseBuffer.write("(ip outside range)");
+        badLeaseBuffer.write("${(badLeaseBuffer.isNotEmpty) ? "," : ""}"
+            "ip Address Outside Range");
         returnValue = false;
       } else if (!printedLowHighRangeWarning) {
         printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
@@ -171,20 +177,30 @@ class ValidateLeases {
           printMsg(
 
               // ignore: lines_longer_than_80_chars
-              "Excluding invalid lease from output (total bad leases ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}: "
+              "Excluding lease from target file (total bad leases: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}: "
               """
 ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]![i]}""");
           totalBadLeases++;
         }
       }
-      if (totalBadLeases > 0) {
-        printMsg(
-            "$totalBadLeases/${rawLeaseMap[g.lbMac]!.length} bad leases excluded from output file");
-      }
+
+      (totalBadLeases == rawLeaseMap[g.lbMac]!.length)
+          ? throw Exception(
+              """Unable to generate target format file, source file format is corrupt or all of its static leases are invalid.""")
+          : printMsg(
+              "Finished Scanning source files for leases, found ${rawLeaseMap[g.lbMac]!.length - totalBadLeases}/${rawLeaseMap[g.lbMac]!.length} valid leases in source file.");
 
       ValidateLeases.clearProcessedLeases();
       return goodLeaseMap;
-    } on Exception {
+    } on Exception catch (e) {
+      if (e.toString().contains("Unable to generate target format")) {
+        if (g.testRun) {
+          rethrow;
+        } else {
+          printMsg(e, errMsg: true);
+        }
+      }
+
       rethrow;
     }
   }

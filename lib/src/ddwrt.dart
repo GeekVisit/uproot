@@ -18,7 +18,7 @@ class Ddwrt extends FileType {
 
     try {
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for getLeaseMap in Ddwrt");
       }
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
@@ -69,7 +69,7 @@ class Ddwrt extends FileType {
     try {
       ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for isContentsValid Ddwrt");
       }
 
       dynamic leaseMap =

@@ -20,8 +20,7 @@ class OpnSense extends FileType {
 
     try {
       if (fileContents == "") {
-        throw Exception(
-            "Missing Argument for getLease, input file may be corrupt");
+        throw Exception("Missing Argument for getLeaseMap in OpnSense");
       }
 
       final XmlDocument opnsenseDoc = XmlDocument.parse(fileContents);
@@ -106,7 +105,7 @@ class OpnSense extends FileType {
     try {
       ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for getLeaseMap in OpnSense");
       }
 
       dynamic leaseMap =

@@ -20,7 +20,7 @@ class PfSense extends FileType {
     try {
       if (fileContents == "") {
         throw Exception(
-            "Missing Argument for getLease, input file may be corrupt");
+            "Missing Argument for getLeaseMap in pfSense");
       }
 
       final XmlDocument pfsenseDoc = XmlDocument.parse(fileContents);
