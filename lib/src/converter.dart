@@ -182,7 +182,6 @@ class Converter {
 $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]} $successResult).""");
   }
 
-
 // ignore: slash_for_doc_comments
 /** Initializes programs - does some validation of arguments 
  * and meta, and sets up log */
@@ -357,7 +356,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     };
 
     dynamic mergeTargetFileType =
-        g.typeOptionToName[g.cliArgs.getFormatTypeOfFile(mergeTargetPath)];
+        g.cliArgs.getFormatTypeOfFile(mergeTargetPath);
 
     printMsg("Processing merge file $mergeTargetPath ...");
     mergeTargetLeaseMap = mergeLeaseMaps(

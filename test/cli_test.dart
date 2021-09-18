@@ -936,6 +936,39 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     testConvertFile(args, "test/test-data/lease-list-infile-opn.xml", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-pfs.xml", uprt, 50);
   });
+
+  test('merge', () {
+    List<String> args = <String>[
+      "", //Input file argument replaced in test methods
+      "-g",
+      "cdjnmop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w",
+      "-m",
+      "" //replace this with path to merge file
+    ];
+
+    //
+
+    for (fFormats eachFormatForInputExt in g.fFormats.values) {
+      // for (String eachFormatToGenerate in ['c', 'd', 'j', 'n', 'm', 'o', 'p']) {
+      //   args[2] = eachFormatToGenerate;
+      for (fFormats eachFormatForMergeExt in g.fFormats.values) {
+        args[9] =
+            "test/test-data/lease-list-infile.${eachFormatForMergeExt.outputExt}";
+
+        testConvertFile(
+            args,
+            "test/test-data/lease-list-infile.${eachFormatForInputExt.outputExt}",
+            uprt,
+            50);
+      }
+      //  }
+    }
+  });
   test('bad_input_files', () {
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
@@ -1040,8 +1073,7 @@ void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
-  g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-
+  // g.tempDir = Directory.systemTemp.createTempSync("uprt_");
 
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
@@ -1055,7 +1087,6 @@ void testExceptionOnGenerate(List<String> args, String inputFileToTest,
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
   g.tempDir = Directory.systemTemp.createTempSync("uprt_");
-
 
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
