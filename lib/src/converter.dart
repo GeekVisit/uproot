@@ -57,23 +57,23 @@ class Converter {
       for (dynamic eachOutputType in outputTypes) {
         switch (eachOutputType) {
           case 'c':
-            saveAndValidateOutFile(toCsv(), Csv(), g.fFormats.csv.abbrev,
-                g.fFormats.csv.outputExt);
+            saveAndValidateOutFile(
+                toCsv(), Csv(), g.fFormats.csv.abbrev, g.fFormats.csv.fileExt);
             break;
 
           case 'd':
             saveAndValidateOutFile(toDdwrt(), Ddwrt(), g.fFormats.ddwrt.abbrev,
-                g.fFormats.ddwrt.outputExt);
+                g.fFormats.ddwrt.fileExt);
             break;
 
           case 'j':
             saveAndValidateOutFile(toJson(), Json(), g.fFormats.json.abbrev,
-                g.fFormats.json.outputExt);
+                g.fFormats.json.fileExt);
             break;
 
           case 'm':
             saveAndValidateOutFile(toMikroTik(), Mikrotik(),
-                g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.outputExt);
+                g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.fileExt);
             break;
 
           case 'n':
@@ -81,13 +81,13 @@ class Converter {
                 toOpnSense(),
                 OpnSense(),
                 g.fFormats.opnsense.abbrev,
-                "-opn.${g.fFormats.opnsense.outputExt}");
+                "${g.fFormats.opnsense.fileExt}");
 
             break;
 
           case 'o':
             saveAndValidateOutFile(toOpenWrt(), OpenWrt(),
-                g.fFormats.openwrt.abbrev, g.fFormats.openwrt.outputExt);
+                g.fFormats.openwrt.abbrev, g.fFormats.openwrt.fileExt);
             break;
 
           case 'p':
@@ -95,7 +95,7 @@ class Converter {
                 toPfsense(),
                 PfSense(),
                 g.fFormats.pfsense.abbrev,
-                "-pfs.${g.fFormats.opnsense.outputExt}");
+                "${g.fFormats.pfsense.fileExt}");
 
             break;
 
@@ -162,7 +162,7 @@ class Converter {
       throw Exception("Output directory ${g.dirOut} does not exist. ");
     }
 
-    outputExt = (outputExt.contains(".")) ? outputExt : ".$outputExt";
+  //dont need - delete outputExt = (outputExt.contains(".")) ? outputExt : ".$outputExt";
 
     outPath =
         p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}"

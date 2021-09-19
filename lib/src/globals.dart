@@ -5,7 +5,6 @@ List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 
-
 String dirOut = argResults['directory-out'];
 
 List<String> inputFileList = <String>[];
@@ -34,13 +33,13 @@ Map<String, String> typeOptionToName = <String, String>{
 };
 
 Map<String, String> extToTypes = <String, String>{
-  fFormats.csv.outputExt: fFormats.csv.abbrev,
-  fFormats.ddwrt.outputExt: fFormats.ddwrt.abbrev,
-  fFormats.json.outputExt: fFormats.json.abbrev,
-  fFormats.mikrotik.outputExt: fFormats.mikrotik.abbrev,
-  fFormats.openwrt.outputExt: fFormats.openwrt.abbrev,
-  fFormats.pfsense.outputExt: fFormats.pfsense.abbrev,
-  fFormats.opnsense.outputExt: fFormats.opnsense.abbrev
+  fFormats.csv.fileExt: fFormats.csv.abbrev,
+  fFormats.ddwrt.fileExt: fFormats.ddwrt.abbrev,
+  fFormats.json.fileExt: fFormats.json.abbrev,
+  fFormats.mikrotik.fileExt: fFormats.mikrotik.abbrev,
+  fFormats.openwrt.fileExt: fFormats.openwrt.abbrev,
+  fFormats.pfsense.fileExt: fFormats.pfsense.abbrev,
+  fFormats.opnsense.fileExt: fFormats.opnsense.abbrev
 };
 
 enum fFormats {
@@ -64,14 +63,14 @@ extension FileFormatProps on fFormats {
     fFormats.pfsense: 'p',
   };
 
-  static const Map<dynamic, String> outputExts = <dynamic, String>{
-    fFormats.csv: 'csv',
-    fFormats.ddwrt: 'ddwrt',
-    fFormats.json: 'json',
-    fFormats.mikrotik: 'rsc',
-    fFormats.opnsense: 'xml',
-    fFormats.openwrt: 'openwrt',
-    fFormats.pfsense: 'xml',
+  static const Map<dynamic, String> fileExts = <dynamic, String>{
+    fFormats.csv: '.csv',
+    fFormats.ddwrt: '.ddwrt',
+    fFormats.json: '.json',
+    fFormats.mikrotik: '.rsc',
+    fFormats.opnsense: '-opn.xml',
+    fFormats.openwrt: '.openwrt',
+    fFormats.pfsense: '-pfs.xml',
   };
 
   static const Map<dynamic, String> formatNames = <dynamic, String>{
@@ -85,7 +84,7 @@ extension FileFormatProps on fFormats {
   };
 
   String get abbrev => abbrevs[this]!;
-  String get outputExt => outputExts[this]!;
+  String get fileExt => fileExts[this]!;
   String get formatName => formatNames[this]!;
 }
 

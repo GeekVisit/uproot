@@ -236,9 +236,9 @@ Examples:
         return g.argResults['input-type']!;
       }
 
-      String fileExtension = p.extension(filePath).replaceAll(".", "");
+      String fileExtension = p.extension(filePath);
 
-      if (fileExtension == "xml") {
+      if (fileExtension.contains("xml")) {
         return xmlFirewallFormat(); //determines whether opnsense or pfsense
       } else {
         if (g.extToTypes.containsKey(fileExtension)) {
