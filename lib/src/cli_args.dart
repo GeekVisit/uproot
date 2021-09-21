@@ -33,22 +33,18 @@ Directory to write files to, defaults to same directory as input file.""")
             displayHelp();
           }
         })
-        ..addOption("input-type",
-            mandatory: false,
-            abbr: 't',
-            help: "Input file type:   c (csv), d (ddwrt), j (json),"
-                "m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
-                "If this option is not used, uprt will determine file "
-                "type based on the following extensions: .csv, .ddwrt, "
-                ".json, .rsc (mikrotik), .xml (for opnsense and pfsense, "
-                "distinguishing by searching for <opnsense> in file)")
-        ..addMultiOption("generate-type",
-            abbr: 'g',
-            help: "Generated types may be multiple. Valid values include: "
-                // ignore: lines_longer_than_80_chars
-                " c (csv), d (DD-WRT), j (json),"
-                "m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
-                "Required")
+        ..addOption("input-type", mandatory: false, abbr: 't', help: """
+Input file type:   c (csv), d (ddwrt), j (json),
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+If this option is not used, uprt will try to determine file 
+type based on the following extensions: .csv, .ddwrt, 
+.json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
+distinguishing by searching for <opnsense> in file)""")
+        ..addMultiOption("generate-type", abbr: 'g', help: """
+Generated types may be multiple. Valid values include: "
+c (csv), d (DD-WRT), j (json),"
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
+Required")""")
         ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
 Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
         ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
@@ -73,10 +69,10 @@ Used to add static leases to an existing output file.""")
             negatable: false, defaultsTo: false, abbr: 'r', help: """
 Applies only when using --merge. If this option is set and the source file 
 has a static lease which has the same mac address, ip or hostname as a lease in
- the merge file, the lease or leases in the merge file that have any of the
- duplicate components will be discarded and the input lease will be used.  
- By default, this is set to false so any lease in the input file that has the 
- same ip, hostname, or mac address as one in the merge file is discarded.""")
+the merge file, the lease or leases in the merge file that have any of the
+duplicate components will be discarded and the input lease will be used.  
+By default, this is set to false so any lease in the input file that has the 
+same ip, hostname, or mac address as one in the merge file is discarded.""")
         ..addFlag("sort",
             abbr: 's', negatable: true, defaultsTo: true, help: """
 Leases in resulting output file are sorted by Ip address.""")
@@ -122,16 +118,23 @@ ${meta['description']}
 Usage: 
 ${g.cliArgs.parser.usage}
 
-Examples: 
+\u001b[4mExamples\u001b[0m: 
 
-  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):
+\u001b[4mConvert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense)\u001b[0m:
 
-  uprt -i test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+  uprt lease-list-infile.csv -g cdjmnop 
+
+\u001b[4mConvert multiple csv files to PfSense and saving output to a specified directory\u001b[0m:
+
+  uprt test/test-data/*.csv -g p -d test/test-output
+
+\u001b[4mConvert a csv file to all formats stripping out leases not in range and saving output to specified directory\u001b[0m: 
+
+  uprt test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
   
-  Convert Mikrotik file to json:
+\u001b[4mMerging leases in a CSV file with an existing DDWRT file and generating an OpnSense file\u001b[0m:
 
-  uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
-  
+    uprt test/test-data/lease-list-infile.csv -m test/test-merge/lease-list-infile-merge.ddwrt -g n -b example-merge-output -d test/test-output
   """);
 
     exit(0);

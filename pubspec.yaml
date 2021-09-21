@@ -1,6 +1,6 @@
 name: uprt
 description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
-version: 2021.09.001
+version: 2021.09.003
 
 environment:
   sdk: ">=2.13.0 <3.0.0"
