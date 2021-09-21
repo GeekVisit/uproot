@@ -13,6 +13,10 @@ class CliArgs {
     try {
       // Note that DefaultsTo only applies if option is not given at all
       parser = ArgParser()
+        ..addFlag("append", abbr: 'a', negatable: false, help: """
+Used when --merge and --sort are given.  If this flag is given, the merged file 
+will have the sorted leases from the source file appended to the end of the 
+target file leases rather than integrated with the merge file. """)
         ..addOption(
           "base-name",
           abbr: 'b',
@@ -73,7 +77,8 @@ has a static lease which has the same mac address, ip or hostname as a lease in
  duplicate components will be discarded and the input lease will be used.  
  By default, this is set to false so any lease in the input file that has the 
  same ip, hostname, or mac address as one in the merge file is discarded.""")
-         ..addFlag("sort", abbr: 's', negatable: true, defaultsTo: true, help: """
+        ..addFlag("sort",
+            abbr: 's', negatable: true, defaultsTo: true, help: """
 Leases in resulting output file are sorted by Ip address.""")
         ..addFlag("verbose", abbr: 'v', negatable: false, help: """
 Verbosity - additional messages""")

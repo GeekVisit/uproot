@@ -230,7 +230,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
           }
         : inputLeaseMap;
 
-    return (g.argResults['sort'])
+    return (g.argResults['sort'] && !g.argResults['append'])
         ? sortLeaseMapByIp(inputLeaseMap)
         : inputLeaseMap;
   }
@@ -296,14 +296,19 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
       Map<String, List<String>> leaseMapInput,
       Map<String, List<String>> leaseMapMerge) {
     try {
-      List<String> leaseListInput = flattenLeaseMap(leaseMapInput, sort: true);
-      List<String> leaseListMerge = flattenLeaseMap(leaseMapMerge, sort: true);
+      List<String> leaseListInput =
+          flattenLeaseMap(leaseMapInput, sort: g.argResults['sort']);
+      List<String> leaseListMerge =
+          flattenLeaseMap(leaseMapMerge, sort: g.argResults['sort']);
       if (g.argResults['replace-duplicates-in-merge-file']) {
         leaseListInput.addAll(leaseListMerge);
-        return explodeLeaseList(leaseListMerge);
-      } else {
-        leaseListMerge.addAll(leaseListInput);
+
         return explodeLeaseList(leaseListInput);
+      } else {
+        //this is the default, keep existing merge contents if duplicate
+        leaseListMerge.addAll(leaseListInput);
+
+        return explodeLeaseList(leaseListMerge);
       }
     } on Exception {
       rethrow;

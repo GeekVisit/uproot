@@ -38,10 +38,14 @@ void main(List<String> arguments) {
       "test/test-merge/lease-list-infile-merge.csv",
       "-d",
       "test/test-output",
-      // "-b",
-      // "example-merge",
+      "-b",
+      "example-merge",
       //"-
       "-w",
+      "-a",
+      "-s",
+      "-r"
+
 // //       "test/test-data/*file.json",
 // //       "test/test-data/*file.csv",
 // //       // "-L",
