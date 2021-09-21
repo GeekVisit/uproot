@@ -73,7 +73,8 @@ has a static lease which has the same mac address, ip or hostname as a lease in
  duplicate components will be discarded and the input lease will be used.  
  By default, this is set to false so any lease in the input file that has the 
  same ip, hostname, or mac address as one in the merge file is discarded.""")
-         ..addFlag("sort", abbr: 's', negatable: true, defaultsTo: true, help: """
+        ..addFlag("sort",
+            abbr: 's', negatable: true, defaultsTo: true, help: """
 Leases in resulting output file are sorted by Ip address.""")
         ..addFlag("verbose", abbr: 'v', negatable: false, help: """
 Verbosity - additional messages""")
