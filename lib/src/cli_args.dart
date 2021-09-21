@@ -23,7 +23,8 @@ class CliArgs {
         )
         ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
 Directory to write files to, defaults to same directory as input file.""")
-        ..addFlag("help", help: "Help", abbr: "h", callback: (dynamic e) {
+        ..addFlag("help", negatable: false, help: "Help", abbr: "h",
+            callback: (dynamic e) {
           if (e) {
             displayHelp();
           }
@@ -48,7 +49,8 @@ Directory to write files to, defaults to same directory as input file.""")
 Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
         ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
 Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File""")
-        ..addFlag("log", abbr: 'l', defaultsTo: false, help: """
+        ..addFlag("log",
+            abbr: 'l', negatable: false, defaultsTo: false, help: """
 Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
         ..addOption("log-file-path",
             abbr: 'P',
@@ -61,13 +63,23 @@ Used to add static leases to an existing output file.""")
         ..addOption("server",
             mandatory: false,
             defaultsTo: "defconf",
-            abbr: 's',
+            abbr: 'S',
             help: "Name to designate in output file for Mikrotik dhcp server.")
-        ..addFlag("verbose", abbr: 'v', help: """
+        ..addFlag("replace-duplicates-in-merge-file",
+            negatable: false, defaultsTo: false, abbr: 'r', help: """
+Applies only when using --merge. If this option is set and the source file 
+has a static lease which has the same mac address, ip or hostname as a lease in
+ the merge file, the lease or leases in the merge file that have any of the
+ duplicate components will be discarded and the input lease will be used.  
+ By default, this is set to false so any lease in the input file that has the 
+ same ip, hostname, or mac address as one in the merge file is discarded.""")
+         ..addFlag("sort", abbr: 's', negatable: true, defaultsTo: true, help: """
+Leases in resulting output file are sorted by Ip address.""")
+        ..addFlag("verbose", abbr: 'v', negatable: false, help: """
 Verbosity - additional messages""")
-        ..addFlag("verbose-debug", abbr: 'z', help: """
+        ..addFlag("verbose-debug", abbr: 'z', negatable: false, help: """
 Verbosity - debug level verbosity""")
-        ..addFlag("version", abbr: 'V', help: "Gives Version",
+        ..addFlag("version", negatable: false, abbr: 'V', help: "Gives Version",
             callback: (dynamic e) {
           if (e) {
             print("${meta["name"]} version ${meta['version']}");
@@ -76,6 +88,7 @@ Verbosity - debug level verbosity""")
         })
         ..addFlag("write-over",
             defaultsTo: false,
+            negatable: false,
             help: "Overwrites output files, if left out, will not overwrite",
             abbr: "w");
 

@@ -223,11 +223,15 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
             fileLines: File(g.inputFile).readAsLinesSync(),
             removeBadLeases: true);
 
-    return (g.argResults['merge'] != null)
+    inputLeaseMap = (g.argResults['merge'] != null)
         ? <String, List<String>>{
             ...mergeLeaseMapWithFile(
                 inputLeaseMap, getGoodPath(g.argResults['merge']))
           }
+        : inputLeaseMap;
+
+    return (g.argResults['sort'])
+        ? sortLeaseMapByIp(inputLeaseMap)
         : inputLeaseMap;
   }
 
@@ -274,18 +278,33 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     return OpnSense().build(getSourceLeaseMap());
   }
 
+  Map<String, List<String>> sortLeaseMapByIp(
+      Map<String, List<String>> leaseMap) {
+    try {
+      List<String> leaseList = flattenLeaseMap(leaseMap, sort: true);
+
+      return explodeLeaseList(leaseList);
+    } on Exception {
+      rethrow;
+    }
+  }
+
 // ignore: slash_for_doc_comments
 /**  Merges two LeaseMaps, optionally sorts them */
 
   Map<String, List<String>> mergeLeaseMaps(
-      Map<String, List<String>> leaseMap1, Map<String, List<String>> leaseMap2,
-      {bool sort = true}) {
+      Map<String, List<String>> leaseMapInput,
+      Map<String, List<String>> leaseMapMerge) {
     try {
-      List<String> leaseList1 = flattenLeaseMap(leaseMap1, sort: true);
-      List<String> leaseList2 = flattenLeaseMap(leaseMap2, sort: true);
-      leaseList1.addAll(leaseList2);
-      if (sort) leaseList1.sort();
-      return explodeLeaseList(leaseList1);
+      List<String> leaseListInput = flattenLeaseMap(leaseMapInput, sort: true);
+      List<String> leaseListMerge = flattenLeaseMap(leaseMapMerge, sort: true);
+      if (g.argResults['replace-duplicates-in-merge-file']) {
+        leaseListInput.addAll(leaseListMerge);
+        return explodeLeaseList(leaseListMerge);
+      } else {
+        leaseListMerge.addAll(leaseListInput);
+        return explodeLeaseList(leaseListInput);
+      }
     } on Exception {
       rethrow;
     }
@@ -332,10 +351,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
 
 // ignore: slash_for_doc_comments
 /** Merge Lease Map with Map of A Second File (Merge File Target)
-   * In case Macs or host name is same, the lease with the lesser ip 
-   * controls, if same ip, then the one in the mergeTarget file 
-   * is replaced with the lease for that ip in the input file
-   * 
+
    * Returns Lease Map of Merge
    */
   Map<String, List<String>> mergeLeaseMapWithFile(
