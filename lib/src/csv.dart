@@ -32,7 +32,7 @@ class Csv extends FileType {
       List<String> csvRows = LineSplitter.split(fileContents).toList();
       List<String> keyName = csvRows[0].split(",");
 
-      if (keyName.length != 3 ||
+      if (keyName.length < 3 ||
           !(keyName[hostIdx].contains(leaseMap.keys.elementAt(hostIdx)) &&
               keyName[macIdx].contains(leaseMap.keys.elementAt(macIdx)) &&
               keyName[ipIdx].contains(leaseMap.keys.elementAt(ipIdx)))) {

@@ -77,11 +77,8 @@ class Converter {
             break;
 
           case 'n':
-            saveAndValidateOutFile(
-                toOpnSense(),
-                OpnSense(),
-                g.fFormats.opnsense.abbrev,
-                "${g.fFormats.opnsense.fileExt}");
+            saveAndValidateOutFile(toOpnSense(), OpnSense(),
+                g.fFormats.opnsense.abbrev, "${g.fFormats.opnsense.fileExt}");
 
             break;
 
@@ -91,11 +88,8 @@ class Converter {
             break;
 
           case 'p':
-            saveAndValidateOutFile(
-                toPfsense(),
-                PfSense(),
-                g.fFormats.pfsense.abbrev,
-                "${g.fFormats.pfsense.fileExt}");
+            saveAndValidateOutFile(toPfsense(), PfSense(),
+                g.fFormats.pfsense.abbrev, "${g.fFormats.pfsense.fileExt}");
 
             break;
 
@@ -161,8 +155,6 @@ class Converter {
     if (!Directory(g.dirOut).existsSync()) {
       throw Exception("Output directory ${g.dirOut} does not exist. ");
     }
-
-  //dont need - delete outputExt = (outputExt.contains(".")) ? outputExt : ".$outputExt";
 
     outPath =
         p.canonicalize("${File(p.join(g.dirOut, g.baseName)).absolute.path}"
@@ -283,15 +275,14 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
   }
 
 // ignore: slash_for_doc_comments
-/**  Merges two LeaseMaps, optionally sorts them 
- * Second LeaseMap takes precedence  */
+/**  Merges two LeaseMaps, optionally sorts them */
 
   Map<String, List<String>> mergeLeaseMaps(
       Map<String, List<String>> leaseMap1, Map<String, List<String>> leaseMap2,
       {bool sort = true}) {
     try {
-      List<String> leaseList1 = flattenLeaseMap(leaseMap1, sort: sort);
-      List<String> leaseList2 = flattenLeaseMap(leaseMap2, sort: sort);
+      List<String> leaseList1 = flattenLeaseMap(leaseMap1, sort: true);
+      List<String> leaseList2 = flattenLeaseMap(leaseMap2, sort: true);
       leaseList1.addAll(leaseList2);
       if (sort) leaseList1.sort();
       return explodeLeaseList(leaseList1);
@@ -323,7 +314,8 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
 /** Converts LeaseMap to a LeaseList consisting of long strings, each string 
  * consisting of fields separated by |. 
  * 4 Fields in string: IP converted to a normalized number string, mac, host, 
- * and ip address. Strings are sorted on first field */
+ * and ip address. Strings are sorted on first field 
+ */
   List<String> flattenLeaseMap(Map<String, List<String>> leaseMap,
       {bool sort = true}) {
     Ip ip = Ip();
@@ -340,10 +332,9 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
 
 // ignore: slash_for_doc_comments
 /** Merge Lease Map with Map of A Second File (Merge File Target)
-   * In case of conflict of Macs or host name, the lease with the lesser ip 
+   * In case Macs or host name is same, the lease with the lesser ip 
    * controls, if same ip, then the one in the mergeTarget file 
-   * is replaced with 
-   * the lease for that ip in the input file
+   * is replaced with the lease for that ip in the input file
    * 
    * Returns Lease Map of Merge
    */

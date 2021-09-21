@@ -8,7 +8,7 @@
 			<mac>F9:CF:5C:08:76:49</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.1</ipaddr>
-			<hostname>testInputHostName1</hostname>
+			<hostname>MergeTestHostName1</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -36,7 +36,7 @@
 			<mac>DA:B9:29:92:07:26</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.2</ipaddr>
-			<hostname>testInputHostName2</hostname>
+			<hostname>MergeTestHostName2</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -64,7 +64,7 @@
 			<mac>C4:4D:02:A0:E1:96</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.3</ipaddr>
-			<hostname>testInputHostName3</hostname>
+			<hostname>MergeTestHostName3</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -92,7 +92,7 @@
 			<mac>7F:B7:26:C3:A8:D3</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.4</ipaddr>
-			<hostname>testInputHostName4</hostname>
+			<hostname>MergeTestHostName4</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -120,7 +120,7 @@
 			<mac>FC:D6:B5:48:65:3D</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.5</ipaddr>
-			<hostname>testInputHostName5</hostname>
+			<hostname>MergeTestHostName5</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -148,7 +148,7 @@
 			<mac>F4:34:E2:3A:F9:30</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.6</ipaddr>
-			<hostname>testInputHostName6</hostname>
+			<hostname>MergeTestHostName6</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -176,7 +176,7 @@
 			<mac>89:2A:F0:C5:2A:30</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.7</ipaddr>
-			<hostname>testInputHostName7</hostname>
+			<hostname>MergeTestHostName7</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -204,7 +204,7 @@
 			<mac>A1:C6:4E:4A:E6:96</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.8</ipaddr>
-			<hostname>testInputHostName8</hostname>
+			<hostname>MergeTestHostName8</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -232,7 +232,7 @@
 			<mac>D1:F4:18:48:A9:C0</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.9</ipaddr>
-			<hostname>testInputHostName9</hostname>
+			<hostname>MergeTestHostName9</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -260,7 +260,7 @@
 			<mac>56:A5:2B:40:39:7F</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.10</ipaddr>
-			<hostname>testInputHostName10</hostname>
+			<hostname>MergeTestHostName10</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -285,10 +285,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>28:5B:98:CD:B5:34</mac>
+			<mac>0B:38:FB:0C:FD:59</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.11</ipaddr>
-			<hostname>testInputHostName11</hostname>
+			<hostname>MergeTestHostName11</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -313,10 +313,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>61:88:68:5E:86:7A</mac>
+			<mac>3C:83:FE:0A:F5:18</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.12</ipaddr>
-			<hostname>testInputHostName12</hostname>
+			<hostname>MergeTestHostName12</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -341,10 +341,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>90:69:74:25:F0:49</mac>
+			<mac>4A:AB:55:8E:3E:73</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.13</ipaddr>
-			<hostname>testInputHostName13</hostname>
+			<hostname>MergeTestHostName13</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -369,10 +369,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>D6:55:91:F0:F2:89</mac>
+			<mac>22:F3:59:C0:4A:6A</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.14</ipaddr>
-			<hostname>testInputHostName14</hostname>
+			<hostname>MergeTestHostName14</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -397,10 +397,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>90:83:FA:69:F2:74</mac>
+			<mac>6D:DF:28:36:0C:4A</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.15</ipaddr>
-			<hostname>testInputHostName15</hostname>
+			<hostname>MergeTestHostName15</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -425,10 +425,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>BD:E0:4D:82:D1:8E</mac>
+			<mac>18:49:F4:11:83:4C</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.16</ipaddr>
-			<hostname>testInputHostName16</hostname>
+			<hostname>MergeTestHostName16</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -453,10 +453,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>9F:53:D9:17:4E:06</mac>
+			<mac>D4:86:70:09:07:FF</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.17</ipaddr>
-			<hostname>testInputHostName17</hostname>
+			<hostname>MergeTestHostName17</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -481,10 +481,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>79:F3:07:D9:69:30</mac>
+			<mac>81:D5:03:46:4B:49</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.18</ipaddr>
-			<hostname>testInputHostName18</hostname>
+			<hostname>MergeTestHostName18</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -509,10 +509,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>49:FB:D4:AA:0A:0B</mac>
+			<mac>C6:6E:EA:20:96:97</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.19</ipaddr>
-			<hostname>testInputHostName19</hostname>
+			<hostname>MergeTestHostName19</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -537,10 +537,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>84:2C:F8:4F:26:E6</mac>
+			<mac>FF:76:64:B8:4C:81</mac>
 			<cid></cid>
 			<ipaddr>192.168.0.20</ipaddr>
-			<hostname>testInputHostName20</hostname>
+			<hostname>MergeTestHostName20</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -565,10 +565,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>BD:54:4A:F8:6F:21</mac>
+			<mac>0A:91:21:C7:CD:1A</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.21</ipaddr>
-			<hostname>testInputHostName21</hostname>
+			<ipaddr>192.168.0.71</ipaddr>
+			<hostname>MergeTestHostName21</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -593,10 +593,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>8D:4D:BC:92:C1:BD</mac>
+			<mac>CD:34:CF:F5:2B:FC</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.22</ipaddr>
-			<hostname>testInputHostName22</hostname>
+			<ipaddr>192.168.0.72</ipaddr>
+			<hostname>MergeTestHostName22</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -621,10 +621,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>B1:3E:2E:D7:55:EC</mac>
+			<mac>24:CC:A6:19:DA:0F</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.23</ipaddr>
-			<hostname>testInputHostName23</hostname>
+			<ipaddr>192.168.0.73</ipaddr>
+			<hostname>MergeTestHostName23</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -649,10 +649,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>15:55:AD:83:79:5B</mac>
+			<mac>DC:61:D1:96:73:3F</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.24</ipaddr>
-			<hostname>testInputHostName24</hostname>
+			<ipaddr>192.168.0.74</ipaddr>
+			<hostname>MergeTestHostName24</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -677,10 +677,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>05:47:4B:16:7B:B5</mac>
+			<mac>5C:A2:B2:92:21:01</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.25</ipaddr>
-			<hostname>testInputHostName25</hostname>
+			<ipaddr>192.168.0.75</ipaddr>
+			<hostname>MergeTestHostName25</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -705,10 +705,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>3C:EB:57:06:8B:C0</mac>
+			<mac>57:54:1A:F2:5B:E7</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.26</ipaddr>
-			<hostname>testInputHostName26</hostname>
+			<ipaddr>192.168.0.76</ipaddr>
+			<hostname>MergeTestHostName26</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -733,10 +733,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>97:E4:42:BA:27:0F</mac>
+			<mac>A2:21:EC:CE:3A:61</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.27</ipaddr>
-			<hostname>testInputHostName27</hostname>
+			<ipaddr>192.168.0.77</ipaddr>
+			<hostname>MergeTestHostName27</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -761,10 +761,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>8D:B8:3D:4B:F7:67</mac>
+			<mac>B5:6C:37:4C:0C:47</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.28</ipaddr>
-			<hostname>testInputHostName28</hostname>
+			<ipaddr>192.168.0.78</ipaddr>
+			<hostname>MergeTestHostName28</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -789,10 +789,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>49:18:D0:A8:8E:F2</mac>
+			<mac>31:C8:15:95:CA:E3</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.29</ipaddr>
-			<hostname>testInputHostName29</hostname>
+			<ipaddr>192.168.0.79</ipaddr>
+			<hostname>MergeTestHostName29</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -817,10 +817,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>CF:CE:63:CB:4C:06</mac>
+			<mac>05:7A:6C:30:90:D1</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.30</ipaddr>
-			<hostname>testInputHostName30</hostname>
+			<ipaddr>192.168.0.80</ipaddr>
+			<hostname>MergeTestHostName30</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -845,10 +845,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>43:E1:7E:A9:58:94</mac>
+			<mac>24:AC:C6:E0:59:33</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.31</ipaddr>
-			<hostname>testInputHostName31</hostname>
+			<ipaddr>192.168.0.81</ipaddr>
+			<hostname>MergeTestHostName31</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -873,10 +873,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>CE:CC:9A:68:08:B8</mac>
+			<mac>E4:7F:96:92:AA:6A</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.32</ipaddr>
-			<hostname>testInputHostName32</hostname>
+			<ipaddr>192.168.0.82</ipaddr>
+			<hostname>MergeTestHostName32</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -901,10 +901,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>ED:AB:20:91:4B:3F</mac>
+			<mac>B9:D6:FA:2C:7D:1F</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.33</ipaddr>
-			<hostname>testInputHostName33</hostname>
+			<ipaddr>192.168.0.83</ipaddr>
+			<hostname>MergeTestHostName33</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -929,10 +929,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>A6:EF:DD:60:9A:40</mac>
+			<mac>F7:A3:58:49:66:50</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.34</ipaddr>
-			<hostname>testInputHostName34</hostname>
+			<ipaddr>192.168.0.84</ipaddr>
+			<hostname>MergeTestHostName34</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -957,10 +957,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>7E:0E:0F:7F:F4:9F</mac>
+			<mac>8B:04:7F:76:51:56</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.35</ipaddr>
-			<hostname>testInputHostName35</hostname>
+			<ipaddr>192.168.0.85</ipaddr>
+			<hostname>MergeTestHostName35</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -985,10 +985,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>3A:9D:95:21:BA:43</mac>
+			<mac>FF:3E:1B:69:C5:69</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.36</ipaddr>
-			<hostname>testInputHostName36</hostname>
+			<ipaddr>192.168.0.86</ipaddr>
+			<hostname>MergeTestHostName36</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1013,10 +1013,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>B7:B4:7E:1C:04:BE</mac>
+			<mac>44:AD:10:92:0D:60</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.37</ipaddr>
-			<hostname>testInputHostName37</hostname>
+			<ipaddr>192.168.0.87</ipaddr>
+			<hostname>MergeTestHostName37</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1041,10 +1041,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>C2:49:BB:82:02:A2</mac>
+			<mac>8A:4D:B4:A3:E6:77</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.38</ipaddr>
-			<hostname>testInputHostName38</hostname>
+			<ipaddr>192.168.0.88</ipaddr>
+			<hostname>MergeTestHostName38</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1069,10 +1069,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>3D:26:5D:42:91:3F</mac>
+			<mac>43:63:91:9D:B1:C9</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.39</ipaddr>
-			<hostname>testInputHostName39</hostname>
+			<ipaddr>192.168.0.89</ipaddr>
+			<hostname>MergeTestHostName39</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1097,10 +1097,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>81:67:FF:FD:AB:60</mac>
+			<mac>AA:77:FF:F2:60:1D</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.40</ipaddr>
-			<hostname>testInputHostName40</hostname>
+			<ipaddr>192.168.0.90</ipaddr>
+			<hostname>MergeTestHostName40</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1125,10 +1125,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>78:CE:DF:86:AE:A9</mac>
+			<mac>13:35:0F:42:BA:90</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.41</ipaddr>
-			<hostname>testInputHostName41</hostname>
+			<ipaddr>192.168.0.91</ipaddr>
+			<hostname>MergeTestHostName41</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1153,10 +1153,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>03:8E:E4:08:39:0E</mac>
+			<mac>0B:6A:AC:4C:8E:26</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.42</ipaddr>
-			<hostname>testInputHostName42</hostname>
+			<ipaddr>192.168.0.92</ipaddr>
+			<hostname>MergeTestHostName42</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1181,10 +1181,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>E8:96:FE:08:82:F0</mac>
+			<mac>85:4E:B7:69:44:B4</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.43</ipaddr>
-			<hostname>testInputHostName43</hostname>
+			<ipaddr>192.168.0.93</ipaddr>
+			<hostname>MergeTestHostName43</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1209,10 +1209,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>53:5F:F7:11:38:1E</mac>
+			<mac>36:51:FB:F7:D9:86</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.44</ipaddr>
-			<hostname>testInputHostName44</hostname>
+			<ipaddr>192.168.0.94</ipaddr>
+			<hostname>MergeTestHostName44</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1237,10 +1237,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>EB:BF:B7:B7:6E:71</mac>
+			<mac>37:FA:0E:AE:7D:92</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.45</ipaddr>
-			<hostname>testInputHostName45</hostname>
+			<ipaddr>192.168.0.95</ipaddr>
+			<hostname>MergeTestHostName45</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1265,10 +1265,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>E5:3B:F3:1D:32:66</mac>
+			<mac>F2:FF:C0:AE:7C:30</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.46</ipaddr>
-			<hostname>testInputHostName46</hostname>
+			<ipaddr>192.168.0.96</ipaddr>
+			<hostname>MergeTestHostName46</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1293,10 +1293,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>7D:A6:13:0F:DF:3D</mac>
+			<mac>F9:F1:F5:3E:EF:F9</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.47</ipaddr>
-			<hostname>testInputHostName47</hostname>
+			<ipaddr>192.168.0.97</ipaddr>
+			<hostname>MergeTestHostName47</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1321,10 +1321,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>8E:34:32:C9:E8:5A</mac>
+			<mac>39:48:C5:BD:07:05</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.48</ipaddr>
-			<hostname>testInputHostName48</hostname>
+			<ipaddr>192.168.0.98</ipaddr>
+			<hostname>MergeTestHostName48</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1349,10 +1349,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>5B:92:24:9F:01:EB</mac>
+			<mac>5B:0D:B7:FD:8E:3A</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.49</ipaddr>
-			<hostname>testInputHostName49</hostname>
+			<ipaddr>192.168.0.99</ipaddr>
+			<hostname>MergeTestHostName49</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>
@@ -1377,10 +1377,10 @@
 			<numberoptions></numberoptions>
 		</staticmap>
  		<staticmap>
-			<mac>8C:FF:BF:FB:CF:BC</mac>
+			<mac>CE:99:85:9F:3B:0E</mac>
 			<cid></cid>
-			<ipaddr>192.168.0.50</ipaddr>
-			<hostname>testInputHostName50</hostname>
+			<ipaddr>192.168.0.100</ipaddr>
+			<hostname>MergeTestHostName50</hostname>
 			<descr></descr>
 			<filename></filename>
 			<rootpath></rootpath>

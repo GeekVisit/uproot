@@ -162,7 +162,7 @@ Examples:
             .listSync();
 
         if (globList.isEmpty) {
-          throw Exception("$globList not found");
+          throw Exception("Source file \"$e\" not found");
         }
         // ignore: avoid_function_literals_in_foreach_calls
         globList.forEach((dynamic f) {

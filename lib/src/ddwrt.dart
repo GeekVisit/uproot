@@ -33,7 +33,7 @@ class Ddwrt extends FileType {
         List<String> leaseProperty = lease[x].split('=');
 
         if (leaseProperty.length < 3) {
-          printMsg("Bad Lease: ${leaseProperty.join(" ")} Skipping ...");
+          printMsg("Bad Lease: \"${leaseProperty.join(" ")}\" Skipping ...");
           continue;
         }
 
