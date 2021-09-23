@@ -302,12 +302,11 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
           flattenLeaseMap(leaseMapMerge, sort: g.argResults['sort']);
       if (g.argResults['replace-duplicates-in-merge-file']) {
         leaseListInput.addAll(leaseListMerge);
-
         return explodeLeaseList(leaseListInput);
       } else {
-        //this is the default, keep existing merge contents if duplicate
+        //this is the default, keep existing merge contents if duplicate lease
+        //component in both
         leaseListMerge.addAll(leaseListInput);
-
         return explodeLeaseList(leaseListMerge);
       }
     } on Exception {
@@ -369,6 +368,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
 
     dynamic mergeTargetFileType =
         g.cliArgs.getFormatTypeOfFile(mergeTargetPath);
+
 
     printMsg("Processing merge file $mergeTargetPath ...");
     mergeTargetLeaseMap = mergeLeaseMaps(

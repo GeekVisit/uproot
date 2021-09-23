@@ -10,10 +10,10 @@
 			<ipaddr>192.168.0.1</ipaddr>
 			<hostname>MergeTestHostName1</hostname>
 			<descr></descr>
-			<filename></filename>
+			<filename>test=filename</filename>
 			<rootpath></rootpath>
 			<defaultleasetime></defaultleasetime>
-			<maxleasetime></maxleasetime>
+			<maxleasetime>1550</maxleasetime>
 			<gateway></gateway>
 			<domain></domain>
 			<domainsearchlist></domainsearchlist>

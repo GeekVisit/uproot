@@ -35,6 +35,7 @@ class OpnSense extends FileType {
           .findAllElements('mac')
           .map((dynamic e) => e.innerText.toString())
           .toList();
+
       leaseMap[g.lbHost] = opnsenseDoc
           .findAllElements('hostname')
           .map((dynamic e) => e.innerText.toString())

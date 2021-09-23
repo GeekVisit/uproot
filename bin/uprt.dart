@@ -19,31 +19,31 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-//     arguments = <String>[
-//       // "test/test-data/*.csv",
-//       // "-g",
-//       // "m",
+    arguments = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "p",
 //       //   "-v",
 //       //   "v",
-//       //   "-b",
-//       //   "test-output-now",
-//       //   "-l",
+      "-b",
+      "example-merge",
+      //   "-l",
 //       //   "-P",
 //       //   "bin/uprt.log"
 
 //       "test/test-data/lease-list-infile.csv",
 //       "-g",
 //       "d",
-//       "-m",
-//       "test/test-merge/lease-list-infile-merge.csv",
-//       "-d",
-//       "test/test-output",
+      "-m",
+      "test/test-merge/lease-list-infile-merge-pfs.xml",
+      "-d",
+      "test/test-output",
 //       "-b",
 //       "example-merge",
 //       //"-
-//       "-w",
-//       "-a",
-//       "-s",
+      "-w",
+      //"-a",
+      "-s",
 //       "-r"
 
 // // //       "test/test-data/*file.json",
@@ -69,7 +69,7 @@ void main(List<String> arguments) {
 // // //       // "-l",
 // // //       // "uprt-log-example.log"
 // //     //"-V"
-//     ];
+    ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);

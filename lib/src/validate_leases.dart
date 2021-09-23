@@ -191,6 +191,7 @@ ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]!
               "Finished Scanning source files for leases, found ${rawLeaseMap[g.lbMac]!.length - totalBadLeases}/${rawLeaseMap[g.lbMac]!.length} valid leases in source file.");
 
       ValidateLeases.clearProcessedLeases();
+
       return goodLeaseMap;
     } on Exception catch (e) {
       if (e.toString().contains("Unable to generate target format")) {
