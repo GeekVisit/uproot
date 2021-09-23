@@ -189,30 +189,33 @@ class PfSense extends FileType {
         pfsenseDoc.findAllElements('staticmap').toList();
     String postLeaseXml = mergeFileContents.split("</staticmap>").last.trim();
     List<int> newLeases = <int>[];
-    bool newLease = true;
+    bool leaseIsNew = true;
 
     preLeaseXml = updateIpRange(preLeaseXml);
 
     //update existing leases with components from the input file
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
-      newLease = true; //set newLease flag to default
+      leaseIsNew = true; //set newLease flag to default
       //get all static maps
+      if (staticMapTags.length == 0) {
+        break;
+      }
 
       for (int x = 0; x < staticMapTags.length; x++) {
         //Update static map. If fails to update (i.e., host, ip, or mac
         //are not the same as in leaseMap, it must be a totally unique new lease
-        //and will need to add a unique staticMap tag using 
+        //and will need to add a unique staticMap tag using
         //the staticMapTemplate.
 
         if (updateStaticMap(staticMapTags[x].outerXml, leaseMap, i, sb)) {
           staticMapTags
               .removeAt(x); //remove as have updated and added to new leases
-          newLease = false;
+          leaseIsNew = false;
           break;
         }
       } //end updating static maps
 
-      if (newLease) {
+      if (leaseIsNew) {
         newLeases.add(i); //add to new leases to add
       }
     }
@@ -250,7 +253,8 @@ Returns true if map is updated, false if not
                     ? "<${m[2]}>${leaseMap[g.lbIp]![indexOfList]}</${m[4]}>"
                     : "");
 
-    sb.write(staticMapUpdated);
+    if ((staticMapUpdated != staticMap)) (sb.write(staticMapUpdated));
+
     return (staticMapUpdated != staticMap); //return true if theres a change
   }
 }

@@ -41,8 +41,8 @@ void main(List<String> arguments) {
 //       "-b",
 //       "example-merge",
 //       //"-
-      "-w",
-      //"-a",
+      //"-w",
+      //   "-a",
       "-s",
 //       "-r"
 

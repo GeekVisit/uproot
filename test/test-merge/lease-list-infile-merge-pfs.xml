@@ -9,10 +9,10 @@
 			<cid></cid>
 			<ipaddr>192.168.0.1</ipaddr>
 			<hostname>MergeTestHostName1</hostname>
-			<descr></descr>
-			<filename>test=filename</filename>
+			<descr>This is a test of existing info in a staticmap</descr>
+			<filename>testFilename</filename>
 			<rootpath></rootpath>
-			<defaultleasetime></defaultleasetime>
+			<defaultleasetime>1440</defaultleasetime>
 			<maxleasetime>1550</maxleasetime>
 			<gateway></gateway>
 			<domain></domain>

@@ -21,10 +21,10 @@ class Converter {
     try {
       initialize(arguments);
       g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
-
+      printMsg("Converting files ...");
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
-        printMsg("Converting ${p.basename(eachFilePath)}...");
+        printMsg("Scanning ${p.basename(eachFilePath)}...");
 
         toOutput();
       }
@@ -116,6 +116,7 @@ class Converter {
       String outputFormatName, String outputExt) {
     try {
       setOutPath(outputExt);
+      printMsg("Validating output ...", onlyIfVerbose: true);
       printCompletedAll(outputFormatName,
           success: (fileContents != "" &&
               outputClass.isContentValid(fileContents: fileContents) &&
@@ -168,10 +169,13 @@ class Converter {
     String displayTargetFile = (g.argResults['verbose'])
         ? p.canonicalize(outPath)
         : p.basename(outPath);
-    String successResult = (success) ? "successful" : "failed";
+    String successResult = (success)
+        ? "\u001b[32mSuccessful\u001b[0m"
+        : "${g.newL}\u001b[31m$displayTargetFile failed to validate and "
+            "save, check above error messages.\u001b[0m";
 
     printMsg("""
-$displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]} $successResult).""");
+$displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]}) $successResult""");
   }
 
 // ignore: slash_for_doc_comments
@@ -296,6 +300,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
       Map<String, List<String>> leaseMapInput,
       Map<String, List<String>> leaseMapMerge) {
     try {
+      printMsg("Merging....");
       List<String> leaseListInput =
           flattenLeaseMap(leaseMapInput, sort: g.argResults['sort']);
       List<String> leaseListMerge =
@@ -369,14 +374,17 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     dynamic mergeTargetFileType =
         g.cliArgs.getFormatTypeOfFile(mergeTargetPath);
 
+    String displayMergeFile = (g.argResults['verbose'])
+        ? p.canonicalize(mergeTargetPath)
+        : p.basename(mergeTargetPath);
 
-    printMsg("Processing merge file $mergeTargetPath ...");
+    printMsg("Scanning merge file $displayMergeFile...");
     mergeTargetLeaseMap = mergeLeaseMaps(
         inputFileLeaseMap,
         g.inputTypeCl[mergeTargetFileType]!.getLeaseMap(
             fileContents: File(mergeTargetPath).readAsStringSync()));
 
-    /* Remove duplicate lease **/
+    /* Remove duplicate leases **/
     return validateLeases.removeBadLeases(
         mergeTargetLeaseMap, mergeTargetFileType);
   }

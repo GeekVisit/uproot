@@ -94,7 +94,8 @@ class ValidateLeases {
       }
 
       if (badLeaseBuffer.isNotEmpty) {
-        badLeases.add(badLeaseBuffer.toString());
+        badLeases.add("$macAddress, $hostName, $ipAddress "
+            "(${badLeaseBuffer.toString()})");
         badLeaseBuffer.clear();
       }
       addProcessedLease(macAddress, hostName, ipAddress);
@@ -134,7 +135,7 @@ class ValidateLeases {
 
   void printBadLeases() {
     if (badLeases.isNotEmpty) {
-      printMsg(badLeases.join(), errMsg: true);
+      printMsg("Error - Bad Leases: ${badLeases.join()}", errMsg: true);
     }
   }
 
@@ -177,9 +178,7 @@ class ValidateLeases {
           printMsg(
 
               // ignore: lines_longer_than_80_chars
-              "Excluding lease from target file (total bad leases: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}: "
-              """
-${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]![i]}""");
+              " \u001b[33mExcluding lease from target file (total excluded: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}\u001b[0m");
           totalBadLeases++;
         }
       }
@@ -188,7 +187,7 @@ ${rawLeaseMap[g.lbMac]![i]} ${rawLeaseMap[g.lbHost]![i]}, ${rawLeaseMap[g.lbIp]!
           ? throw Exception(
               """Unable to generate target format file, source file format is corrupt or all of its static leases are invalid.""")
           : printMsg(
-              "Finished Scanning source files for leases, found ${rawLeaseMap[g.lbMac]!.length - totalBadLeases}/${rawLeaseMap[g.lbMac]!.length} valid leases in source file.");
+              "Finished validating leases, found ${rawLeaseMap[g.lbMac]!.length - totalBadLeases}/${rawLeaseMap[g.lbMac]!.length} valid leases.");
 
       ValidateLeases.clearProcessedLeases();
 
