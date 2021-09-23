@@ -11,6 +11,48 @@ class PfSense extends FileType {
 
   String fileType = g.fFormats.pfsense.formatName;
 
+  String preLeaseXml = '''<dhcpd>
+	<lan>
+		<range>
+			<from></from>
+			<to></to>
+		</range>''';
+
+  String staticMapTemplate = '''
+ 		<staticmap>
+			<mac></mac>
+			<cid></cid>
+			<ipaddr></ipaddr>
+			<hostname></hostname>
+			<descr></descr>
+			<filename></filename>
+			<rootpath></rootpath>
+			<defaultleasetime></defaultleasetime>
+			<maxleasetime></maxleasetime>
+			<gateway></gateway>
+			<domain></domain>
+			<domainsearchlist></domainsearchlist>
+			<ddnsdomain></ddnsdomain>
+			<ddnsdomainprimary></ddnsdomainprimary>
+			<ddnsdomainsecondary></ddnsdomainsecondary>
+			<ddnsdomainkeyname></ddnsdomainkeyname>
+			<ddnsdomainkeyalgorithm>hmac-md5</ddnsdomainkeyalgorithm>
+			<ddnsdomainkey></ddnsdomainkey>
+			<tftp></tftp>
+			<ldap></ldap>
+			<nextserver></nextserver>
+			<filename32></filename32>
+			<filename64></filename64>
+			<filename32arm></filename32arm>
+			<filename64arm></filename64arm>
+			<numberoptions></numberoptions>
+		</staticmap>''';
+
+  String postLeaseXml = '''
+    <enable></enable>
+  </lan>
+</dhcpd>''';
+
   @override
   //Given a string this returns Maps of a list of each lease
   Map<String, List<String>> getLeaseMap(
@@ -65,55 +107,15 @@ class PfSense extends FileType {
           : "";
 
       StringBuffer sbPf = StringBuffer();
-      String preLeaseXml = '''<dhcpd>
-	<lan>
-		<range>
-			<from></from>
-			<to></to>
-		</range>''';
-
-      String staticMapTemplate = '''
- 		<staticmap>
-			<mac></mac>
-			<cid></cid>
-			<ipaddr></ipaddr>
-			<hostname></hostname>
-			<descr></descr>
-			<filename></filename>
-			<rootpath></rootpath>
-			<defaultleasetime></defaultleasetime>
-			<maxleasetime></maxleasetime>
-			<gateway></gateway>
-			<domain></domain>
-			<domainsearchlist></domainsearchlist>
-			<ddnsdomain></ddnsdomain>
-			<ddnsdomainprimary></ddnsdomainprimary>
-			<ddnsdomainsecondary></ddnsdomainsecondary>
-			<ddnsdomainkeyname></ddnsdomainkeyname>
-			<ddnsdomainkeyalgorithm>hmac-md5</ddnsdomainkeyalgorithm>
-			<ddnsdomainkey></ddnsdomainkey>
-			<tftp></tftp>
-			<ldap></ldap>
-			<nextserver></nextserver>
-			<filename32></filename32>
-			<filename64></filename64>
-			<filename32arm></filename32arm>
-			<filename64arm></filename64arm>
-			<numberoptions></numberoptions>
-		</staticmap>''';
-
-      String postLeaseXml = '''
-    <enable></enable>
-  </lan>
-</dhcpd>''';
 
       preLeaseXml = updateIpRange(preLeaseXml);
 
       String tmpLeaseTags;
 
       if (g.argResults['merge'] != null && mergeTargetFileType == "p") {
-        return mergeLeaseMapsIntoPfsMergeFile(leaseMap, staticMapTemplate);
+        return mergePfs(leaseMap);
       }
+
       // fill in template for each lease map and write to tmpLeaseTags
       for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
         sbPf.write("\n${fillInStaticTemplate(staticMapTemplate, leaseMap, x)}");
@@ -138,8 +140,7 @@ class PfSense extends FileType {
   }
 
   String fillInStaticTemplate(
-      String staticMapTemplate, Map<String, List<String>?> leaseMap, int x) {
-    String tmpLeaseTags = staticMapTemplate;
+      String tmpLeaseTags, Map<String, List<String>?> leaseMap, int x) {
     tmpLeaseTags = tmpLeaseTags.replaceAll(
         "<mac></mac>", "<mac>${leaseMap[g.lbMac]![x]}</mac>");
     tmpLeaseTags = tmpLeaseTags.replaceAll("<hostname></hostname>",
@@ -178,50 +179,30 @@ class PfSense extends FileType {
   /**  Keeps and updates existing lease in PFS merge file
    *  Adds new ones from input. 
   */
-  String mergeLeaseMapsIntoPfsMergeFile(
-      Map<String, List<String>?> leaseMap, String staticMapTemplate) {
+  String mergePfs(Map<String, List<String>?> leaseMap) {
     StringBuffer sb = StringBuffer();
 
     String mergeFileContents = File(g.argResults['merge']).readAsStringSync();
-    final XmlDocument pfsenseDoc = XmlDocument.parse(mergeFileContents);
+    //final XmlDocument pfsenseDoc = XmlDocument.parse(mergeFileContents);
+    //  pfsenseDoc.findAllElements('staticmap').toList().join("");
     String preLeaseXml = mergeFileContents.split("<staticmap>").first.trim();
-    List<XmlElement> staticMapTags =
-        pfsenseDoc.findAllElements('staticmap').toList();
     String postLeaseXml = mergeFileContents.split("</staticmap>").last.trim();
-    List<int> newLeases = <int>[];
-    bool leaseIsNew = true;
+    List<String> staticMapTags = mergeFileContents
+        .replaceFirst(preLeaseXml, "")
+        .replaceFirst(postLeaseXml, "")
+        .trim()
+        .split("</staticmap>")
+        .join("</staticmap>||")
+        .split("||");
 
     preLeaseXml = updateIpRange(preLeaseXml);
-
+    String template = "";
     //update existing leases with components from the input file
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
-      leaseIsNew = true; //set newLease flag to default
-      //get all static maps
-      if (staticMapTags.length == 0) {
-        break;
-      }
+      template = getStaticMapTemplateForMerge(staticMapTags, leaseMap, i)!;
 
-      for (int x = 0; x < staticMapTags.length; x++) {
-        //Update static map. If fails to update (i.e., host, ip, or mac
-        //are not the same as in leaseMap, it must be a totally unique new lease
-        //and will need to add a unique staticMap tag using
-        //the staticMapTemplate.
-
-        if (updateStaticMap(staticMapTags[x].outerXml, leaseMap, i, sb)) {
-          staticMapTags
-              .removeAt(x); //remove as have updated and added to new leases
-          leaseIsNew = false;
-          break;
-        }
-      } //end updating static maps
-
-      if (leaseIsNew) {
-        newLeases.add(i); //add to new leases to add
-      }
-    }
-    // add any new leases using the staticMapTemplate
-    for (int i in newLeases) {
-      sb.write("\n${fillInStaticTemplate(staticMapTemplate, leaseMap, i)}");
+      sb.write("\n${fillInStaticTemplate(template, leaseMap, i)}");
+    
     }
     mergeFileContents = "$preLeaseXml${sb.toString()}$postLeaseXml";
     return mergeFileContents;
@@ -248,13 +229,49 @@ Returns true if map is updated, false if not
         (dynamic m) => (m[2] == "hostname")
             ? "<${m[2]}>${leaseMap[g.lbHost]![indexOfList]}</${m[4]}"
             : (m[2] == "mac")
-                ? "<${m[2]}>${leaseMap[g.lbMac]![indexOfList]}</${m[4]}>"
+                ? "<${m[2]}>${leaseMap[g.lbMac]![indexOfList]}</${m[4]}"
                 : (m[2] == "ipaddr")
-                    ? "<${m[2]}>${leaseMap[g.lbIp]![indexOfList]}</${m[4]}>"
+                    ? "<${m[2]}>${leaseMap[g.lbIp]![indexOfList]}</${m[4]}"
                     : "");
 
     if ((staticMapUpdated != staticMap)) (sb.write(staticMapUpdated));
 
     return (staticMapUpdated != staticMap); //return true if theres a change
+  }
+
+  // ignore: slash_for_doc_comments
+  /** If host ip or mac tag has a value that matches one that's in
+  leaseMap then return the staticmap to be used as a template */
+  String? getStaticMapTemplateForMerge(List<String> staticMapTags,
+      Map<String, List<String>?> leaseMap, int indexOfList) {
+    String value =
+        "${leaseMap[g.lbHost]![indexOfList]}|${leaseMap[g.lbMac]![indexOfList]}"
+        "|${leaseMap[g.lbIp]![indexOfList]}";
+
+    //if host ip or mac tag has a value that matches one that's in
+    //leaseMap then return that static map as a template
+
+    RegExp regexp = RegExp(
+        r'(<staticmap>.*?<(hostname|ipaddr|mac)>('
+        "$value"
+        r')</(hostname|ipaddr|mac))>.*?</staticmap>',
+        caseSensitive: false,
+        dotAll: true);
+
+    late Iterable<RegExpMatch> match;
+
+    for (String eachStaticMap in staticMapTags) {
+      match = regexp.allMatches(eachStaticMap);
+      if (match.isNotEmpty) break;
+    }
+    if (match.length == 1) {
+      return match.elementAt(0).group(0);
+    } else if (match.isEmpty) {
+      return staticMapTemplate;
+    } else {
+      printMsg(
+          "\u001b[33mWarning: Merge file contains two or more leases that share a common ip, hostname, and/or mac address. Using first instance and discarding others.\u001b[0m");
+    }
+    return staticMapTemplate;
   }
 }

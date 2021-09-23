@@ -262,10 +262,10 @@
 			<ipaddr>192.168.0.10</ipaddr>
 			<hostname>MergeTestHostName10</hostname>
 			<descr></descr>
-			<filename></filename>
+			<filename>TestFileName10</filename>
 			<rootpath></rootpath>
-			<defaultleasetime></defaultleasetime>
-			<maxleasetime></maxleasetime>
+			<defaultleasetime>1000</defaultleasetime>
+			<maxleasetime>2000</maxleasetime>
 			<gateway></gateway>
 			<domain></domain>
 			<domainsearchlist></domainsearchlist>
