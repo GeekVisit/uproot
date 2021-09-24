@@ -998,6 +998,74 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       //  }
     }
   });
+
+  test('mergeWithSort', () {
+    List<String> args = <String>[
+      "", //Input file argument replaced in test methods
+      "-g",
+      "cdjmnop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-m",
+      "" //replace this with path to merge file
+          "-s",
+    ];
+
+    deleteFiles("test/test-output/*output*.*");
+    deleteFiles("test/test-output/*.log");
+
+    for (fFormats eachFormatForInputExt in g.fFormats.values) {
+      for (fFormats eachFormatForMergeExt in g.fFormats.values) {
+        args[8] =
+            "test/test-data/lease-list-infile${eachFormatForMergeExt.fileExt}";
+
+        testConvertFile(
+            args,
+            "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
+            uprt,
+            50,
+            deleteAllFiles: false);
+      }
+      //  }
+    }
+  });
+
+  test('mergeWithAppendedSort', () {
+    List<String> args = <String>[
+      "", //Input file argument replaced in test methods
+      "-g",
+      "cdjmnop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-m",
+      "" //replace this with path to merge file
+          "-s",
+      "-a"
+    ];
+
+    deleteFiles("test/test-output/*output*.*");
+    deleteFiles("test/test-output/*.log");
+
+    for (fFormats eachFormatForInputExt in g.fFormats.values) {
+      for (fFormats eachFormatForMergeExt in g.fFormats.values) {
+        args[8] =
+            "test/test-data/lease-list-infile${eachFormatForMergeExt.fileExt}";
+
+        testConvertFile(
+            args,
+            "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
+            uprt,
+            50,
+            deleteAllFiles: false);
+      }
+      //  }
+    }
+  });
+
   test('bad_input_files', () {
     List<String> args = <String>[
       "", //Input file argument replaced in test methods

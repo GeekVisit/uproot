@@ -202,46 +202,15 @@ class PfSense extends FileType {
       template = getStaticMapTemplateForMerge(staticMapTags, leaseMap, i)!;
 
       sb.write("\n${fillInStaticTemplate(template, leaseMap, i)}");
-    
     }
     mergeFileContents = "$preLeaseXml${sb.toString()}$postLeaseXml";
     return mergeFileContents;
   }
 
-/* Replaces by regex the leases in  <staticmap> tag with the 
-lease in the leaseMap when one of the components (host/ip/mac) in static map  
-matches corresponding component of leaseMap.
-Returns true if map is updated, false if not
-*/
-
-  bool updateStaticMap(String staticMap, Map<String, List<String>?> leaseMap,
-      int indexOfList, StringBuffer sb) {
-    String value =
-        "${leaseMap[g.lbHost]![indexOfList]}|${leaseMap[g.lbMac]![indexOfList]}"
-        "|${leaseMap[g.lbIp]![indexOfList]}";
-
-    //if host ip or mac tag has a value that matches one that's in
-    //leaseMap then replace with whats in lease tag
-    String staticMapUpdated = staticMap.replaceAllMapped(
-        RegExp(
-            r'(<(hostname|ipaddr|mac)>(' "$value" r')</(hostname|ipaddr|mac))',
-            caseSensitive: false),
-        (dynamic m) => (m[2] == "hostname")
-            ? "<${m[2]}>${leaseMap[g.lbHost]![indexOfList]}</${m[4]}"
-            : (m[2] == "mac")
-                ? "<${m[2]}>${leaseMap[g.lbMac]![indexOfList]}</${m[4]}"
-                : (m[2] == "ipaddr")
-                    ? "<${m[2]}>${leaseMap[g.lbIp]![indexOfList]}</${m[4]}"
-                    : "");
-
-    if ((staticMapUpdated != staticMap)) (sb.write(staticMapUpdated));
-
-    return (staticMapUpdated != staticMap); //return true if theres a change
-  }
-
   // ignore: slash_for_doc_comments
   /** If host ip or mac tag has a value that matches one that's in
-  leaseMap then return the staticmap to be used as a template */
+  leaseMap then return the staticmap to be used as a template otherwise
+  use generic template */
   String? getStaticMapTemplateForMerge(List<String> staticMapTags,
       Map<String, List<String>?> leaseMap, int indexOfList) {
     String value =
