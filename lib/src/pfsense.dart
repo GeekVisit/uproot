@@ -113,7 +113,7 @@ class PfSense extends FileType {
       String tmpLeaseTags;
 
       if (g.argResults['merge'] != null && mergeTargetFileType == "p") {
-        return mergePfs(leaseMap);
+        return mergeXmlTags(leaseMap);
       }
 
       // fill in template for each lease map and write to tmpLeaseTags
@@ -155,7 +155,7 @@ class PfSense extends FileType {
     try {
       ValidateLeases.clearProcessedLeases();
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLease");
+        throw Exception("Missing Argument for isContentValid in pfSense");
       }
 
       dynamic leaseMap =
@@ -179,12 +179,11 @@ class PfSense extends FileType {
   /**  Keeps and updates existing lease in PFS merge file
    *  Adds new ones from input. 
   */
-  String mergePfs(Map<String, List<String>?> leaseMap) {
+  String mergeXmlTags(Map<String, List<String>?> leaseMap) {
     StringBuffer sb = StringBuffer();
 
     String mergeFileContents = File(g.argResults['merge']).readAsStringSync();
-    //final XmlDocument pfsenseDoc = XmlDocument.parse(mergeFileContents);
-    //  pfsenseDoc.findAllElements('staticmap').toList().join("");
+
     String preLeaseXml = mergeFileContents.split("<staticmap>").first.trim();
     String postLeaseXml = mergeFileContents.split("</staticmap>").last.trim();
     List<String> staticMapTags = mergeFileContents
@@ -239,7 +238,9 @@ class PfSense extends FileType {
       return staticMapTemplate;
     } else {
       printMsg(
-          "\u001b[33mWarning: Merge file contains two or more leases that share a common ip, hostname, and/or mac address. Using first instance and discarding others.\u001b[0m");
+          "\u001b[33mWarning: Merge file contains two or more leases that share"
+          "a common ip, hostname, and/or mac address. Using first instance and "
+          "discarding others.\u001b[0m");
     }
     return staticMapTemplate;
   }

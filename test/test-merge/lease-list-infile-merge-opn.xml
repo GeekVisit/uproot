@@ -5,6 +5,7 @@
  		      <staticmap>
         <mac>F9:CF:5C:08:76:49</mac>
         <ipaddr>192.168.0.1</ipaddr>
+        <extratag>ForTestingShouldShowUpInMerge</extratag>
         <hostname>MergeTestHostName1</hostname>        
       </staticmap>
  		      <staticmap>
@@ -50,7 +51,9 @@
  		      <staticmap>
         <mac>56:A5:2B:40:39:7F</mac>
         <ipaddr>192.168.0.10</ipaddr>
+        <extratag2>ForTestingShouldShowUpInMerge2</extratag2>
         <hostname>MergeTestHostName10</hostname>        
+        <extratag3>ForTestingShouldShowUpInMerge3</extratag3>
       </staticmap>
  		      <staticmap>
         <mac>0B:38:FB:0C:FD:59</mac>
