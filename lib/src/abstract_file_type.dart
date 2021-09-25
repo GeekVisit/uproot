@@ -90,6 +90,8 @@ abstract class FileType {
     preLeaseXml = updateXmlIpRange(preLeaseXml);
     String template = "";
     //update existing leases with components from the input file
+
+    //TODO: Refactor - Extract to function and use in build() also ?
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       template = getXmlStaticMapTemplateForMerge(
         staticMapTags,

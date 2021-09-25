@@ -22,7 +22,7 @@ void main(List<String> arguments) {
     arguments = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "n",
+      "o",
 //       //   "-v",
 //       //   "v",
       "-b",
@@ -35,7 +35,7 @@ void main(List<String> arguments) {
 //       "-g",
 //       "d",
       "-m",
-      "test/test-merge/lease-list-infile-merge-opn.xml",
+      "test/test-data/dhcp.openwrt",
       "-d",
       "test/test-output",
 //       "-b",
