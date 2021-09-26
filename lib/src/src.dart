@@ -5,7 +5,6 @@ export 'csv.dart';
 export 'ddwrt.dart';
 export 'error_msgs.dart';
 export 'file_ops.dart';
-export 'globals.dart';
 export 'ip.dart';
 export 'json.dart';
 export 'meta.dart';

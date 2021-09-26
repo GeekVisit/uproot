@@ -1,7 +1,7 @@
 import 'package:xml/xml.dart';
 
+import '../lib.dart';
 import 'globals.dart' as g;
-import 'src.dart';
 
 class OpnSense extends FileType {
   //

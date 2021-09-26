@@ -66,40 +66,70 @@ If you choose to compile yourself:
 
 For a complete list of options, simply type `uprt` or `uprt -h`
 
-Below is the latest help (version 2021.09.001):
+Below is the latest help (version 2021.09.003):
 
 ````bash
 
-**uprt** (2021.09.001 running on windows "Windows 10 Pro" 10.0 (Build 19042))
+uprt (2021.09.003 running on windows "Windows 10 Pro" 10.0 (Build 19042))
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
 
-**Usage:**
--L, --ip-low-address     Ip4 Lowest Address of Network Range
--H, --ip-high-address    Ip4 Highest Address of Network Range
--t, --input-type         Input file type:   c (csv), d (ddwrt), j (json),m (mikrotik), 
-                         n (opnsense), o (openwrt), p (pfsense)
--d, --directory-out      Directory to write files to, defaults to current directory.
--s, --server             Name to designate in output file for Mikrotik dhcp server.
-                         (defaults to "defconf")
--w, --[no-]write-over    Overwrite output files, if left out, will not overwrite
--h, --[no-]help          Help
--g, --generate-type      Generated types may be multiple. Valid values include:  c (csv), d (ddwrt), j (json),m (mikrotik), n (opnsense), o (openwrt), p (pfsense)
--b, --base-name          Base Name of Output Files
--l, --[no-]log           Creates Log file, if -p not set, then location is in system temporary folder
--p, --log-file-path      Log error messages to specified file path.
--v, --[no-]verbose       Verbosity - additional debugging messages
+Usage:
+-a, --append                              Used when --merge and --sort are given.  If this flag is given, the merged file
+                                          will have the sorted leases from the source file appended to the end of the
+                                          target file leases rather than integrated with the merge file.
+-b, --base-name                           Specify Base Name of Output Files (default uses basename of input file)
+-d, --directory-out                       Directory to write files to, defaults to same directory as input file.
+-h, --help                                Help
+-t, --input-type                          Input file type:   c (csv), d (ddwrt), j (json),
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+                                          If this option is not used, uprt will try to determine file
+                                          type based on the following extensions: .csv, .ddwrt,
+                                          .json, .rsc (mikrotik), .xml (for opnsense and pfsense,
+                                          distinguishing by searching for <opnsense> in file)
+-g, --generate-type                       Generated types may be multiple. Valid values include: "
+                                          c (csv), d (DD-WRT), j (json),"
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
+                                          Required")
+-L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File     
+-H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File   
+-l, --log                                 Creates Log file, if -P not set, then location is at 'J:\temp\uprt.log'
+-P, --log-file-path                       Full file path to log file.
+                                          (defaults to "J:\temp\uprt.log")
+-m, --merge                               Merge to file. Specify path to file to merge converted output.
+                                          Used to add static leases to an existing output file.
+-S, --server                              Name to designate in output file for Mikrotik dhcp server.
+                                          (defaults to "defconf")
+-r, --replace-duplicates-in-merge-file    Applies only when using --merge. If this option is set and the source file
+                                          has a static lease which has the same mac address, ip or hostname as a lease in
+                                          the merge file, the lease or leases in the merge file that have any of the
+                                          duplicate components will be discarded and the input lease will be used.
+                                          By default, this is set to false so any lease in the input file that has the
+                                          same ip, hostname, or mac address as one in the merge file is discarded.
+-s, --[no-]sort                           Leases in resulting output file are sorted by Ip address.
+                                          (defaults to on)
+-v, --verbose                             Verbosity - additional messages
+-z, --verbose-debug                       Verbosity - debug level verbosity
+-V, --version                             Gives Version
+-w, --write-over                          Overwrites output files, if left out, will not overwrite
 
-**Examples:**
+Examples: 
 
-**  Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense): **
+**Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):**
 
-  uprt -i test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+  uprt lease-list-infile.csv -g cdjmnop
 
- ** Convert Mikrotik file to json:**
+**Convert multiple csv files to PfSense and saving output to a specified directory:**
 
-  uprt -i test/test-data/lease-list-infile.rsc -b converted-output -g j -L 192.168.0.1 -H 192.168.0.254  -d test/test-output
+  uprt test/test-data/*.csv -g p -d test/test-output
 
+**Convert a csv file to all formats stripping out leases not in range and saving output to specified directory:**
+
+  uprt test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+
+**Merging leases in a CSV file with an existing DDWRT file and generating an OpnSense file:**
+
+    uprt test/test-data/lease-list-infile.csv -m test/test-merge/lease-list-infile-merge.ddwrt -g n -b example-merge-output -d test/test-output
 ````
 
 ## Test Data Included

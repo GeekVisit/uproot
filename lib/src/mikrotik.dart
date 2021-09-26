@@ -1,5 +1,5 @@
+import '../lib.dart';
 import 'globals.dart' as g;
-import 'src.dart';
 
 class Mikrotik extends FileType {
   //

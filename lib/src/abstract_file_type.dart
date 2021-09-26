@@ -11,9 +11,8 @@ abstract class FileType {
 
   String genericXmlStaticMapTemplate = "";
 
-// ignore: slash_for_doc_comments
-/** Gets Map of Static Leases from file contents
-   Removes Bad Leases by Default */
+  /// Gets Map of Static Leases from file contents
+  ///   Removes Bad Leases by Default
   Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String> fileLines,
@@ -39,9 +38,8 @@ abstract class FileType {
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Used for Pfs and Opn conversions.
- Updates XMl tag to reflect hi-low */
+  ///  Used for Pfs and Opn conversions.
+  /// Updates XMl tag to reflect hi-low
   String updateXmlIpRange(String preLeaseXml) {
     if (g.argResults['ip-low-address'] != null &&
         g.argResults['ip-high-address'] != null) {
@@ -53,9 +51,8 @@ abstract class FileType {
     return preLeaseXml;
   }
 
-  // ignore: slash_for_doc_comments
-  /** Fills in in the staticmap templates with lease components. 
-   Use for Pfs and Opn conversions */
+  ///  Fills in in the staticmap templates with lease components.
+  ///  Use for Pfs and Opn conversions
 
   String fillInXmlStaticTemplate(
       String tmpLeaseTags, Map<String, List<String>?> leaseMap, int x) {
@@ -68,10 +65,9 @@ abstract class FileType {
     return tmpLeaseTags;
   }
 
-  // ignore: slash_for_doc_comments
-  /**  Used for Pfs and Opn conversions. Keeps and updates existing
-   *  lease in merge file and adds new ones from input. 
-  */
+  ///   Used for Pfs and Opn conversions. Keeps and updates existing
+  ///   lease in merge file and adds new ones from input.
+  ///
   String mergeXmlTags(Map<String, List<String>?> leaseMap) {
     StringBuffer sb = StringBuffer();
 
@@ -91,7 +87,6 @@ abstract class FileType {
     String template = "";
     //update existing leases with components from the input file
 
-    //TODO: Refactor - Extract to function and use in build() also ?
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       template = getXmlStaticMapTemplateForMerge(
         staticMapTags,
@@ -105,10 +100,9 @@ abstract class FileType {
     return mergeFileContents;
   }
 
-  // ignore: slash_for_doc_comments
-  /** Used for Opn and Pfs conversions. If host ip or mac tag has a value that 
-   * matches one that's in leaseMap then return the staticmap to be used as a 
-   * template otherwise  use generic template */
+  ///  Used for Opn and Pfs conversions. If host ip or mac tag has a value that
+  ///  matches one that's in leaseMap then return the staticmap to be used as a
+  ///  template otherwise  use generic template
   String? getXmlStaticMapTemplateForMerge(List<String> staticMapTags,
       Map<String, List<String>?> leaseMap, int indexOfList) {
     String value =

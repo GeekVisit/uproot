@@ -1,6 +1,7 @@
 import 'package:xml/xml.dart';
+
+import '../lib.dart';
 import 'globals.dart' as g;
-import 'src.dart';
 
 class PfSense extends FileType {
   //
@@ -127,7 +128,6 @@ class PfSense extends FileType {
       rethrow;
     }
   }
-
 
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {

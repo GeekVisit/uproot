@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
+import 'package:validators/sanitizers.dart';
 import 'globals.dart' as g;
 
 void printMsg(
@@ -16,7 +17,7 @@ void printMsg(
     stderr.writeln(msg.toString().replaceFirst("Exception:", "").trim());
   } else if (!logOnly) {
     if (onlyIfVerbose) {
-      (g.argResults['verbose']) ? stdout.writeln(msg) : "";
+      (g.verbose) ? stdout.writeln(msg) : "";
     } else {
       stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
     }
@@ -30,15 +31,17 @@ void printMsg(
   //Write to Log
   try {
     if (g.argResults['log']) {
+      //strip color codes
+      msg = stripLow(msg)
+          .replaceAll(RegExp('[[0-9]+m', multiLine: false, dotAll: true), "");
       File logFile = File(g.logPath);
-      logFile.writeAsStringSync(
-          // ignore: lines_longer_than_80_chars
-          "$msg  ${g.newL}",
+      logFile.writeAsStringSync(stripLow("$msg  ${g.newL}"),
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
         logFile.writeAsStringSync(
-            "${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
+            "${g.newL}${StackTrace.current.toString().trim()}${g.newL}",
+            mode: FileMode.append);
       }
     }
   } on FormatException catch (e) {
@@ -118,8 +121,7 @@ bool isStringAValidFilePath(String testPath) {
   }
 }
 
-// ignore: slash_for_doc_comments
-/** Deletes files, excepts shell expansion globs */
+/// Deletes files, excepts shell expansion globs
 void deleteFiles(String filesGlobToDelete) {
   try {
     Glob listOfFilesToDelete = Glob(filesGlobToDelete);
@@ -140,8 +142,7 @@ String getGoodPath(String fPath) {
   }
 }
 
-// ignore: slash_for_doc_comments
-/** Get contents of json file, or temporary json file if none given */
+/// Get contents of json file, or temporary json file if none given
 String getFileContents(String filePath) {
   return File(filePath).readAsStringSync();
 }

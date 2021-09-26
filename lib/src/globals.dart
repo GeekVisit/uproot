@@ -11,6 +11,8 @@ List<String> inputFileList = <String>[];
 String inputFile = "";
 String inputType = "j";
 String baseName = "";
+bool verbose = false;
+
 
 Map<String, FileType> inputTypeCl = <String, FileType>{
   fFormats.csv.abbrev: Csv(),

@@ -1,22 +1,19 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+
+import '../lib.dart';
 import 'globals.dart' as g;
 
-import 'src.dart';
-
 class Converter {
-  // ignore: slash_for_doc_comments
-  /** Main loop - process each file argument */
+  /// Main loop - process each file argument
 
   String outPath = "";
 
-  // ignore: slash_for_doc_comments
-  /** Output files that have been saved to prevent overwriting */
+  /// Output files that have been saved to prevent overwriting
   List<String> outputFilesSaved = <String>[];
 
-  // ignore: slash_for_doc_comments
-  /** Main loop to convert all files on command line */
+  /// Main loop to convert all files on command line
   void convertFileList(List<String> arguments) {
     try {
       initialize(arguments);
@@ -110,8 +107,7 @@ class Converter {
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Save converted contents to outFile path and check if valid */
+  /// Save converted contents to outFile path and check if valid
   void saveAndValidateOutFile(String fileContents, FileType outputClass,
       String outputFormatName, String outputExt) {
     try {
@@ -126,8 +122,7 @@ class Converter {
     }
   }
 
-  // ignore: slash_for_doc_comments
-  /** Saves Converted Output file */
+  /// Saves Converted Output file
   bool saveToOutPath(String outContents) {
     /** Don't save over files previously saved in same run if happen to have
      *  same name, overrides write-over command line option*/
@@ -144,8 +139,7 @@ class Converter {
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Builds output path for generated filed given the output extension */
+  /// Builds output path for generated filed given the output extension
   void setOutPath(String outputExt) {
     // Sets output directory to g.dirname or if not specified then input dir
     g.dirOut = (g.argResults['directory-out'] == null ||
@@ -163,12 +157,10 @@ class Converter {
   }
 
   void printCompletedAll(String fileType, {bool success = true}) {
-    String displaySourceFile = (g.argResults['verbose'])
-        ? p.canonicalize(g.inputFile)
-        : p.basename(g.inputFile);
-    String displayTargetFile = (g.argResults['verbose'])
-        ? p.canonicalize(outPath)
-        : p.basename(outPath);
+    String displaySourceFile =
+        (g.verbose) ? p.canonicalize(g.inputFile) : p.basename(g.inputFile);
+    String displayTargetFile =
+        (g.verbose) ? p.canonicalize(outPath) : p.basename(outPath);
     String successResult = (success)
         ? "\u001b[32mSuccessful\u001b[0m"
         : "${g.newL}\u001b[31m$displayTargetFile failed to validate and "
@@ -178,9 +170,8 @@ class Converter {
 $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]}) $successResult""");
   }
 
-// ignore: slash_for_doc_comments
-/** Initializes programs - does some validation of arguments 
- * and meta, and sets up log */
+  /// Initializes programs - does some validation of arguments
+  /// and meta, and sets up log
 
   void initialize(List<String> arguments) {
     MetaUpdate("pubspec.yaml").verifyCodeHasUpdatedMeta();
@@ -189,7 +180,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     g.cliArgs.checkArgs();
     setLogPath();
 
-    printMsg("${g.newL}uprt converting ...", onlyIfVerbose: true);
+    printMsg("${g.newL}uprt converting ...", onlyIfVerbose: false);
     if (g.logPath != "") {
       String logMessage =
           '''${meta['name']} (${meta['version']} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} Locale: ${Platform.localeName})${g.newL}''';
@@ -198,28 +189,37 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     }
   }
 
-  // ignore: slash_for_doc_comments
-  /**  Set log-file-path to system temp folder if option set */
+  /// Set log-file-path to system temp folder if option set
   void setLogPath() {
-    g.logPath = (g.argResults['log'] &&
-            isStringAValidFilePath(g.argResults['log-file-path']))
-        ? g.argResults['log-file-path']
-        : '${p.join(Directory.systemTemp.path, "uprt.log")}';
+    try {
+      g.logPath = (g.argResults['log'] &&
+              isStringAValidFilePath(g.argResults['log-file-path']))
+          ? g.argResults['log-file-path']
+          : '${p.join(Directory.systemTemp.path, "uprt.log")}';
+      if (File(g.logPath).existsSync()) {
+        //delete old log
+        File(g.logPath).deleteSync();
+      }
+    } on Exception {
+      rethrow;
+    }
   }
 
-  // ignore: slash_for_doc_comments
-  /** Post Conversion Cleanup */
+  /// Post Conversion Cleanup
   static void cleanUp() {
     try {
       if (g.tempDir.existsSync()) g.tempDir.deleteSync(recursive: true);
+      if (g.argResults['log']) {
+        printMsg("Log is at ${g.argResults['log-file-path']}");
+        //.replaceAll(r'\', r'/'));
+      }
     } on Exception catch (e) {
       print(e);
     }
   }
 
-// ignore: slash_for_doc_comments
-  /** Gets the temporary LeaseMap from json file and Merge if Option Given 
-  */
+  /// Gets the temporary LeaseMap from json file and Merge if Option Given
+
   Map<String, List<String>> getSourceLeaseMap() {
     Map<String, List<String>> inputLeaseMap = g.inputTypeCl[g.inputType]!
         .getLeaseMap(
@@ -239,45 +239,39 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
         : inputLeaseMap;
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds Csv String from input File and Merge File */
+  /// Builds Csv String from input File and Merge File
   String toCsv() {
     return Csv().build(getSourceLeaseMap());
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds Ddwrt String from input File and Merge File */
+  /// Builds Ddwrt String from input File and Merge File
   String toDdwrt() {
     return Ddwrt().build(getSourceLeaseMap());
   }
-// ignore: slash_for_doc_comments
-/**  Builds Json String from input & merge file */
+
+  /// Builds Json String from input & merge file
 
   String toJson() {
     return Json().build(getSourceLeaseMap());
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds OpenWrt String from input and merge File */
+  /// Builds OpenWrt String from input and merge File
   String toOpenWrt() {
     return OpenWrt().build(getSourceLeaseMap());
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds Mikrotik String from input and merge File */
+  /// Builds Mikrotik String from input and merge File
   String toMikroTik() {
     return Mikrotik().build(getSourceLeaseMap());
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds OpnSense from input and merge File */
+  /// Builds OpnSense from input and merge File
 
   String toPfsense() {
     return PfSense().build(getSourceLeaseMap());
   }
 
-// ignore: slash_for_doc_comments
-/**  Builds OpnSense String from OpnSense File and Merge File */
+  /// Builds OpnSense String from OpnSense File and Merge File
   String toOpnSense() {
     return OpnSense().build(getSourceLeaseMap());
   }
@@ -293,8 +287,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     }
   }
 
-// ignore: slash_for_doc_comments
-/**  Merges two LeaseMaps, optionally sorts them */
+  /// Merges two LeaseMaps, optionally sorts them
 
   Map<String, List<String>> mergeLeaseMaps(
       Map<String, List<String>> leaseMapInput,
@@ -305,6 +298,12 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
           flattenLeaseMap(leaseMapInput, sort: g.argResults['sort']);
       List<String> leaseListMerge =
           flattenLeaseMap(leaseMapMerge, sort: g.argResults['sort']);
+
+      //This if statement determines which list is filtered for duplicates.
+      //Duplicates in the argument for addAll will be filtered out
+      //by removeBadLeases if they are already contained in existing lease.
+      //So the status -r determines which is existing leaseMap and which
+      //leaseMap will be filtered
       if (g.argResults['replace-duplicates-in-merge-file']) {
         leaseListInput.addAll(leaseListMerge);
         return explodeLeaseList(leaseListInput);
@@ -319,8 +318,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Takes List created by flattenLeaseMap and returns LeaseMap  */
+  /// Takes List created by flattenLeaseMap and returns LeaseMap
 
   Map<String, List<String>> explodeLeaseList(List<String> leaseList) {
     Map<String, List<String>> leaseMap = <String, List<String>>{
@@ -338,12 +336,11 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     return leaseMap;
   }
 
-// ignore: slash_for_doc_comments
-/** Converts LeaseMap to a LeaseList consisting of long strings, each string 
- * consisting of fields separated by |. 
- * 4 Fields in string: IP converted to a normalized number string, mac, host, 
- * and ip address. Strings are sorted on first field 
- */
+  /// Converts LeaseMap to a LeaseList consisting of long strings, each string
+  /// consisting of fields separated by |.
+  ///  4 Fields in string: IP converted to a normalized number string,
+  /// mac, host, and ip address. Strings are sorted on first field
+
   List<String> flattenLeaseMap(Map<String, List<String>> leaseMap,
       {bool sort = true}) {
     Ip ip = Ip();
@@ -358,11 +355,8 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     return leaseList;
   }
 
-// ignore: slash_for_doc_comments
-/** Merge Lease Map with Map of A Second File (Merge File Target)
-
-   * Returns Lease Map of Merge
-   */
+  ///  Merge Lease Map with Map of A Second File (Merge File Target)
+  /// Returns Lease Map of Merge
   Map<String, List<String>> mergeLeaseMapWithFile(
       Map<String, List<String>> inputFileLeaseMap, String mergeTargetPath) {
     Map<String, List<String>> mergeTargetLeaseMap = <String, List<String>>{
@@ -374,7 +368,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     dynamic mergeTargetFileType =
         g.cliArgs.getFormatTypeOfFile(mergeTargetPath);
 
-    String displayMergeFile = (g.argResults['verbose'])
+    String displayMergeFile = (g.verbose)
         ? p.canonicalize(mergeTargetPath)
         : p.basename(mergeTargetPath);
 
@@ -385,7 +379,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
             fileContents: File(mergeTargetPath).readAsStringSync()));
 
     /* Remove duplicate leases **/
-    return validateLeases.removeBadLeases(
-        mergeTargetLeaseMap, mergeTargetFileType);
+    return g.validateLeases
+        .removeBadLeases(mergeTargetLeaseMap, mergeTargetFileType);
   }
 }

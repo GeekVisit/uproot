@@ -1,11 +1,13 @@
 import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'package:validators/validators.dart';
+
+import '../lib.dart';
 import 'globals.dart' as g;
-import 'src.dart';
 
 class CliArgs {
   ArgParser parser = ArgParser();
@@ -99,7 +101,7 @@ Verbosity - debug level verbosity""")
 
       return parser.parse(arguments);
     } on FormatException catch (e) {
-      if (!testRun) {
+      if (!g.testRun) {
         print(e);
         exit(1);
       }
@@ -142,6 +144,7 @@ ${g.cliArgs.parser.usage}
 
   void checkArgs() {
     try {
+      g.verbose = (g.argResults['verbose-debug'] || g.argResults['verbose']);
       checkIfOptionArgsAreGiven();
       checkForMissingMandatoryOptions(<String>["g"]);
       validateIpRangeOptions();
@@ -169,8 +172,7 @@ ${g.cliArgs.parser.usage}
     }
   }
 
-  // ignore: slash_for_doc_comments
-  /** Gets all input file paths after glob from arguments without flags */
+  /// Gets all input file paths after glob from arguments without flags
   List<String> getInputFileList(List<String> rest) {
     try {
       List<String> inFiles = <String>[];
@@ -243,11 +245,10 @@ ${g.cliArgs.parser.usage}
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Gets format type (j for json, etc) -
- use specified format, if not specified, get from extension,
- if xml look if contains opnsense 
- Returns empty string if unable to be determined. */
+//// Gets format type (j for json, etc) -
+  /// use specified format, if not specified, get from extension,
+  /// if xml look if contains opnsense
+  /// Returns empty string if unable to be determined.
   String getFormatTypeOfFile([String filePath = ""]) {
     try {
       if (filePath == "") {
@@ -278,10 +279,8 @@ ${g.cliArgs.parser.usage}
     }
   }
 
-// ignore: slash_for_doc_comments
-/** Determines whether xml file is opnsense or pfsense 
- * Returns "n" for opnsense and "p" for pfsense
-*/
+  /// Determines whether xml file is opnsense or pfsense
+  /// Returns "n" for opnsense and "p" for pfsense
 
   String xmlFirewallFormat() {
     return (File(g.inputFile).readAsStringSync().contains("<opnsense>"))
@@ -289,8 +288,7 @@ ${g.cliArgs.parser.usage}
         : "p";
   }
 
-// ignore: slash_for_doc_comments
-/** Check if Mandatory Options Are Missing from Option or Value arguments */
+  /// Check if Mandatory Options Are Missing from Option or Value arguments
   void checkForMissingMandatoryOptions(List<String> requiredOptionsByAbbrs) {
     try {
       List<String> allowedAbbrevList = parser.options.entries

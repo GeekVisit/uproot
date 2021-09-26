@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import '../lib.dart';
 import 'globals.dart' as g;
-import 'src.dart';
 
 class OpenWrt extends FileType {
   String fileType = g.fFormats.openwrt.formatName;
@@ -146,10 +146,9 @@ class OpenWrt extends FileType {
     return sbOpenwrt.toString();
   }
 
-  // ignore: slash_for_doc_comments
-  /**  Used for Pfs and Opn conversions. Keeps and updates existing
-   *  lease in merge file and adds new ones from input. 
-  */
+  ///  Used for Pfs and Opn conversions. Keeps and updates existing
+  ///   lease in merge file and adds new ones from input.
+
   String mergeOpenWrtConfig(Map<String, List<String>?> leaseMap) {
     try {
       StringBuffer sb = StringBuffer();
@@ -158,10 +157,6 @@ class OpenWrt extends FileType {
 
       RegExp regExp = RegExp(r'((config host.*?)((config (?!host))|$))',
           multiLine: false, dotAll: true);
-
-      //TODO: Concept: find configs by regex, then search and
-      //replace old config with new
-      //config
 
       String template = "";
       //update existing leases with components from the input file
@@ -245,17 +240,17 @@ config host
         return genericConfigTemplate;
       }
     } on Exception {
-      // TODO
       rethrow;
     }
   }
 
+  /// Fill in config Template with values from leaseMap
   String fillInTemplate(
       String template, Map<String, List<String>?> leaseMap, int i) {
     return template
         .replaceFirst(
             RegExp(r'^.*option mac.*?$', multiLine: true, dotAll: false),
-            """        option mac '${leaseMap[g.lbMac]![i]}'""")
+            """  option mac '${leaseMap[g.lbMac]![i]}'""")
         .trim()
         .replaceFirst(
             RegExp(r'option name.*?$', multiLine: true, dotAll: false),
