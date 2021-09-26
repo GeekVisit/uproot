@@ -1,8 +1,6 @@
 //Follow this convention for branching:
 //https://nvie.com/posts/a-successful-git-branching-model
 
-//TODO: make sure verbosity works properly
-
 import 'package:uprt/lib.dart';
 import 'package:uprt/src/globals.dart' as g;
 
