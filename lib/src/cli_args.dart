@@ -271,11 +271,10 @@ ${g.cliArgs.parser.usage}
           return g.extToTypes[
               fileExtension]!; //returns type option associated w/extension
         } else {
-          String errMsg = """Unable to determine file type for $filePath" +
-               (filePath == g.inputFile) 
-               ? "Please use only extensions specified in help or specify file type using -t" 
-               : "" 
-               """;
+          String errMsg = (filePath == g.inputFile)
+              ? "Please use only extensions specified in help or specify file type using -t"
+              : "";
+          errMsg = """Unable to determine file type for $filePath $errMsg""";
 
           if (g.testRun) {
             throw Exception(errMsg);
