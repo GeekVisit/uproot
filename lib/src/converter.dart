@@ -90,11 +90,11 @@ class Converter {
 
             break;
 
+          case 'Z': //unable to determine file type
+            break;
           default:
             printMsg("Incorrect Output type: $eachOutputType.", errMsg: true);
-            sleep(Duration(seconds: 1));
-            g.cliArgs.displayHelp();
-            exit(1);
+            break;
         }
       }
     } on Exception catch (e) {

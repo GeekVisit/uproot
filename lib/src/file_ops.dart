@@ -47,11 +47,14 @@ void printMsg(
   } on FormatException catch (e) {
     if (!g.testRun) {
       print("${e.message} (log file)");
+      return;
+    } else {
+      rethrow;
     }
-    rethrow;
   } on Exception {
-    //print(e);
-    rethrow;
+    stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
+    if (g.testRun) rethrow;
+    return;
   }
 }
 

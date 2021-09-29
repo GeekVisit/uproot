@@ -197,6 +197,7 @@ class ValidateLeases {
           rethrow;
         } else {
           printMsg(e, errMsg: true);
+          return goodLeaseMap;
         }
       }
 

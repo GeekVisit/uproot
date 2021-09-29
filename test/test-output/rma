@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+#script to delete all files in test output. deletes everything except placeholder and this script
+shopt -s extglob
+rm -v !("placeholder"|"rma")

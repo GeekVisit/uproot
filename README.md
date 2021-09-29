@@ -54,12 +54,18 @@ If you choose to compile yourself:
     git clone https://github.com/GeekVisit/uproot.git
     ````
 
-4. Type the following:
+4. Pull down the dependencies:
 
     ````bash
-    cd uproot/bin
+      cd uproot
+      dart pub get
+    ` ```
 
-    dart compile exe uprt.dart -o uprt
+5. Change int the bin directory and compile:
+
+    ````bash
+    cd ../bin
+    dart compile exe uprt.dart -o uprt   [or -o uprt.exe if you are on windows]
     ````
 
 ## Use

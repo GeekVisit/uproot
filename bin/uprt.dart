@@ -7,13 +7,13 @@ import 'package:uprt/src/globals.dart' as g;
 void main(List<String> arguments) {
   try {
     // arguments = <String>[
-    //   "test/test-data/lease-list-infile.csv",
+    //   "test/test-data/*.*",
     //   "-g",
-    //   "o",
+    //   "cdjmnop",
 // //       //   "-v",
 // //       //   "v",
-//       "-b",
-//       "example-merge",
+    // "-b",
+    // "example-merge",
 //       //   "-l",
 // //       //   "-P",
 // //       //   "bin/uprt.log"
@@ -23,8 +23,8 @@ void main(List<String> arguments) {
 // //       "d",
 //       "-m",
 //       "test/test-merge/dhcp.openwrt",
-//       "-d",
-//       "test/test-output",
+    // "-d",
+    // "test/test-output",
 // //       "-b",
 // //       "example-merge",
 // //       //"-
