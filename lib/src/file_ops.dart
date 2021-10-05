@@ -13,12 +13,14 @@ import 'package:validators/sanitizers.dart';
 import 'globals.dart' as g;
 
 void printMsg(
-  dynamic msg, {
+  dynamic msgToPrint, {
   bool errMsg = false,
   bool onlyIfVerbose = false,
   bool logOnly = false,
 }) {
+  String msg = msgToPrint.toString();
   g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
+
   if (errMsg) {
     stderr.writeln(
         """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
@@ -46,18 +48,16 @@ void printMsg(
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
-
         logFile.writeAsStringSync(
             // ignore: prefer_interpolation_to_compose_strings
             """
 ${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
             "${g.newL}",
             mode: FileMode.append);
-
       }
     }
   } on FormatException catch (e) {
-    print("${e.message} (log file)");
+    print("${e.message.toString()} (log file)");
     return;
   } on Exception {
     stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
