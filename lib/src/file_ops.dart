@@ -46,8 +46,26 @@ void printMsg(
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
-        logFile.writeAsStringSync(LineSplitter().convert("""
-${g.newL}${StackTrace.current.toString().trim()}${g.newL})""").join(g.newL),
+        logFile.writeAsStringSync(
+            // ignore: prefer_interpolation_to_compose_strings
+            """
+${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
+                    .split("#")
+                    .join("${g.newL}#") +
+                "${g.newL}",
+            mode: FileMode.append);
+
+        logFile.writeAsStringSync(
+            // ignore: prefer_interpolation_to_compose_strings
+            """
+${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
+            "${g.newL}",
+            mode: FileMode.append);
+
+        logFile.writeAsStringSync(
+            // ignore: prefer_interpolation_to_compose_strings
+
+            LineSplitter().convert(StackTrace.current.toString()).join(g.newL),
             mode: FileMode.append);
       }
     }
