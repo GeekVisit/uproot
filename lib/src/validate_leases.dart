@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'package:validators/validators.dart';
 
@@ -112,6 +111,7 @@ class ValidateLeases {
     ValidateLeases.clearProcessedLeases();
     try {
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
+        printMsg("Source file is corrupt - unable to extract static leases.");
         return true;
       }
 
@@ -162,7 +162,7 @@ class ValidateLeases {
     int totalBadLeases = 0;
     try {
       if (areAllLeaseMapValuesEmpty(rawLeaseMap)) {
-        printMsg("Error - no valid leases in file.");
+        printMsg("Error - no valid leases in source file.");
         return rawLeaseMap;
       }
 
@@ -181,7 +181,7 @@ class ValidateLeases {
           printMsg(
 
               // ignore: lines_longer_than_80_chars
-              " \u001b[33mExcluding lease from target file (total excluded: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}\u001b[0m");
+              " ${g.colorWarning}Excluding lease from target file (total excluded: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}${g.ansiFormatEnd}");
           totalBadLeases++;
         }
       }
@@ -197,12 +197,8 @@ class ValidateLeases {
       return goodLeaseMap;
     } on Exception catch (e) {
       if (e.toString().contains("Unable to generate target format")) {
-        if (g.testRun) {
-          rethrow;
-        } else {
-          printMsg(e, errMsg: true);
-          return goodLeaseMap;
-        }
+        printMsg(e, errMsg: true);
+        return goodLeaseMap;
       }
 
       rethrow;

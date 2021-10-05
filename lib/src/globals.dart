@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
 import '../lib.dart';
@@ -13,6 +12,16 @@ Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
 String lastPrint = "";
 
 String dirOut = argResults['directory-out'];
+
+const String colorWarning = ansiYellow;
+const String colorError = colorRed;
+const String colorSuccess = colorGreen;
+
+const String colorRed = "\u001b[31m";
+const String colorGreen = "\u001b[32m";
+const String ansiYellow = "\u001b[33m";
+const String ansiFormatEnd = "\u001b[0m";
+const String ansiBold = "\u001b[4m";
 
 List<String> inputFileList = <String>[];
 String inputFile = "";

@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
 
@@ -19,7 +18,8 @@ void printMsg(
 }) {
   g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
   if (errMsg) {
-    stderr.writeln(msg.toString().replaceFirst("Exception:", "").trim());
+    stderr.writeln(
+        """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
   } else if (!logOnly) {
     if (onlyIfVerbose) {
       (g.verbose) ? stdout.writeln(msg) : "";
@@ -50,15 +50,10 @@ void printMsg(
       }
     }
   } on FormatException catch (e) {
-    if (!g.testRun) {
-      print("${e.message} (log file)");
-      return;
-    } else {
-      rethrow;
-    }
+    print("${e.message} (log file)");
+    return;
   } on Exception {
     stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
-    if (g.testRun) rethrow;
     return;
   }
 }

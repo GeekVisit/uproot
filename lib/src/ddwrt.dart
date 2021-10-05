@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import '../lib.dart';
 import 'globals.dart' as g;
@@ -26,6 +25,11 @@ class Ddwrt extends FileType {
         g.lbHost: <String>[],
         g.lbIp: <String>[],
       };
+
+      if (fileContents == "") {
+        printMsg("Error: Source file is empty.", errMsg: true);
+        return leaseMap;
+      }
 
       List<String> lease = fileContents.split(' ');
 

@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
 
@@ -22,7 +21,7 @@ class Converter {
     try {
       initialize(arguments);
       g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
-      printMsg("Converting files ...");
+      printMsg("Uprt converting files ...");
       for (String eachFilePath in g.inputFileList) {
         setInputFile(eachFilePath);
         printMsg("Scanning ${p.basename(eachFilePath)}...");
@@ -104,7 +103,6 @@ class Converter {
     } on Exception catch (e) {
       if (e.toString().contains("is invalid format")) {
         printMsg(e);
-        if (g.testRun) rethrow;
         return;
       }
       rethrow;
@@ -166,9 +164,10 @@ class Converter {
     String displayTargetFile =
         (g.verbose) ? p.canonicalize(outPath) : p.basename(outPath);
     String successResult = (success)
-        ? "\u001b[32mSuccessful\u001b[0m"
-        : "${g.newL}\u001b[31m$displayTargetFile failed to validate and "
-            "save, check above error messages.\u001b[0m";
+        ? "${g.colorSuccess}Successful${g.ansiFormatEnd}"
+        : "${g.newL}${g.colorError}$displayTargetFile failed to validate and "
+            """
+save. Check that source file is properly formatted.${g.ansiFormatEnd}""";
 
     printMsg("""
 $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} => ${g.typeOptionToName[fileType]}) $successResult""");
@@ -184,7 +183,6 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     g.cliArgs.checkArgs();
     setLogPath();
 
-    printMsg("${g.newL}uprt converting ...", onlyIfVerbose: false);
     if (g.logPath != "") {
       String logMessage =
           '''${meta['name']} (${meta['version']} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion} Locale: ${Platform.localeName})${g.newL}''';

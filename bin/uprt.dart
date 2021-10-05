@@ -1,14 +1,10 @@
-
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 //Follow this convention for branching:
 //https://nvie.com/posts/a-successful-git-branching-model
 
 import 'package:uprt/lib.dart';
-import 'package:uprt/src/globals.dart' as g;
-
 
 void main(List<String> arguments) {
   try {
@@ -70,7 +66,7 @@ void main(List<String> arguments) {
     Converter uprt = Converter();
     uprt.convertFileList(arguments);
   } on Exception catch (e) {
-    if (!g.testRun) handleExceptions(e);
+    handleExceptions(e);
     // ignore: avoid_catching_errors
   } on Error catch (e) {
     displayFatalError(e);

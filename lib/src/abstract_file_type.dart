@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 // ignore: unused_import
 import 'dart:io';
@@ -134,10 +133,10 @@ abstract class FileType {
     } else if (match.isEmpty) {
       return genericXmlStaticMapTemplate;
     } else {
-      printMsg(
-          "\u001b[33mWarning: Merge file contains two or more leases that share"
+      printMsg("""
+${g.colorWarning}Warning: Merge file contains two or more leases that share"""
           "a common ip, hostname, and/or mac address. Using first instance and"
-          " discarding others.\u001b[0m");
+          " discarding others.${g.ansiFormatEnd}");
     }
     return genericXmlStaticMapTemplate;
   }

@@ -152,8 +152,8 @@ void testUpRooted() {
     expect(g.cliArgs.getFormatTypeOfFile(), "p");
 
     uprt.setInputFile("test/test-data/lease-list-infile.dd");
-    expect(() => g.cliArgs.getFormatTypeOfFile(),
-        checkErrorMessage(("Unable to determine file type")));
+    g.cliArgs.getFormatTypeOfFile();
+    expect(g.lastPrint, contains("Unable to determine file type"));
 
 /* Test Mandatory */
 
@@ -1050,7 +1050,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "-t",
       "c"
     ];
-    g.testRun = false;
 
     args[9] = "c";
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
@@ -1081,8 +1080,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     args[9] = "p";
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
         uprt, "failed to validate");
-
-    g.testRun = true;
   });
 
   test('bad_input_files', () {
@@ -1099,17 +1096,17 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     // Files totally bad
 
-    testExceptionOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
-        uprt, "Unable to generate target format");
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
+        uprt, "failed to validate and save");
 
-    testExceptionOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
-        uprt, "Unable to generate target format");
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
+        uprt, "failed to validate and save");
 
-    testExceptionOnGenerate(
+    testPrintMsgOnGenerate(
         args,
         "test/test-data/lease-list-bad-address-data.json",
         uprt,
-        "Unable to generate target format");
+        "failed to validate and save");
 
     //Partially bad files
     testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
@@ -1156,7 +1153,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("uprt converting") &&
+        logFileContents.contains("Uprt converting") &&
             logFileContents.contains("Validating output") &&
             logFileContents.contains("Finished validating leases"),
         true);
@@ -1185,7 +1182,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("uprt converting") &&
+        logFileContents.contains("Uprt converting") &&
             logFileContents.contains("Validating output") &&
             logFileContents.contains("Finished validating leases"),
         true);
@@ -1215,7 +1212,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("uprt converting") &&
+        logFileContents.contains("Uprt converting") &&
             logFileContents.contains("Converter.") &&
             logFileContents.contains("Finished validating leases"),
         true);

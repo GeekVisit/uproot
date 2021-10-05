@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:convert';
 
@@ -32,6 +31,7 @@ class Csv extends FileType {
       };
 
       if (fileContents == "") {
+        printMsg("Source file is empty or corrupt.", errMsg: true);
         return leaseMap;
       }
 
@@ -68,8 +68,7 @@ class Csv extends FileType {
       }
     } on Exception catch (e) {
       if ((e.toString().contains("is empty") ||
-              e.toString().contains("CSV Wrong Format")) &&
-          !g.testRun) {
+          e.toString().contains("CSV Wrong Format"))) {
         print(e);
         return <String, List<String>>{};
       } else {
@@ -100,9 +99,6 @@ class Csv extends FileType {
     try {
       Map<String, List<String>> leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for isContentValid");
-      }
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.csv.formatName)) {
         return false;

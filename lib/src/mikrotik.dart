@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import '../lib.dart';
 import 'globals.dart' as g;
@@ -14,9 +13,6 @@ class Mikrotik extends FileType {
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
-    if (fileContents == "" && fileLines == null) {
-      throw Exception("Missing Argument for getLeaseMap in Mikrotik");
-    }
     try {
       List<String> fileLines = extractLeaseMatches(fileContents);
 
@@ -25,6 +21,11 @@ class Mikrotik extends FileType {
         g.lbMac: <String>[],
         g.lbIp: <String>[]
       };
+
+      if (fileContents == "") {
+        printMsg("Source file is empty or corrupt.", errMsg: true);
+        return leaseMap;
+      }
 
       leaseMap[g.lbHost] = extractLeaseParam(fileLines, "name");
       leaseMap[g.lbMac] = extractLeaseParam(fileLines, g.lbMac);

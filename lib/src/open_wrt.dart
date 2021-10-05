@@ -1,6 +1,5 @@
 // Copyright 2021 GeekVisit All rights reserved.
-// Use of this source code is governed by the license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
 
@@ -77,11 +76,16 @@ class OpenWrt extends FileType {
             .toList();
       }
 
-      if (fileLines == null) {
-        throw Exception("Missing Argument for getLeaseMap in OpenWrt");
-      }
+      Map<String, List<String>> leaseMap = <String, List<String>>{
+        g.lbMac: <String>[],
+        g.lbHost: <String>[],
+        g.lbIp: <String>[],
+      };
 
-      Map<String, List<String>> leaseMap = <String, List<String>>{};
+      if (fileLines == null || fileLines.isEmpty) {
+        printMsg("Source file is empty or corrupt.", errMsg: true);
+        return leaseMap;
+      }
 
       //Match string between single quotes
       RegExp exp = RegExp(r"""\s['|"](.*)['|"]""", caseSensitive: false);
