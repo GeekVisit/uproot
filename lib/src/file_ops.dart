@@ -1,13 +1,15 @@
 // Copyright 2021 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
+import 'dart:convert';
 import 'dart:io';
-
 import 'dart:math';
+
 import 'package:glob/glob.dart';
 import 'package:glob/list_local_fs.dart';
 import 'package:path/path.dart' as p;
 import 'package:validators/sanitizers.dart';
+
 import 'globals.dart' as g;
 
 void printMsg(
@@ -44,8 +46,8 @@ void printMsg(
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
-        logFile.writeAsStringSync(
-            "${g.newL}${StackTrace.current.toString().trim()}${g.newL}",
+        logFile.writeAsStringSync(LineSplitter().convert("""
+${g.newL}${StackTrace.current.toString().trim()}${g.newL})""").join(g.newL),
             mode: FileMode.append);
       }
     }
