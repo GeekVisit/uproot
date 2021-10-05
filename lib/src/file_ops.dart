@@ -40,7 +40,7 @@ void printMsg(
       msg = stripLow(msg)
           .replaceAll(RegExp('[[0-9]+m', multiLine: false, dotAll: true), "");
       File logFile = File(g.logPath);
-      logFile.writeAsStringSync(stripLow("$msg  ${g.newL}"),
+      logFile.writeAsStringSync("${stripLow(msg)} ${g.newL}",
           mode: FileMode.append);
       /* Log Stack Trace if Debug */
       if (g.argResults['verbose-debug']) {
