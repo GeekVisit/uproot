@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:convert';
 
 import '../lib.dart';
@@ -17,11 +21,15 @@ class Json extends FileType {
     String fileType = g.fFormats.json.formatName;
     //
 
+    Map<String, List<String>> rawLeaseMap = <String, List<String>>{
+      g.lbHost: <String>[],
+      g.lbMac: <String>[],
+      g.lbIp: <String>[],
+    };
     try {
-      Map<String, List<String>> rawLeaseMap = <String, List<String>>{};
       List<String> valueList = <String>[];
       if (fileContents == "") {
-        throw Exception("Missing json fileContents for getLease");
+        return rawLeaseMap;
       }
 
       List<dynamic> deviceList = JsonDecoder().convert(fileContents);
@@ -42,8 +50,11 @@ class Json extends FileType {
       } else {
         return rawLeaseMap;
       }
+    } on FormatException catch (e) {
+      printMsg("""
+Unable to extract static leases from File, file may not be proper json format, $e""");
+      return rawLeaseMap;
     } on Exception {
-      //   printMsg(e, errMsg: true);
       rethrow;
     }
   }
@@ -64,7 +75,8 @@ class Json extends FileType {
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
       if (fileContents == "") {
-        throw Exception("No argument provided for json.isContentProvided");
+        throw Exception(
+            "         argument provided for json.isContentProvided");
       }
 
       if (!isJson(fileContents)) {
@@ -86,8 +98,6 @@ class Json extends FileType {
       return false;
     }
   }
-
-
 
   bool isJson(String string) {
     try {

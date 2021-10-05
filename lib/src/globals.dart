@@ -1,9 +1,16 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:io';
 import '../lib.dart';
 
 List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
+
+///Last message sent to printMsg, used in tests
+String lastPrint = "";
 
 String dirOut = argResults['directory-out'];
 
@@ -12,7 +19,6 @@ String inputFile = "";
 String inputType = "j";
 String baseName = "";
 bool verbose = false;
-
 
 Map<String, FileType> inputTypeCl = <String, FileType>{
   fFormats.csv.abbrev: Csv(),

@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
-
 import 'package:uprt/lib.dart';
 import 'package:uprt/src/globals.dart' as g;
 
+List<String> printLog = <String>[];
 void main() {
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
@@ -929,6 +929,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test/test-output",
       "-w"
     ];
+
     testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.csv", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.json", uprt, 50);
@@ -1036,6 +1037,53 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       //  }
     }
   });
+  test('empty_input_files', () {
+    List<String> args = <String>[
+      "", //Input file argument replaced in test methods
+      "-g",
+      "cdjmnop",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w",
+      "-t",
+      "c"
+    ];
+    g.testRun = false;
+
+    args[9] = "c";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    args[9] = "d"; //test empty file with different types
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    args[9] = "j";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    args[9] = "m";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    args[9] = "n";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    args[9] = "o";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+    testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
+    args[9] = "p";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
+
+    g.testRun = true;
+  });
 
   test('bad_input_files', () {
     List<String> args = <String>[
@@ -1050,6 +1098,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     ];
 
     // Files totally bad
+
     testExceptionOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
         uprt, "Unable to generate target format");
 
@@ -1201,6 +1250,21 @@ void testExceptionOnGenerate(List<String> args, String inputFileToTest,
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
   expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
+}
+
+void testPrintMsgOnGenerate(List<String> args, String inputFileToTest,
+    Converter uprt, String printMessage) {
+  deleteFiles("test/test-output/*output*.*");
+  deleteFiles("test/test-output/*.log");
+  Converter.cleanUp();
+  g.tempDir = Directory.systemTemp.createTempSync("uprt_");
+
+  args[0] = inputFileToTest;
+  g.argResults = g.cliArgs.getArgs(args);
+//expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
+  uprt.convertFileList(args);
+
+  expect(g.lastPrint, contains(printMessage));
 }
 
 void testOutputFiles(

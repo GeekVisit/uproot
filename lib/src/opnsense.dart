@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'package:xml/xml.dart';
 
 import '../lib.dart';
@@ -36,18 +40,17 @@ class OpnSense extends FileType {
       bool removeBadLeases = true}) {
     //
 
+    Map<String, List<String>> leaseMap = <String, List<String>>{
+      g.lbMac: <String>[],
+      g.lbHost: <String>[],
+      g.lbIp: <String>[],
+    };
     try {
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLeaseMap in OpnSense");
+        return leaseMap;
       }
 
       final XmlDocument opnsenseDoc = XmlDocument.parse(fileContents);
-
-      Map<String, List<String>> leaseMap = <String, List<String>>{
-        g.lbMac: <String>[],
-        g.lbHost: <String>[],
-        g.lbIp: <String>[],
-      };
 
       leaseMap[g.lbMac] = opnsenseDoc
           .findAllElements('mac')
@@ -69,9 +72,11 @@ class OpnSense extends FileType {
       } else {
         return leaseMap;
       }
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
-
+    } on XmlParserException catch (e) {
+      printMsg("""
+Unable to extract static leases from file, file may not be proper OPNsense XML format, $e""");
+      return leaseMap;
+    } on Exception {
       rethrow;
     }
   }

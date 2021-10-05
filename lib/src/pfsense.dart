@@ -1,3 +1,6 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
 import 'package:xml/xml.dart';
 
 import '../lib.dart';
@@ -60,18 +63,18 @@ class PfSense extends FileType {
       bool removeBadLeases = true}) {
     //
 
+    Map<String, List<String>> leaseMap = <String, List<String>>{
+      g.lbMac: <String>[],
+      g.lbHost: <String>[],
+      g.lbIp: <String>[],
+    };
+
     try {
       if (fileContents == "") {
-        throw Exception("Missing Argument for getLeaseMap in pfSense");
+        return leaseMap;
       }
 
       final XmlDocument pfsenseDoc = XmlDocument.parse(fileContents);
-
-      Map<String, List<String>> leaseMap = <String, List<String>>{
-        g.lbMac: <String>[],
-        g.lbHost: <String>[],
-        g.lbIp: <String>[],
-      };
 
       leaseMap[g.lbMac] = pfsenseDoc
           .findAllElements('mac')
@@ -92,9 +95,11 @@ class PfSense extends FileType {
       } else {
         return leaseMap;
       }
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
-
+    } on XmlParserException catch (e) {
+      printMsg("""
+Unable to extract static leases from file, file may not be proper pfSense XML format, $e""");
+      return leaseMap;
+    } on Exception {
       rethrow;
     }
   }

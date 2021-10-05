@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:io';
 
 import 'dart:math';
@@ -13,6 +17,7 @@ void printMsg(
   bool onlyIfVerbose = false,
   bool logOnly = false,
 }) {
+  g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
   if (errMsg) {
     stderr.writeln(msg.toString().replaceFirst("Exception:", "").trim());
   } else if (!logOnly) {

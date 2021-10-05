@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:convert';
 
 import '../lib.dart';
@@ -20,16 +24,21 @@ class Csv extends FileType {
       List<String> csvRow = <String>[];
 
       fileContents = fileContents.trim();
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for getLeaseMap in Csv");
-      }
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
         g.lbHost: <String>[],
         g.lbMac: <String>[],
         g.lbIp: <String>[],
       };
+
+      if (fileContents == "") {
+        return leaseMap;
+      }
+
       List<String> csvRows = LineSplitter.split(fileContents).toList();
+      if (csvRows.isEmpty) {
+        throw Exception("Source file is empty: ${g.inputFile}");
+      }
       List<String> keyName = csvRows[0].split(",");
 
       if (keyName.length < 3 ||
@@ -57,14 +66,25 @@ class Csv extends FileType {
       } else {
         return leaseMap;
       }
-    } on Exception {
-      rethrow;
+    } on Exception catch (e) {
+      if ((e.toString().contains("is empty") ||
+              e.toString().contains("CSV Wrong Format")) &&
+          !g.testRun) {
+        print(e);
+        return <String, List<String>>{};
+      } else {
+        rethrow;
+      }
     }
   }
 
   @override
   String build(Map<String, List<String>?> deviceList) {
     StringBuffer sb = StringBuffer();
+
+    if (deviceList[g.lbMac]!.isEmpty) {
+      return "";
+    }
 
     sb.write("host-name, mac-address, address\n");
     for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {

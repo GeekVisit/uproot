@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -235,7 +239,9 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
           }
         : inputLeaseMap;
 
-    return (g.argResults['sort'] && !g.argResults['append'])
+    return (g.argResults['sort'] &&
+            !g.argResults['append'] &&
+            !ValidateLeases().areAllLeaseMapValuesEmpty(inputLeaseMap))
         ? sortLeaseMapByIp(inputLeaseMap)
         : inputLeaseMap;
   }

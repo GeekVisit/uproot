@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import '../lib.dart';
 import 'globals.dart' as g;
 
@@ -17,10 +21,6 @@ class Ddwrt extends FileType {
     //
 
     try {
-      if (fileContents == "") {
-        throw Exception("Missing Argument for getLeaseMap in Ddwrt");
-      }
-
       Map<String, List<String>> leaseMap = <String, List<String>>{
         g.lbMac: <String>[],
         g.lbHost: <String>[],

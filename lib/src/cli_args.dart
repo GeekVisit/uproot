@@ -1,3 +1,7 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license that can be
+// found in the LICENSE file.
+
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -272,6 +276,7 @@ ${g.cliArgs.parser.usage}
               fileExtension]!; //returns type option associated w/extension
         } else {
           String errMsg = (filePath == g.inputFile)
+              // ignore: lines_longer_than_80_chars
               ? "Please use only extensions specified in help or specify file type using -t"
               : "";
           errMsg = """Unable to determine file type for $filePath $errMsg""";
