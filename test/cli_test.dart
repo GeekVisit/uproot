@@ -12,7 +12,7 @@ void main() {
   deleteFiles("test/test-output/*.log");
   g.testRun = true;
 
-  //Update version info
+  //Update version info in main program kept in meta.dart
   MetaUpdate("pubspec.yaml").writeMetaDartFile("lib/src/meta.dart");
   //run all test
   testUpRooted();
@@ -88,8 +88,8 @@ void testUpRooted() {
 
     mu = MetaUpdate("file-does-not-exist.yaml");
     expect(mu.verifyCodeHasUpdatedMeta(), g.MetaCheck.runningAsBinary);
-
-    pubSpecTestDir.delete();
+    pubSpecTestFile.deleteSync();
+    pubSpecTestDir.deleteSync();
   });
   test('isWithinRange', () {
     g.argResults = g.cliArgs.getArgs(args);
@@ -124,6 +124,11 @@ void testUpRooted() {
   });
 
   test("Args", () {
+    // /* test with no options */
+    // args = <String>[];
+    // expect(() => g.cliArgs.getArgs(args), returnsNormally);
+    // expect(() => g.cliArgs.checkArgs(), returnsNormally);
+
     /* test if multiple options work */
 
     args = <String>[...argsTestBase];

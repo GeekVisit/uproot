@@ -1,7 +1,6 @@
 // Copyright 2021 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -18,50 +17,57 @@ void printMsg(
   bool onlyIfVerbose = false,
   bool logOnly = false,
 }) {
-  String msg = msgToPrint.toString();
-  g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
-
-  if (errMsg) {
-    stderr.writeln(
-        """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
-  } else if (!logOnly) {
-    if (onlyIfVerbose) {
-      (g.verbose) ? stdout.writeln(msg) : "";
-    } else {
-      stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
-    }
-  }
-
-/* Print Stack Trace if Debug */
-  if (g.argResults['verbose-debug']) {
-    stdout.writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
-  }
-
-  //Write to Log
   try {
-    if (g.argResults['log']) {
-      //strip color codes
-      msg = stripLow(msg)
-          .replaceAll(RegExp('[[0-9]+m', multiLine: false, dotAll: true), "");
-      File logFile = File(g.logPath);
-      logFile.writeAsStringSync("${stripLow(msg)} ${g.newL}",
-          mode: FileMode.append);
-      /* Log Stack Trace if Debug */
-      if (g.argResults['verbose-debug']) {
-        logFile.writeAsStringSync(
-            // ignore: prefer_interpolation_to_compose_strings
-            """
-${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
-            "${g.newL}",
-            mode: FileMode.append);
+    String msg = msgToPrint.toString();
+    g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
+
+    if (errMsg) {
+      stderr.writeln(
+          """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
+    } else if (!logOnly) {
+      if (onlyIfVerbose) {
+        (g.verbose) ? stdout.writeln(msg) : "";
+      } else {
+        stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
       }
     }
-  } on FormatException catch (e) {
-    print("${e.message.toString()} (log file)");
-    return;
+
+    /* Print Stack Trace if Debug */
+    if (g.argResults['verbose-debug'] != null &&
+        g.argResults['verbose-debug']) {
+      stdout
+          .writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
+    }
+
+    //Write to Log
+    try {
+      if (g.argResults['log'] != null && g.argResults['log']) {
+        //strip color codes
+        msg = stripLow(msg)
+            .replaceAll(RegExp('[[0-9]+m', multiLine: false, dotAll: true), "");
+        File logFile = File(g.logPath);
+        logFile.writeAsStringSync("${stripLow(msg)} ${g.newL}",
+            mode: FileMode.append);
+        /* Log Stack Trace if Debug */
+        if (g.argResults['verbose-debug'] != null &&
+            g.argResults['verbose-debug']) {
+          logFile.writeAsStringSync(
+              // ignore: prefer_interpolation_to_compose_strings
+              """
+    ${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
+              "${g.newL}",
+              mode: FileMode.append);
+        }
+      }
+    } on FormatException catch (e) {
+      print("${e.message.toString()} (log file)");
+      return;
+    } on Exception {
+      stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
+      return;
+    }
   } on Exception {
-    stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
-    return;
+    rethrow;
   }
 }
 

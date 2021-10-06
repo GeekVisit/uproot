@@ -9,59 +9,59 @@ import 'package:uprt/lib.dart';
 void main(List<String> arguments) {
   try {
     // arguments = <String>[
-    //   "test/test-data/*.*",
-    //   "-g",
-    //   "cdjmnop",
-// //       //   "-v",
-// //       //   "v",
-    // "-b",
-    // "example-merge",
-//       //   "-l",
-// //       //   "-P",
-// //       //   "bin/uprt.log"
+    //    "test/test-data/*.*",
+    //    "-g",
+    //    "cdjmnop",
+    //        "-v",
+    //        "v",
+    //  "-b",
+    //  "example-merge",
+    //       "-l",
+    //        "-P",
+    //        "bin/uprt.log"
 
-// //       "test/test-data/lease-list-infile.csv",
-// //       "-g",
-// //       "d",
-//       "-m",
-//       "test/test-merge/dhcp.openwrt",
-    // "-d",
-    // "test/test-output",
-// //       "-b",
-// //       "example-merge",
-// //       //"-
-//       "-w",
-//       //"-a",
-//       "-s",
-//       "-z",
-//       "-P",
-//       "./uprt-p.log"
-//           "-r"
+    //     "test/test-data/lease-list-infile.csv",
+    //     "-g",
+    //     "d",
+    //    "-m",
+    //    "test/test-merge/dhcp.openwrt",
+    //  "-d",
+    //  "test/test-output",
+    //     "-b",
+    //     "example-merge",
+    //     "-"
+    //    "-w",
+    //    "-a",
+    //    "-s",
+    //    "-z",
+    //    "-P",
+    //    "./uprt-p.log"
+    //        "-r"
 
-// // // //       "test/test-data/*file.json",
-// // // //       "test/test-data/*file.csv",
-// // // //       // "-L",
-// // // //       "192.168.0.1",
-// // // //       "-H",
-// // // //       "192.168.0.254",
-// // // // //      "-t",
-// // // //       //    "c",
-// // // //       //"-b",
-// // // //       //"test-output-file",
-// // // //       "-g",
-// // // //       "m",
+    //       "test/test-data/*file.json",
+    //       "test/test-data/*file.csv",
+    //        "-L",
+    //       "192.168.0.1",
+    //       "-H",
+    //       "192.168.0.254",
+    //       "-t",
+    //           "c",
+    //       "-b",
+    //       "test-output-file",
+    //       "-g",
+    //       "m",
 
-// // // //       //"-S",
-// // // //       // "myserver",
+    //       "-S",
+    //        "myserver",
 
-// // // // //      "c",
-// // // //       //   "cdjnmop",
+    //       "c",
+    //          "cdjnmop",
 
-// // // //       //"-v",
-// // // //       // "-l",
-// // // //       // "uprt-log-example.log"
-// // //     //"-V"
-    // ];
+    //       "-v",
+    //        "-l",
+    //        "uprt-log-example.log"
+    //    "-V"
+    //  ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);
