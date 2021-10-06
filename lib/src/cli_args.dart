@@ -46,10 +46,10 @@ type based on the following extensions: .csv, .ddwrt,
 .json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
 distinguishing by searching for <opnsense> in file)""")
         ..addMultiOption("generate-type", abbr: 'g', help: """
-Generated types may be multiple. Valid values include: "
-c (csv), d (DD-WRT), j (json),"
-m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
-Required")""")
+Required. Generated types may be multiple. Valid values include: 
+c (csv), d (DD-WRT), j (json),
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+""")
         ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
 Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
         ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
