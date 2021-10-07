@@ -304,7 +304,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
     ![Backups Menu](readme-pics/opn-download-backup.png)
 
-3. The backup file you've downloaded contains **AlL** backup data for the router. As of this writing, the OPNSense configuration does not allow partial backups of data (although it does allow partial restores).  Since you only need the data in the static map tags and their parents and related closing tags, you can delete all tags unrelated to the static lease export.  Preserve the static map tags and the other tags shown in the below example, but delete all others:
+3. The backup file you've downloaded contains **ALL** backup data for the router. As of this writing, the OPNSense configuration does not allow partial backups of data (although it does allow partial restores).  Since you only need the data in the static map tags and their parents and related closing tags, you can delete all tags unrelated to the static lease export.  Preserve the static map tags and the other tags shown in the below example, but delete all others:
   
     ![Backup File Revised to Contain Only Static Map Tags](readme-pics/opn-export-2021-09-03_22-01-54.png)
 
@@ -322,7 +322,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 1. **NOTE: Always make a [backup](https://docs.opnsense.org/manual/backups.html) of your OPNsense configuration before importing !**
 
-2. **Importing REPLACES any static leases your router currently has. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-opnsense--merging-leases-with-an-existing-configuration) .**
+2. **Importing REPLACES any static leases your router currently has. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-opnsense---merging-leases-with-an-existing-configuration) .**
 
 3. To start your import, log in to your OPNsense router and navigate to System->Configuration->Backups.
 
@@ -330,7 +330,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
     ![Backups Menu](readme-pics/opn-download-backup.png)
 
-5. In the `Restore` section under the `Restore Area` click on the drop down arrow and change `All` to `DHCP Server`. Click on `Browse ..." and select the file to be imported. Then click "Restore configuration".
+5. In the `Restore` section under the `Restore Area` click on the drop down arrow and change `All` to `DHCP Server`. Click on `Browse ...` and select the file to be imported. Then click "Restore configuration".
 
     ![Backups Menu](readme-pics/opnsense-restore-firefox.png)
 
@@ -350,7 +350,7 @@ If you are ADDING leases to an existing OpnSense configuration, you'll need to u
     uprt static_leases-to-import-opn.xml -m static-lease-backup.xml -g o -b merge-output 
 ````
 
-This will output a "merge-output-opn.xml" file. [Import](#user-opnsense--importing) this into your OpnSense router.
+This will output a "merge-output-opn.xml" file. [Import](#user-content-opnsense---import) this into your OpnSense router.
 
 ## pfSense
 
@@ -379,7 +379,7 @@ This will output a "merge-output-opn.xml" file. [Import](#user-opnsense--importi
 
 1. **NOTE: Always make a [backup](https://docs.netgate.com/pfsense/en/latest/backup/index.html) of your pfSense configuration before importing !**
 
-2. **Importing REPLACES any static leases you currently have. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-pfsense--merging-leases-with-an-existing-configuration) .**
+2. **Importing REPLACES any static leases you currently have. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-pfsense---merging-leases-with-an-existing-configuration) .**
 
 3. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
 
@@ -407,7 +407,7 @@ Download to your local computer a backup from your existing configuration, then 
     uprt static_leases-to-import-pfs.xml -m static-lease-backup.xml -g p -b merge-output
 ````
 
-This will output a "merge-output-pfs.xml" file. [Import](#user-pfsense--importing) this file into your pfSense router.
+This will output a "merge-output-pfs.xml" file. [Import](#user-content-pfsense---import) this file into your pfSense router.
 
 ## Mikrotik
 
@@ -488,4 +488,4 @@ This will output a "merge-output-pfs.xml" file. [Import](#user-pfsense--importin
         uprt dhcp-static-leases.rsc -m dhcp-static-leases-export.rsc -g m -b merge-output
     ````
 
-3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing]((#user-mikrotik--importing).
+3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing]((#user-content-mikrotik---import).
