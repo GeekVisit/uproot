@@ -1,0 +1,200 @@
+config host
+             option mac 'F9:CF:5C:08:76:49'
+             option name 'aNDCqrh'
+             option ip '192.168.0.1'
+   config host
+             option mac 'DA:B9:29:92:07:26'
+             option name 'wCfxZjSVg'
+             option ip '192.168.0.2'
+   config host
+             option mac 'C4:4D:02:A0:E1:96'
+             option name '❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙'
+             option ip '192.168.0.3'
+   config host
+             option mac '7F:B7:26:C3:A8:D3'
+             option name 'FxwzLDsBK'
+             option ip '192.168.0.4'
+   config host
+             option mac '❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙'
+             option name 'agXCrZIQT'
+             option ip '192.168.0.5'
+   config host
+             option mac 'F4:34:E2:3A:F9:30'
+             option name 'umTiNUO'
+             option ip '❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙'
+   config host
+             option mac '89:2A:F0:C5:2A:30'
+             option name 'KnOtLxjPCm'
+             option ip '192.168.0.7'
+   config host
+             option mac 'A1:C6:4E:4A:E6:96'
+             option name 'EfnktBOZWh'
+             option ip '192.168.0.8'
+   config host
+             option mac 'D1:F4:18:48:A9:C0'
+             option name 'vAYoTegH'
+             option ip '192.168.0.9'
+   config host
+             option mac '56:A5:2B:40:39:7F'
+             option name 'mgeLTnQV'
+             option ip '192.168.0.10'
+   config host
+             option mac '28:5B:98:CD:B5:34'
+             option name 'vlrZbMUO'
+             option ip '192.168.0.11'
+   config host
+             option mac '61:88:68:5E:86:7A'
+             option name 'gfrM'
+             option ip '192.168.0.12'
+   config host
+             option mac '90:69:74:25:F0:49'
+             option name 'CQvAEsca'
+             option ip '192.168.0.13'
+   config host
+             option mac 'D6:55:91:F0:F2:89'
+             option name 'EBknxyhwO'
+             option ip '192.168.0.14'
+   config host
+             option mac '90:83:FA:69:F2:74'
+             option name 'GxhW'
+             option ip '192.168.0.15'
+   config host
+             option mac 'BD:E0:4D:82:D1:8E'
+             option name 'bcqGmaMSP'
+             option ip '192.168.0.16'
+   config host
+             option mac '9F:53:D9:17:4E:06'
+             option name 'lJujxAzHe'
+             option ip '192.168.0.17'
+   config host
+             option mac '79:F3:07:D9:69:30'
+             option name 'oIcqN'
+             option ip '192.168.0.18'
+   config host
+             option mac '49:FB:D4:AA:0A:0B'
+             option name 'HFGJPW'
+             option ip '192.168.0.19'
+   config host
+             option mac '84:2C:F8:4F:26:E6'
+             option name 'QJyNHnM'
+             option ip '192.168.0.20'
+   config host
+             option mac 'BD:54:4A:F8:6F:21'
+             option name 'ZxNeOCmfQ'
+             option ip '192.168.0.21'
+   config host
+             option mac '8D:4D:BC:92:C1:BD'
+             option name 'OaMYUo'
+             option ip '192.168.0.22'
+   config host
+             option mac 'B1:3E:2E:D7:55:EC'
+             option name 'enpW'
+             option ip '192.168.0.23'
+   config host
+             option mac '15:55:AD:83:79:5B'
+             option name 'zcnktlj'
+             option ip '192.168.0.24'
+   config host
+             option mac '05:47:4B:16:7B:B5'
+             option name 'dHMXslJ'
+             option ip '192.168.0.25'
+   config host
+             option mac '3C:EB:57:06:8B:C0'
+             option name 'ktwBTWFI'
+             option ip '192.168.0.26'
+   config host
+             option mac '97:E4:42:BA:27:0F'
+             option name 'MgnHF'
+             option ip '192.168.0.27'
+   config host
+             option mac '8D:B8:3D:4B:F7:67'
+             option name 'VFfXTH'
+             option ip '192.168.0.28'
+   config host
+             option mac '49:18:D0:A8:8E:F2'
+             option name 'JnCOzm'
+             option ip '192.168.0.29'
+   config host
+             option mac 'CF:CE:63:CB:4C:06'
+             option name 'YAEBJzaPdl'
+             option ip '192.168.0.30'
+   config host
+             option mac '43:E1:7E:A9:58:94'
+             option name 'gJmHPo'
+             option ip '192.168.0.31'
+   config host
+             option mac 'CE:CC:9A:68:08:B8'
+             option name 'oiFzC'
+             option ip '192.168.0.32'
+   config host
+             option mac 'ED:AB:20:91:4B:3F'
+             option name 'ZAcgWwsY'
+             option ip '192.168.0.33'
+   config host
+             option mac 'A6:EF:DD:60:9A:40'
+             option name 'ansiZ'
+             option ip '192.168.0.34'
+   config host
+             option mac '7E:0E:0F:7F:F4:9F'
+             option name 'rvJf'
+             option ip '192.168.0.35'
+   config host
+             option mac '3A:9D:95:21:BA:43'
+             option name 'NjXMRTW'
+             option ip '192.168.0.36'
+   config host
+             option mac 'B7:B4:7E:1C:04:BE'
+             option name 'vMzVq'
+             option ip '192.168.0.37'
+   config host
+             option mac 'C2:49:BB:82:02:A2'
+             option name 'NYptZcWBHo'
+             option ip '192.168.0.38'
+   config host
+             option mac '3D:26:5D:42:91:3F'
+             option name 'KpWxe'
+             option ip '192.168.0.39'
+   config host
+             option mac '81:67:FF:FD:AB:60'
+             option name 'SVpRvIl'
+             option ip '192.168.0.40'
+   config host
+             option mac '78:CE:DF:86:AE:A9'
+             option name 'rVBv'
+             option ip '192.168.0.41'
+   config host
+             option mac '03:8E:E4:08:39:0E'
+             option name 'YrUbFEk'
+             option ip '192.168.0.183'
+   config host
+             option mac 'E8:96:FE:08:82:F0'
+             option name 'QkChN'
+             option ip '192.168.0.103'
+   config host
+             option mac '53:5F:F7:11:38:1E'
+             option name 'WwRhy'
+             option ip '192.168.0.192'
+   config host
+             option mac 'EB:BF:B7:B7:6E:71'
+             option name 'vESR'
+             option ip '192.168.0.200'
+   config host
+             option mac 'E5:3B:F3:1D:32:66'
+             option name 'sSwpycbOa'
+             option ip '192.168.0.210'
+   config host
+             option mac '7D:A6:13:0F:DF:3D'
+             option name 'LAbwKS'
+             option ip '192.168.0.225'
+   config host
+             option mac '8E:34:32:C9:E8:5A'
+             option name 'SYUNe'
+             option ip '192.168.0.243'
+   config host
+             option mac '5B:92:24:9F:01:EB'
+             option name 'muYhDI'
+             option ip '192.168.0.232'
+   config host
+             option mac '8C:FF:BF:FB:CF:BC'
+             option name 'PZksufltaX'
+             option ip '192.168.0.253'

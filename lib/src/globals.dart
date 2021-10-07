@@ -1,31 +1,42 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
+
 import 'dart:io';
+import '../lib.dart';
 
-import 'package:path/path.dart' as p;
-
-import 'cli_args.dart';
-
-import 'file_ops.dart';
-import 'meta.dart';
-import 'validate_leases.dart';
+List<String> arguments = <String>[];
 
 Directory tempDir = Directory.systemTemp.createTempSync("uprt_");
-File tempJsonOutFile = getTmpIntermedConvFile("tmpJsonFile");
+
+///Last message sent to printMsg, used in tests
+String lastPrint = "";
+
 String dirOut = argResults['directory-out'];
-//Output directory with basename attached
-String basePath = File(p.join(dirOut, argResults['base-name'])).absolute.path;
 
+const String colorWarning = ansiYellow;
+const String colorError = colorRed;
+const String colorSuccess = colorGreen;
+
+const String colorRed = "\u001b[31m";
+const String colorGreen = "\u001b[32m";
+const String ansiYellow = "\u001b[33m";
+const String ansiFormatEnd = "\u001b[0m";
+const String ansiBold = "\u001b[4m";
+
+List<String> inputFileList = <String>[];
+String inputFile = "";
 String inputType = "j";
+String baseName = "";
+bool verbose = false;
 
-Map<String, String> outputPathNames = <String, String>{
-  "${fFormats.openwrt.formatName}": "$basePath.${fFormats.openwrt.outputExt}",
-  "${fFormats.ddwrt.formatName}": "$basePath.${fFormats.ddwrt.outputExt}",
-  "${fFormats.mikrotik.formatName}": "$basePath.${fFormats.mikrotik.outputExt}",
-  "${fFormats.json.formatName}": "$basePath.${fFormats.json.outputExt}",
-  "${fFormats.csv.formatName}": "$basePath.${fFormats.csv.outputExt}",
-  "${fFormats.pfsense.formatName}":
-      "$basePath-pfs.${fFormats.pfsense.outputExt}",
-  "${fFormats.opnsense.formatName}":
-      "$basePath-opn.${fFormats.opnsense.outputExt}",
+Map<String, FileType> inputTypeCl = <String, FileType>{
+  fFormats.csv.abbrev: Csv(),
+  fFormats.ddwrt.abbrev: Ddwrt(),
+  fFormats.json.abbrev: Json(),
+  fFormats.mikrotik.abbrev: Mikrotik(),
+  fFormats.openwrt.abbrev: OpenWrt(),
+  fFormats.pfsense.abbrev: PfSense(),
+  fFormats.opnsense.abbrev: OpnSense(),
 };
 
 Map<String, String> typeOptionToName = <String, String>{
@@ -39,13 +50,13 @@ Map<String, String> typeOptionToName = <String, String>{
 };
 
 Map<String, String> extToTypes = <String, String>{
-  fFormats.csv.outputExt: fFormats.csv.abbrev,
-  fFormats.ddwrt.outputExt: fFormats.ddwrt.abbrev,
-  fFormats.json.outputExt: fFormats.json.abbrev,
-  fFormats.mikrotik.outputExt: fFormats.mikrotik.abbrev,
-  fFormats.openwrt.outputExt: fFormats.openwrt.abbrev,
-  fFormats.pfsense.outputExt: fFormats.pfsense.abbrev,
-  fFormats.opnsense.outputExt: fFormats.opnsense.abbrev
+  fFormats.csv.fileExt: fFormats.csv.abbrev,
+  fFormats.ddwrt.fileExt: fFormats.ddwrt.abbrev,
+  fFormats.json.fileExt: fFormats.json.abbrev,
+  fFormats.mikrotik.fileExt: fFormats.mikrotik.abbrev,
+  fFormats.openwrt.fileExt: fFormats.openwrt.abbrev,
+  fFormats.pfsense.fileExt: fFormats.pfsense.abbrev,
+  fFormats.opnsense.fileExt: fFormats.opnsense.abbrev
 };
 
 enum fFormats {
@@ -69,14 +80,14 @@ extension FileFormatProps on fFormats {
     fFormats.pfsense: 'p',
   };
 
-  static const Map<dynamic, String> outputExts = <dynamic, String>{
-    fFormats.csv: 'csv',
-    fFormats.ddwrt: 'ddwrt',
-    fFormats.json: 'json',
-    fFormats.mikrotik: 'rsc',
-    fFormats.opnsense: 'xml',
-    fFormats.openwrt: 'openwrt',
-    fFormats.pfsense: 'xml',
+  static const Map<dynamic, String> fileExts = <dynamic, String>{
+    fFormats.csv: '.csv',
+    fFormats.ddwrt: '.ddwrt',
+    fFormats.json: '.json',
+    fFormats.mikrotik: '.rsc',
+    fFormats.opnsense: '-opn.xml',
+    fFormats.openwrt: '.openwrt',
+    fFormats.pfsense: '-pfs.xml',
   };
 
   static const Map<dynamic, String> formatNames = <dynamic, String>{
@@ -89,30 +100,10 @@ extension FileFormatProps on fFormats {
     fFormats.pfsense: 'pfSense',
   };
 
-  static final Map<dynamic, String> outPutPathName = <dynamic, String>{
-    fFormats.csv: "$basePath.${fFormats.csv.outputExt}",
-    fFormats.ddwrt: "$basePath.${fFormats.ddwrt.outputExt}",
-    fFormats.json: "$basePath.${fFormats.json.outputExt}",
-    fFormats.mikrotik: "$basePath.${fFormats.mikrotik.outputExt}",
-    fFormats.openwrt: "$basePath.${fFormats.openwrt.outputExt}",
-    fFormats.opnsense: "$basePath.${fFormats.opnsense.outputExt}",
-    fFormats.pfsense: "$basePath.${fFormats.pfsense.outputExt}",
-  };
-
   String get abbrev => abbrevs[this]!;
-  String get outputExt => outputExts[this]!;
+  String get fileExt => fileExts[this]!;
   String get formatName => formatNames[this]!;
 }
-
-Map<String, String> conversionTypes = <String, String>{
-  fFormats.csv.abbrev: fFormats.csv.formatName,
-  fFormats.ddwrt.abbrev: fFormats.ddwrt.formatName,
-  fFormats.json.abbrev: fFormats.json.formatName,
-  fFormats.mikrotik.abbrev: fFormats.mikrotik.formatName,
-  fFormats.openwrt.abbrev: fFormats.openwrt.formatName,
-  fFormats.opnsense.abbrev: fFormats.opnsense.formatName,
-  fFormats.pfsense.abbrev: fFormats.pfsense.formatName,
-};
 
 ValidateLeases validateLeases = ValidateLeases();
 
@@ -127,5 +118,11 @@ String logPath = "";
 
 bool testRun = false;
 
-Meta meta = Meta();
 String newL = (Platform.isWindows) ? "\r\n" : newL = "\n";
+
+// ignore: avoid_classes_with_only_static_members
+class MetaCheck {
+  static int match = 0;
+  static int mismatch = 1;
+  static int runningAsBinary = 2;
+}
