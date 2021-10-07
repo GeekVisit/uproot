@@ -134,7 +134,7 @@ ${g.ansiBold}Examples${g.ansiFormatEnd}:
 
 ${g.ansiBold}Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense)${g.ansiFormatEnd}:
 
-  uprt lease-list-infile.csv -g cdjmnop 
+  uprt test/test-data/lease-list-infile.csv -g cdjmnop -d test/test-output
 
 ${g.ansiBold}Convert multiple csv files to PfSense and saving output to a specified directory${g.ansiFormatEnd}:
 
