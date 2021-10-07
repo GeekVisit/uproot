@@ -7,7 +7,6 @@ uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utili
 Current router/firewall software supported:
 
 * DD-WRT
-* Json
 * Mikrotik RouterOS
 * OPNSense
 * OpenWrt
