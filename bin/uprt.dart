@@ -3,7 +3,10 @@
 
 //Follow this convention for branching:
 //https://nvie.com/posts/a-successful-git-branching-model
+//from feature to develop:
 //https://nvie.com/posts/a-successful-git-branching-model/#incorporating-a-finished-feature-on-develop
+//from develop to release:
+//https://nvie.com/posts/a-successful-git-branching-model/#creating-a-release-branch
 //don't rebase https://dmytrechko.com/differences-between-git-merge-and-git-rebase-dc471d84c72d
 // use conventional commits:
 //https://www.conventionalcommits.org/en/v1.0.0/#summary
