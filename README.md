@@ -236,7 +236,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 ### Video Demo of DD-WRT Import
 
-[![Youtube Demo of DD-WRT Import](readme-pics/ddwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
+[![Youtube Demo of DD-WRT Import](readme-pics/ddwrt-youtube-thumb.jpg)](https://www.youtube.com/watch?v=2bRY8d098CM)
 
 ## OpenWrt
 
