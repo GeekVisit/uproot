@@ -212,7 +212,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 ### DD-WRT - Import
 
-1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).**All imports will REPLACE your existing static leases.  To add leases to an existing file, use the `--merge option`. **
+1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).** All imports will REPLACE your existing static leases.  To add leases to an existing file, use the `--merge option`. **
 
 2. Using WinSCP (if on Windows) or a similar utility, login to your router and upload the `static_leases.ddwrt` file to the router.
 
