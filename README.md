@@ -350,7 +350,7 @@ If you are ADDING leases to an existing OpnSense configuration, you'll need to u
     uprt static_leases-to-import-opn.xml -m static-lease-backup.xml -g o -b merge-output 
 ````
 
-This will output a "merge-output-opn.xml" file. [Import](#user-opnsense--importing) this into your OpnSense router.
+This will output a "merge-output-opn.xml" file. [Import](#opnsense--importing) this into your OpnSense router.
 
 ## pfSense
 
