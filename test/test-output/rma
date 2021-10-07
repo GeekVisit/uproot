@@ -1,4 +1,35 @@
-#!/usr/bin/bash
+#!/bin/bash
+
+
+
+pathvar="$( cd "$( dirname $0 )" && pwd )";
+placeholder=$pathvar/placeholder;
+rma=$pathvar/rma;
+
+
 #script to delete all files in test output. deletes everything except placeholder and this script
+if [[ ! -f placeholder ]] 
+then
+    echo "$placeholder does not exist. You must be in the same directory as placeholder before running. Exiting..."
+    exit
+fi
+
+if [[ ! -f "$rma" ]] 
+then
+    echo "Not in the correct directory, can't find this script. Exiting."
+    exit
+fi
+
+echo "Delete all files except placeholder and rma in "$(pwd)" (y/N)?"
+while true; do
+    read yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Nothing Deleted.";exit;;
+    esac
+done
+
+
 shopt -s extglob
 rm -v !("placeholder"|"rma")
