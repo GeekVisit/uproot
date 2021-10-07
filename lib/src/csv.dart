@@ -1,20 +1,20 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
+
 import 'dart:convert';
-import 'dart:io';
 
 import '../lib.dart';
+import 'globals.dart' as g;
 
 class Csv extends FileType {
   //
 //this is the appearance of the columns in the file (Mac comes first, etc.)
   static const int hostIdx = 0, macIdx = 1, ipIdx = 2;
 
-  String fileType = fFormats.csv.formatName;
-
-  //Returns Lease map containing list of hostnames, macs, etc.
-  //
+  String fileType = g.fFormats.csv.formatName;
 
   @override
-  Map<String, List<String>> getLease(
+  Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
       bool removeBadLeases = true}) {
@@ -23,27 +23,33 @@ class Csv extends FileType {
       List<String> csvRow = <String>[];
 
       fileContents = fileContents.trim();
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for getLease");
-      }
 
       Map<String, List<String>> leaseMap = <String, List<String>>{
-        lbHost: <String>[],
-        lbMac: <String>[],
-        lbIp: <String>[],
+        g.lbHost: <String>[],
+        g.lbMac: <String>[],
+        g.lbIp: <String>[],
       };
+
+      if (fileContents == "") {
+        printMsg("Source file is empty or corrupt.", errMsg: true);
+        return leaseMap;
+      }
+
       List<String> csvRows = LineSplitter.split(fileContents).toList();
+      if (csvRows.isEmpty) {
+        throw Exception("Source file is empty: ${g.inputFile}");
+      }
       List<String> keyName = csvRows[0].split(",");
 
-      if (keyName.length != 3 ||
+      if (keyName.length < 3 ||
           !(keyName[hostIdx].contains(leaseMap.keys.elementAt(hostIdx)) &&
               keyName[macIdx].contains(leaseMap.keys.elementAt(macIdx)) &&
               keyName[ipIdx].contains(leaseMap.keys.elementAt(ipIdx)))) {
         printMsg(
             "CSV File is wrong format - must have 3 columns containing "
-            "($lbHost, $lbMac, $lbIp). ",
+            "(g.lbHost, g.lbMac, g.lbIp). ",
             errMsg: true);
-        throw Exception("Error: CSV Wrong Format");
+        throw Exception("CSV Wrong Format");
       }
 
       for (int i = 1; i < csvRows.length; i++) {
@@ -55,41 +61,50 @@ class Csv extends FileType {
       }
 
       if (removeBadLeases) {
-        return validateLeases.getValidLeaseMap(
-            leaseMap, fFormats.csv.formatName);
+        return g.validateLeases
+            .removeBadLeases(leaseMap, g.fFormats.csv.formatName);
       } else {
         return leaseMap;
       }
-    } on Exception {
-      rethrow;
+    } on Exception catch (e) {
+      if ((e.toString().contains("is empty") ||
+          e.toString().contains("CSV Wrong Format"))) {
+        print(e);
+        return <String, List<String>>{};
+      } else {
+        rethrow;
+      }
     }
   }
 
   @override
-  String build(Map<String, List<String>?> deviceList, StringBuffer sbCsv) {
-    sbCsv.write("host-name, mac-address, address\n");
-    for (int i = 0; i < deviceList[lbHost]!.length; i++) {
-      sbCsv.write(
-          // ignore: lines_longer_than_80_chars
-          "${deviceList[lbHost]![i]},${deviceList[lbMac]![i]},${deviceList[lbIp]![i]}\n");
+  String build(Map<String, List<String>?> deviceList) {
+    StringBuffer sb = StringBuffer();
+
+    if (deviceList[g.lbMac]!.isEmpty) {
+      return "";
     }
-    return sbCsv.toString();
+
+    sb.write("host-name, mac-address, address\n");
+    for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
+      sb.write(
+          // ignore: lines_longer_than_80_chars
+          "${deviceList[g.lbHost]![i]},${deviceList[g.lbMac]![i]},${deviceList[g.lbIp]![i]}\n");
+    }
+    return sb.toString();
   }
 
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
-    ValidateLeases.initialize();
     try {
       Map<String, List<String>> leaseMap =
-          getLease(fileContents: fileContents, removeBadLeases: false);
-      if (fileContents == "" && fileLines == null) {
-        throw Exception("Missing Argument for isContentValid");
-      }
-      if (validateLeases.containsBadLeases(leaseMap)) {
+          getLeaseMap(fileContents: fileContents, removeBadLeases: false);
+      if (g.validateLeases
+          .containsBadLeases(leaseMap, g.fFormats.csv.formatName)) {
         return false;
       }
 
-      validateLeases.validateLeaseList(leaseMap, fFormats.csv.formatName);
+      g.validateLeases.validateLeaseList(leaseMap, g.fFormats.csv.formatName);
 
       return true;
     } on Exception catch (e) {
@@ -97,17 +112,6 @@ class Csv extends FileType {
 
       return false;
     }
-  }
-
-  @override
-  String toJson() {
-    Json json = Json();
-    StringBuffer sbJson = StringBuffer();
-    isFileValid(File(argResults['input-file']).absolute.path);
-    Map<String, List<String>> lease = getLease(
-        fileContents: File(File(argResults['input-file']).absolute.path)
-            .readAsStringSync());
-    return json.build(lease, sbJson);
   }
 
   void csvAddColumnNamesAndRows(List<dynamic> deviceList, StringBuffer sbCsv) {
