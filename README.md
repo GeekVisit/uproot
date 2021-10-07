@@ -506,4 +506,4 @@ This will output a "merge-output-pfs.xml" file. [Import](#user-content-pfsense--
         uprt dhcp-static-leases.rsc -m dhcp-static-leases-export.rsc -g m -b merge-output
     ````
 
-3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing]((#user-content-mikrotik---import).
+3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#user-content-mikrotik---import).
