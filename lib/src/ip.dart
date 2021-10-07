@@ -1,11 +1,16 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
+
 import 'dart:math';
+
+import 'package:validators/validators.dart';
 
 import 'file_ops.dart';
 
 class Ip {
   int ipStrToNum(String ip) {
     try {
-      if (!isIp4(ip)) throw Exception("$ip is Not an ip4 Address.");
+      if (!isIP(ip, 4)) throw Exception("$ip is Not an ip4 Address.");
       return int.parse(ip
           .split(".")
           .map((dynamic d) => ('000$d'.substring('000$d'.length - 3)))
@@ -13,17 +18,6 @@ class Ip {
           .join(""));
     } on Exception {
       rethrow;
-    }
-  }
-
-  bool isIp4(String ip) {
-    try {
-      Uri.parseIPv4Address(ip);
-      return true;
-    } on FormatException {
-      return false;
-    } on Exception {
-      return false;
     }
   }
 
@@ -41,7 +35,7 @@ class Ip {
       int rangeMax = ipStrToNum(dotRangeMax);
       int numAddress = ipStrToNum(address);
 
-      if (!isIp4(address) | !isIp4(dotRangeMin) | !isIp4(dotRangeMin)) {
+      if (!isIP(address, 4) | !isIP(dotRangeMin, 4) | !isIP(dotRangeMin, 4)) {
         printMsg(
             "IP Range Check Failed - not a valid ipv4 address: IP: "
             "$address Range: $dotRangeMin - $dotRangeMax).",

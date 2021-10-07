@@ -1,0 +1,200 @@
+config host
+             option mac 'F9:CF:5C:08:76:49'
+             option name 'MergeTestHostName1'
+             option ip '192.168.0.1'
+   config host
+             option mac 'DA:B9:29:92:07:26'
+             option name 'MergeTestHostName2'
+             option ip '192.168.0.2'
+   config host
+             option mac 'C4:4D:02:A0:E1:96'
+             option name 'MergeTestHostName3'
+             option ip '192.168.0.3'
+   config host
+             option mac '7F:B7:26:C3:A8:D3'
+             option name 'MergeTestHostName4'
+             option ip '192.168.0.4'
+   config host
+             option mac 'FC:D6:B5:48:65:3D'
+             option name 'MergeTestHostName5'
+             option ip '192.168.0.5'
+   config host
+             option mac 'F4:34:E2:3A:F9:30'
+             option name 'MergeTestHostName6'
+             option ip '192.168.0.6'
+   config host
+             option mac '89:2A:F0:C5:2A:30'
+             option name 'MergeTestHostName7'
+             option ip '192.168.0.7'
+   config host
+             option mac 'A1:C6:4E:4A:E6:96'
+             option name 'MergeTestHostName8'
+             option ip '192.168.0.8'
+   config host
+             option mac 'D1:F4:18:48:A9:C0'
+             option name 'MergeTestHostName9'
+             option ip '192.168.0.9'
+   config host
+             option mac '56:A5:2B:40:39:7F'
+             option name 'MergeTestHostName10'
+             option ip '192.168.0.10'
+   config host
+             option mac '0B:38:FB:0C:FD:59'
+             option name 'MergeTestHostName11'
+             option ip '192.168.0.11'
+   config host
+             option mac '3C:83:FE:0A:F5:18'
+             option name 'MergeTestHostName12'
+             option ip '192.168.0.12'
+   config host
+             option mac '4A:AB:55:8E:3E:73'
+             option name 'MergeTestHostName13'
+             option ip '192.168.0.13'
+   config host
+             option mac '22:F3:59:C0:4A:6A'
+             option name 'MergeTestHostName14'
+             option ip '192.168.0.14'
+   config host
+             option mac '6D:DF:28:36:0C:4A'
+             option name 'MergeTestHostName15'
+             option ip '192.168.0.15'
+   config host
+             option mac '18:49:F4:11:83:4C'
+             option name 'MergeTestHostName16'
+             option ip '192.168.0.16'
+   config host
+             option mac 'D4:86:70:09:07:FF'
+             option name 'MergeTestHostName17'
+             option ip '192.168.0.17'
+   config host
+             option mac '81:D5:03:46:4B:49'
+             option name 'MergeTestHostName18'
+             option ip '192.168.0.18'
+   config host
+             option mac 'C6:6E:EA:20:96:97'
+             option name 'MergeTestHostName19'
+             option ip '192.168.0.19'
+   config host
+             option mac 'FF:76:64:B8:4C:81'
+             option name 'MergeTestHostName20'
+             option ip '192.168.0.20'
+   config host
+             option mac '0A:91:21:C7:CD:1A'
+             option name 'MergeTestHostName21'
+             option ip '192.168.0.71'
+   config host
+             option mac 'CD:34:CF:F5:2B:FC'
+             option name 'MergeTestHostName22'
+             option ip '192.168.0.72'
+   config host
+             option mac '24:CC:A6:19:DA:0F'
+             option name 'MergeTestHostName23'
+             option ip '192.168.0.73'
+   config host
+             option mac 'DC:61:D1:96:73:3F'
+             option name 'MergeTestHostName24'
+             option ip '192.168.0.74'
+   config host
+             option mac '5C:A2:B2:92:21:01'
+             option name 'MergeTestHostName25'
+             option ip '192.168.0.75'
+   config host
+             option mac '57:54:1A:F2:5B:E7'
+             option name 'MergeTestHostName26'
+             option ip '192.168.0.76'
+   config host
+             option mac 'A2:21:EC:CE:3A:61'
+             option name 'MergeTestHostName27'
+             option ip '192.168.0.77'
+   config host
+             option mac 'B5:6C:37:4C:0C:47'
+             option name 'MergeTestHostName28'
+             option ip '192.168.0.78'
+   config host
+             option mac '31:C8:15:95:CA:E3'
+             option name 'MergeTestHostName29'
+             option ip '192.168.0.79'
+   config host
+             option mac '05:7A:6C:30:90:D1'
+             option name 'MergeTestHostName30'
+             option ip '192.168.0.80'
+   config host
+             option mac '24:AC:C6:E0:59:33'
+             option name 'MergeTestHostName31'
+             option ip '192.168.0.81'
+   config host
+             option mac 'E4:7F:96:92:AA:6A'
+             option name 'MergeTestHostName32'
+             option ip '192.168.0.82'
+   config host
+             option mac 'B9:D6:FA:2C:7D:1F'
+             option name 'MergeTestHostName33'
+             option ip '192.168.0.83'
+   config host
+             option mac 'F7:A3:58:49:66:50'
+             option name 'MergeTestHostName34'
+             option ip '192.168.0.84'
+   config host
+             option mac '8B:04:7F:76:51:56'
+             option name 'MergeTestHostName35'
+             option ip '192.168.0.85'
+   config host
+             option mac 'FF:3E:1B:69:C5:69'
+             option name 'MergeTestHostName36'
+             option ip '192.168.0.86'
+   config host
+             option mac '44:AD:10:92:0D:60'
+             option name 'MergeTestHostName37'
+             option ip '192.168.0.87'
+   config host
+             option mac '8A:4D:B4:A3:E6:77'
+             option name 'MergeTestHostName38'
+             option ip '192.168.0.88'
+   config host
+             option mac '43:63:91:9D:B1:C9'
+             option name 'MergeTestHostName39'
+             option ip '192.168.0.89'
+   config host
+             option mac 'AA:77:FF:F2:60:1D'
+             option name 'MergeTestHostName40'
+             option ip '192.168.0.90'
+   config host
+             option mac '13:35:0F:42:BA:90'
+             option name 'MergeTestHostName41'
+             option ip '192.168.0.91'
+   config host
+             option mac '0B:6A:AC:4C:8E:26'
+             option name 'MergeTestHostName42'
+             option ip '192.168.0.92'
+   config host
+             option mac '85:4E:B7:69:44:B4'
+             option name 'MergeTestHostName43'
+             option ip '192.168.0.93'
+   config host
+             option mac '36:51:FB:F7:D9:86'
+             option name 'MergeTestHostName44'
+             option ip '192.168.0.94'
+   config host
+             option mac '37:FA:0E:AE:7D:92'
+             option name 'MergeTestHostName45'
+             option ip '192.168.0.95'
+   config host
+             option mac 'F2:FF:C0:AE:7C:30'
+             option name 'MergeTestHostName46'
+             option ip '192.168.0.96'
+   config host
+             option mac 'F9:F1:F5:3E:EF:F9'
+             option name 'MergeTestHostName47'
+             option ip '192.168.0.97'
+   config host
+             option mac '39:48:C5:BD:07:05'
+             option name 'MergeTestHostName48'
+             option ip '192.168.0.98'
+   config host
+             option mac '5B:0D:B7:FD:8E:3A'
+             option name 'MergeTestHostName49'
+             option ip '192.168.0.99'
+   config host
+             option mac 'CE:99:85:9F:3B:0E'
+             option name 'MergeTestHostName50'
+             option ip '192.168.0.100'
