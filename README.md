@@ -6,7 +6,7 @@ uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utili
 
 ## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
 
-[:floppy_disk Download binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
+:floppy_disk [Download binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
 
 [Windows, Mac, and X86 Linux Binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
 
