@@ -1,46 +1,84 @@
-//Take out requirement to have hostnames and validate without
-//TODO: allow new static leases to be inserted into existing pfsense XML doc
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
 
-import 'dart:io';
+//Follow this convention for branching:
+//https://nvie.com/posts/a-successful-git-branching-model
+//https://nvie.com/posts/a-successful-git-branching-model/#incorporating-a-finished-feature-on-develop
+//don't rebase https://dmytrechko.com/differences-between-git-merge-and-git-rebase-dc471d84c72d
+// use conventional commits:
+//https://www.conventionalcommits.org/en/v1.0.0/#summary
+
 import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-//     arguments = <String>[
-//       "-i",
-//       "test/test-data/lease-list-infile-opn.xml",
-//       "-L",
-//       "192.168.0.1",
-//       "-H",
-//       "192.168.0.254",
-// //      "-t",
-//       //    "c",
-//       "-b",
-//       "test-output-file",
-//       "-p",
-//       "c:/test.log",
-//       "-d",
-//       "test/test-output",
+    // arguments = <String>[
+    //    "test/test-data/*.*",
+    //    "-g",
+    //    "cdjmnop",
+    //        "-v",
+    //        "v",
+    //  "-b",
+    //  "example-merge",
+    //       "-l",
+    //        "-P",
+    //        "bin/uprt.log"
 
-// //      "c",
-//       //   "cdjnmop",
-//       "-w",
-//       //"-v",
-//       // "-l",
-//       // "uprt-log-example.log"
-//     ];
+    //     "test/test-data/lease-list-infile.csv",
+    //     "-g",
+    //     "d",
+    //    "-m",
+    //    "test/test-merge/dhcp.openwrt",
+    //  "-d",
+    //  "test/test-output",
+    //     "-b",
+    //     "example-merge",
+    //     "-"
+    //    "-w",
+    //    "-a",
+    //    "-s",
+    //    "-z",
+    //    "-P",
+    //    "./uprt-p.log"
+    //        "-r"
 
-    upRoot(arguments);
-  } on FileSystemException catch (e) {
-    displayFatalFileSystemError(e);
-  } on FormatException catch (e) {
-    printMsg(e.message, errMsg: true);
+    //       "test/test-data/*file.json",
+    //       "test/test-data/*file.csv",
+    //        "-L",
+    //       "192.168.0.1",
+    //       "-H",
+    //       "192.168.0.254",
+    //       "-t",
+    //           "c",
+    //       "-b",
+    //       "test-output-file",
+    //       "-g",
+    //       "m",
+
+    //       "-S",
+    //        "myserver",
+
+    //       "c",
+    //          "cdjnmop",
+
+    //       "-v",
+    //        "-l",
+    //        "uprt-log-example.log"
+    //    "-V"
+    //  ];
+
+    Converter uprt = Converter();
+    uprt.convertFileList(arguments);
   } on Exception catch (e) {
-    displayFatalException(e);
-  // ignore: avoid_catching_errors
+    handleExceptions(e);
+    // ignore: avoid_catching_errors
   } on Error catch (e) {
     displayFatalError(e);
   } finally {
-    cleanUp();
+    try {
+      Converter.cleanUp();
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 }

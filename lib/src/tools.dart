@@ -1,3 +1,6 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
+
 import 'dart:io';
 
 import 'ip.dart';
@@ -14,7 +17,6 @@ class Tools {
         RegExp(r"(?:(?:[0-9A-Fa-f]{2}(?=([-:]))(?:\1[0-9A-Fa-f]{2}){5}))");
 
     fileContents.replaceAll(macMatchPattern, ip.getRandomMacAddress());
-    
   }
 }
 

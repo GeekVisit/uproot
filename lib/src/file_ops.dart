@@ -1,82 +1,112 @@
+// Copyright 2021 GeekVisit All rights reserved.
+// Use of this source code is governed by the license in the LICENSE file.
+
 import 'dart:io';
-
 import 'dart:math';
-import 'package:path/path.dart' as p;
-import '../lib.dart';
-import 'globals.dart';
 
-void printMsg(dynamic message,
-    {bool errMsg = false, bool onlyIfVerbose = false, bool logOnly = false}) {
-  if (errMsg) {
-    stderr.writeln(message.toString().replaceFirst("Exception:", "").trim());
-  } else if (!logOnly) {
-    if (onlyIfVerbose) {
-      (argResults['verbose']) ? stdout.writeln(message) : "";
-    } else {
-      stdout.writeln(message.toString().replaceFirst("Exception:", "").trim());
+import 'package:glob/glob.dart';
+import 'package:glob/list_local_fs.dart';
+import 'package:path/path.dart' as p;
+import 'package:validators/sanitizers.dart';
+
+import 'globals.dart' as g;
+
+void printMsg(
+  dynamic msgToPrint, {
+  bool errMsg = false,
+  bool onlyIfVerbose = false,
+  bool logOnly = false,
+}) {
+  try {
+    String msg = msgToPrint.toString();
+    g.lastPrint = msg.toString().replaceFirst("Exception:", "").trim();
+
+    if (errMsg) {
+      stderr.writeln(
+          """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
+    } else if (!logOnly) {
+      if (onlyIfVerbose) {
+        (g.verbose) ? stdout.writeln(msg) : "";
+      } else {
+        stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
+      }
+    }
+
+    /* Print Stack Trace if Debug */
+    if (g.argResults['verbose-debug'] != null &&
+        g.argResults['verbose-debug']) {
+      stdout
+          .writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
     }
 
     //Write to Log
     try {
-      if (logPath != "") {
-        File logFile = File(logPath);
-        logFile.writeAsStringSync(
-            "${"$message  $newL ${StackTrace.current}".toString().trim()}$newL",
+      if (g.argResults['log'] != null && g.argResults['log']) {
+        //strip color codes
+        msg = stripLow(msg)
+            .replaceAll(RegExp('[[0-9]+m', multiLine: false, dotAll: true), "");
+        File logFile = File(g.logPath);
+        logFile.writeAsStringSync("${stripLow(msg)} ${g.newL}",
             mode: FileMode.append);
+        /* Log Stack Trace if Debug */
+        if (g.argResults['verbose-debug'] != null &&
+            g.argResults['verbose-debug']) {
+          logFile.writeAsStringSync(
+              // ignore: prefer_interpolation_to_compose_strings
+              """
+    ${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
+              "${g.newL}",
+              mode: FileMode.append);
+        }
       }
     } on FormatException catch (e) {
-      if (!testRun) {
-        print("${e.message} (log file)");
-      }
-      rethrow;
+      print("${e.message.toString()} (log file)");
+      return;
     } on Exception {
-      //print(e);
-      rethrow;
+      stdout.writeln(msg.toString().replaceFirst("Exception:", "").trim());
+      return;
     }
+  } on Exception {
+    rethrow;
   }
 }
 
-String saveOutFile(String outContents, String outputPath,
-    {bool overWrite = false}) {
+String saveFile(String contents, String savePath, {bool overWrite = false}) {
   try {
     int x = 1;
-    File outputFile = File(outputPath);
-    String outputBaseFileName = p.basenameWithoutExtension(outputFile.path);
-    String ext = p.extension(outputFile.path);
+    File fileToSave = File(savePath);
+    String fileToSaveBaseName = p.basenameWithoutExtension(savePath);
+    String ext = p.extension(savePath);
 
     if (!overWrite) {
-      while (outputFile.existsSync()) {
-        outputFile = File(p.join(p.dirname(outputPath),
-            "$outputBaseFileName(${x.toString().padLeft(2, '0')})$ext"));
+      while (fileToSave.existsSync()) {
+        fileToSave = File(p.join(p.dirname(savePath),
+            "$fileToSaveBaseName(${x.toString().padLeft(2, '0')})$ext"));
         x++;
       }
     }
 
-    outputFile.writeAsStringSync(outContents.trim());
+    fileToSave.writeAsStringSync(contents.trim());
 
     //return name of file saved as may change if exists and didn't overwrite
-    return outputFile.absolute.path;
+    return fileToSave.absolute.path;
   } on Exception catch (e) {
     printMsg(e, errMsg: true);
     rethrow;
   }
 }
 
-void saveFile(String contents, String filePath) {
-  File saveFile = File(filePath);
-  saveFile.writeAsStringSync;
-}
+/// Returns temporary filepath for temporary uprt file
+/// 2021-09 Deprecated currently, may not need */
 
-///  Returns temporary filepath for temporary uprt conversion file
-
-File getTmpIntermedConvFile(String baseName, {String extension = ".tmp"}) {
+File getTmpFile(String baseName, {String extension = ".tmp"}) {
   // ignore: unused_local_variable
   int x = 1;
   File temp =
-      File(p.join(tempDir.path, "${argResults['base-name']}$extension"));
+      File(p.join(g.tempDir.path, "${g.argResults['base-name']}$extension"));
 
   while (temp.existsSync()) {
-    temp = File(p.join(tempDir.path,
+    temp = File(p.join(g.tempDir.path,
         "uprt_$baseName\_${getRandomString(6)}$extension".replaceAll("'", "")));
     x++;
   }
@@ -105,4 +135,30 @@ bool isStringAValidFilePath(String testPath) {
     printMsg(e, logOnly: true);
     return false;
   }
+}
+
+/// Deletes files, excepts shell expansion globs
+void deleteFiles(String filesGlobToDelete) {
+  try {
+    Glob listOfFilesToDelete = Glob(filesGlobToDelete);
+
+    for (FileSystemEntity file in listOfFilesToDelete.listSync()) {
+      file.deleteSync();
+    }
+  } on Exception {
+    rethrow;
+  }
+}
+
+String getGoodPath(String fPath) {
+  try {
+    return p.canonicalize(File(fPath).absolute.path);
+  } on Exception {
+    rethrow;
+  }
+}
+
+/// Get contents of json file, or temporary json file if none given
+String getFileContents(String filePath) {
+  return File(filePath).readAsStringSync();
 }
