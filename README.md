@@ -1,14 +1,12 @@
 <!-- markdownlint-disable MD033 -->
 
-# UPROOT
+# [UPROOT](https://github.com/GeekVisit/uproot/)
 
 uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert static leases between routers. **Currently only ip4 static leases are supported.**
 
 ## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
 
-:floppy_disk [Download binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
-
-[Windows, Mac, and X86 Linux Binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
+[Download Windows, Mac, and X86 Linux Binaries binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
 
 Like this project ? Please click the star at the top of this page.
 
