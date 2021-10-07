@@ -3,6 +3,10 @@
 
 //Follow this convention for branching:
 //https://nvie.com/posts/a-successful-git-branching-model
+//https://nvie.com/posts/a-successful-git-branching-model/#incorporating-a-finished-feature-on-develop
+//don't rebase https://dmytrechko.com/differences-between-git-merge-and-git-rebase-dc471d84c72d
+// use conventional commits:
+//https://www.conventionalcommits.org/en/v1.0.0/#summary
 
 import 'package:uprt/lib.dart';
 

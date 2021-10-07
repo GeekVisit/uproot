@@ -21,19 +21,19 @@ Also supports the following file formats:
 ## Features
 
 * Detection of input format based on extension (can also manually specify the format)
-* Single input file can be simultaneously converted into multiple formats
-* Csv and Json input files
-* Validation Checks to avoid errors while importing:
+* Converts to multiple formats simultaneously
+* Merges static leases from one file into another
+* Optionally sorts static leases by IP addresses
+* Validates lease to avoid import errors:
   * Validates all generated files against expected output type
   * Enforces IP range (optional)
-  * Requires each static lease to have an IP, Mac,and (except for Mikrotik RouterOS files), Host address
   * Excludes unnecessary duplicates from output
-  * Excludes invalid ip4 and Mac addresses from output file
+  * Excludes invalid ip4 and Mac addresses from output
 * Example input files available in source for testing
 
 ## Limitations
 
-* Mikrotik RouterOS format: Does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
+* Mikrotik RouterOS format does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
 * Does not support ip6 leases
 
 ## Installing
@@ -46,7 +46,7 @@ If you choose to compile yourself:
 
 1. Open a terminal.
 2. Install the latest version of [Dart](https://dart.dev/get-dart) for your operating system.
-3. Clone the repository (you'll need a [personal access](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) token if by https). Alternatively, download the zip file).
+3. Clone the repository (you'll need a [personal access](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) token if by https).
 
    Example:
 
@@ -59,9 +59,15 @@ If you choose to compile yourself:
     ````bash
       cd uproot
       dart pub get
-    ` ```
+    ````
 
-5. Change int the bin directory and compile:
+5. Run all tests (optional):
+
+    ````bash
+      dart test
+    ````
+  
+6. Change into the bin directory and compile:
 
     ````bash
     cd ../bin
@@ -70,13 +76,14 @@ If you choose to compile yourself:
 
 ## Use
 
-For a complete list of options, simply type `uprt` or `uprt -h`
+For a complete list of options, type `uprt` or `uprt -h`
 
-Below is the latest help (version 2021.09.003):
+Below is the latest help:
 
 ````bash
 
-uprt (2021.09.003 running on windows "Windows 10 Pro" 10.0 (Build 19042))
+uprt (2021.10.001 running on macos 10.15.7)
+
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
 
@@ -93,15 +100,13 @@ Usage:
                                           type based on the following extensions: .csv, .ddwrt,
                                           .json, .rsc (mikrotik), .xml (for opnsense and pfsense,
                                           distinguishing by searching for <opnsense> in file)
--g, --generate-type                       Generated types may be multiple. Valid values include: "
-                                          c (csv), d (DD-WRT), j (json),"
-                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)"
-                                          Required")
--L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File     
--H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File   
--l, --log                                 Creates Log file, if -P not set, then location is at 'J:\temp\uprt.log'
+-g, --generate-type                       Required. Generated types may be multiple. Valid values include:
+                                          c (csv), d (DD-WRT), j (json),
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+-L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
+-H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File
+-l, --log                                 Creates Log file, if -P not set, then location is in temp folder
 -P, --log-file-path                       Full file path to log file.
-                                          (defaults to "J:\temp\uprt.log")
 -m, --merge                               Merge to file. Specify path to file to merge converted output.
                                           Used to add static leases to an existing output file.
 -S, --server                              Name to designate in output file for Mikrotik dhcp server.
@@ -118,29 +123,39 @@ Usage:
 -z, --verbose-debug                       Verbosity - debug level verbosity
 -V, --version                             Gives Version
 -w, --write-over                          Overwrites output files, if left out, will not overwrite
+````
 
-Examples: 
+***Examples:***
 
 **Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):**
 
-  uprt lease-list-infile.csv -g cdjmnop
+  ````bash
+    uprt lease-list-infile.csv -g cdjmnop
+  ````
 
-**Convert multiple csv files to PfSense and saving output to a specified directory:**
+  **Convert multiple csv files to PfSense and save output to a specified directory:**
 
-  uprt test/test-data/*.csv -g p -d test/test-output
+  ````bash
+    uprt test/test-data/*.csv -g p -d test/test-output
+  ````
 
-**Convert a csv file to all formats stripping out leases not in range and saving output to specified directory:**
+**Convert a csv file to all formats, stripping out leases not in range and saving output to specified directory:**
 
-  uprt test/test-data/lease-list-infile.csv -b converted-output -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+````bash
+  uprt test/test-data/lease-list-infile.csv -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+````
 
 **Merging leases in a CSV file with an existing DDWRT file and generating an OpnSense file:**
 
+````bash
     uprt test/test-data/lease-list-infile.csv -m test/test-merge/lease-list-infile-merge.ddwrt -g n -b example-merge-output -d test/test-output
 ````
 
+**Make a full backup of your router/firewall before importing any files generated by uprt. Use of uprt and files generated by uprt is entirely at user's risk.**
+
 ## Test Data Included
 
-To test uprt yourself, there are test input files located under the `test/test-data` folder in the repository. Simply open a terminal, clone the repository, cd into the uproot directory and apply the examples given in `uprt -h` on the test files.
+To test uprt yourself, there are test input files are located under the `test/test-data` folder in the repository. Cd into the uproot directory and apply the examples given in `uprt -h` on the test files.
 
 ## Video Demo
 
@@ -175,12 +190,12 @@ Below are the export/import steps for each router/firewall type that is supporte
       Converting from DD-WRT format to OpenWrt format, with static leases having range of 192.168.0.1 to 192.168.0.254:
 
       ````bash
-      uprt -i static_leases.ddwrt -b static_leases -g o -L 192.168.0.1 -H 192.168.0.254  
+      uprt static_leases.ddwrt -g o -L 192.168.0.1 -H 192.168.0.254  
       ````
 
 ### DD-WRT - Import
 
-1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).**All imports will REPLACE your existing static leases.****
+1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).**All imports will REPLACE your existing static leases.  To add leases to an existing file, use the `--merge option`. **
 
 2. Using WinSCP (if on Windows) or a similar utility, login to your router and upload the `static_leases.ddwrt` file to the router.
 
@@ -232,18 +247,18 @@ Below are the export/import steps for each router/firewall type that is supporte
     Converting DD-WRT to a json file
 
     ````bash
-      uprt -i static_leases.ddwrt -b static_leases -g j -L 192.168.0.1 -H 192.168.0.254  
+      uprt static_leases.ddwrt -g j -L 192.168.0.1 -H 192.168.0.254  
     ````
 
     Converting DD-WRT to a Mikrotik RouterOS import script
 
     ````bash
-      uprt -i static_leases.ddwrt -b static_leases -g m -L 192.168.0.1 -H 192.168.0.254 -s defconf 
+      uprt static_leases.ddwrt -g m -L 192.168.0.1 -H 192.168.0.254 -s defconf 
     ````
 
 ### OpenWrt - Import
 
-1. **NOTE: Always Make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing! All imports will REPLACE your existing static leases.**
+1. **NOTE: Always Make a [backup](https://openwrt.org/docs/guide-user/troubleshooting/backup_restore) of your Openwrt Router Files before importing! All imports will REPLACE your existing static leases. To add leases to an existing file, use the --merge option.**
 
 2. Using [WinSCP](https://winscp.net/) (if on Windows) or a similar scp utility, login to your router and upload the file to be imported to the router (`static_leases.openwrt` in the Open-WRT export example).
 
@@ -254,17 +269,34 @@ Below are the export/import steps for each router/firewall type that is supporte
         cat *infile.openwrt >> /etc/config/dhcp
     ````
 
-    **WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup!**
+    **WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup! To merge [will remove duplicates] instead of append, see step 4.**
 
-4. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
+4. **ALTERNATIVELY**, you can download the `dhcp` file to your local computer, merge the import file using `uprt`, then upload the resulting `dhcp.openwrt` file with the resulting merged file (you'll need to rename the output file to `dhcp`). The advantage of this is you'll be able to sort the static leases by IP address and `uprt` will also automatically take care of duplicates (please see `uprt -h` for sorting and append options). Example:
 
-5. **TIP:** If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps, viewing the browser window as you make them. After the static leases appear, click `Save & Apply` on the`DHCP and DNS` web page.
+    1. On local computer:
+
+          ````bash
+              uprt infile.openwrt -g o -m dhcp -b dhcp
+          ````
+
+    2. Upload dhcp.openwrt to your router, remove the "openwrt" and replace /etc/config/dhcp.
+
+          ````bash
+          cp /etc/config/dhcp /etc/config/dhcp.original
+          cp /etc/config/dhcp.openwrt /etc/config/dhcp
+          ````
+
+5. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
+
+6. **TIP:** If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps, viewing the browser window as you make them. After the static leases appear, click `Save & Apply` on the`DHCP and DNS` web page.
 
 ### Video Demo of Open-WRT import
 
   [![Youtube Demo of OpenWrt Import](readme-pics/openwrt-youtube-thumb.jpg)](https://www.youtube.com/embed/c-3m4Lm-XjA)
 
-## OPNsense - Exporting
+## OPNsense
+
+### OPNsense - Export
 
 1. Log in to your OPNsense router and navigate to System->Configuration->Backups.
 
@@ -283,14 +315,14 @@ Below are the export/import steps for each router/firewall type that is supporte
      Converting OPNSense to pfSense
 
     ````bash
-      uprt -i static_leases-opn.xml -b static_leases -g p -L 192.168.0.1 -H 192.168.0.254  
+      uprt static_leases-opn.xml -g p -L 192.168.0.1 -H 192.168.0.254  
     ````
 
-## OPNsense - Importing
+### OPNsense - Import
 
 1. **NOTE: Always make a [backup](https://docs.opnsense.org/manual/backups.html) of your OPNsense configuration before importing !**
 
-2. **In addition, importing REPLACES any static leases you currently have. See [below](#user-content-OpnSense--adding-leases-to-an-existing-pfSense-configuration) if you just are adding leases to an existing configuration.**
+2. **Importing REPLACES any static leases your router currently has. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-opnsense--merging-leases-with-an-existing-configuration) .**
 
 3. To start your import, log in to your OPNsense router and navigate to System->Configuration->Backups.
 
@@ -310,7 +342,19 @@ Below are the export/import steps for each router/firewall type that is supporte
 
    ![Imported Static Leases](readme-pics/opn-sense-imported%20leases.png)
 
-## pfSense - Exporting
+### OpnSense - Merging Leases With An Existing Configuration
+
+If you are ADDING leases to an existing OpnSense configuration, you'll need to use the `--merge` option, merging the import file into a backup file of your existing configuration. Download to your local computer a backup from your existing configuration, then merge with the file to be imported:
+
+````bash
+    uprt static_leases-to-import-opn.xml -m static-lease-backup.xml -g o -b merge-output 
+````
+
+This will output a "merge-output-opn.xml" file. [Import](#user-opnsense--importing) this into your OpnSense router.
+
+## pfSense
+
+### pfSense - Export
 
 1. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
 
@@ -327,21 +371,15 @@ Below are the export/import steps for each router/firewall type that is supporte
      Convert pfSense to OPNsense:
 
     ````bash
-    uprt -i static_leases-pfs.xml -b static_leases -g p -L 192.168.0.1 -H 192.168.0.254  
+    uprt static_leases-pfs.xml -g p -L 192.168.0.1 -H 192.168.0.254  
 
     ````
 
-### OpnSense - Adding Leases to An Existing Configuration
-
-If you are ADDING leases to an existing OpnSense configuration, you'll need to download a backup from your existing configuration, select and copy all the "staticmap" tags from your backup, and paste them into your import file so your import file is in this format:
-
-![Format of OpnSense Static Leases](readme-pics/opn-export-2021-09-03_22-01-54.png)
-
-## pfSense - Importing
+### pfSense - Import
 
 1. **NOTE: Always make a [backup](https://docs.netgate.com/pfsense/en/latest/backup/index.html) of your pfSense configuration before importing !**
 
-2. **In addition, importing REPLACES any static leases you currently have. See [below](#user-content-pfSense--adding-leases-to-an-existing-pfSense-configuration) if you just are adding leases to an existing configuration.**
+2. **Importing REPLACES any static leases you currently have. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-pfsense--merging-leases-with-an-existing-configuration) .**
 
 3. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
 
@@ -359,14 +397,21 @@ If you are ADDING leases to an existing OpnSense configuration, you'll need to d
 
    ![Navigate to Lan Static Lease Menu](readme-pics/pfsense-static-leases-list-red.png)
 
-### pfSense - Adding Leases to An Existing Configuration
+### pfSense - Merging Leases With An Existing Configuration
 
-If you are ADDING leases to an existing pfSense configuration, you'll need to download a backup from your existing configuration, select and copy all the "staticmap" tags from your backup, and paste them into your import file so your import file is in this format:
+If you are ADDING leases to an existing pfSense configuration, you'll need to use the `--merge` option, merging the import file into a backup file of your existing configuration.
 
-  ![Format of pfSense Static Leases](readme-pics/pfsense-xml-format-of-leases.png)
-   ![Imported Static Leases](readme-readme-pics/pfsense-static-leases-list-red.png)
+Download to your local computer a backup from your existing configuration, then merge with the file to be imported:
 
-## Mikrotik - Exporting
+````bash
+    uprt static_leases-to-import-pfs.xml -m static-lease-backup.xml -g p -b merge-output
+````
+
+This will output a "merge-output-pfs.xml" file. [Import](#user-pfsense--importing) this file into your pfSense router.
+
+## Mikrotik
+
+### Mikrotik - Export
 
 1. Open [Winbox](https://mikrotik.com/download)  or the [Webfig](https://help.mikrotik.com/docs/display/ROS/Webfig) url.
 
@@ -395,10 +440,10 @@ If you are ADDING leases to an existing pfSense configuration, you'll need to do
     **Example: Convert Mikrotik RouterOS file to pfSense**
 
     ````bash
-      uprt -i dhcp-static_leases.rsc -b static_leases -g p -L 192.168.0.1 -H 192.168.0.254  
+      uprt dhcp-static_leases.rsc -g p -L 192.168.0.1 -H 192.168.0.254  
     ````
 
-## Mikrotik - Importing
+### Mikrotik - Import
 
 1. Open [Winbox](https://mikrotik.com/download) or the [Webfig](https://help.mikrotik.com/docs/display/ROS/Webfig) url.
 
@@ -420,7 +465,7 @@ If you are ADDING leases to an existing pfSense configuration, you'll need to do
 
 6. Common Error Messages:
 
-    * **"Already have a static lease for this client"** - Edit the input file to delete the lease.
+    * **"Already have a static lease for this client"** - Edit the input file to delete the lease, or alternatively use the `--merge` option - see above.**
     * **"input does not match any value of server"** - Most likely the DHCP server named in your input file is different from your Mikrotik RouterOS configuration. Either change the name of the DHCP Server (in Winbox, IP->DHCP Server->DHCP  and click on server), or edit the input file.  Uprt also has a "-s" option to set the server name when converting to Mikrotik RouterOS files.
 
 7. Verify all leases are imported by navigating to IP->DHCP Server and clicking the `Leases` tab.
@@ -432,3 +477,15 @@ If you are ADDING leases to an existing pfSense configuration, you'll need to do
       ````bash
       /ip dhcp-server lease print
       ````
+
+### Mikrotik - Merging Static Leases with an Existing Configuration
+
+1. If you are ADDING leases to an existing Mikrotik configuration, you'll want to use the `--merge` option, merging the import file into a backup file of your existing configuration.
+
+2. Download to your local computer a backup from your existing configuration, then merge with the file to be imported:
+
+    ````bash
+        uprt dhcp-static-leases.rsc -m dhcp-static-leases-export.rsc -g m -b merge-output
+    ````
+
+3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing]((#user-mikrotik--importing).
