@@ -77,9 +77,9 @@ If you choose to compile yourself:
 7. If on Linux or Mac, set permission and copy into bin directory in path:
 
    ```bash
-      sudo chmod 700 ./uprt
-      sudo chown $(whoami) ./uprt
+      sudo chmod 700 ./uprt      
       sudo cp ./uprt  /usr/local/bin/uprt
+      sudo chown $(whoami) /usr/local/bin/uprt
    ````
 
 8. If on Windows, make sure `uprt.exe` is in a folder that is in your PATH environmental variable. If not, move it to the appropriate path or [add the directory](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/).
