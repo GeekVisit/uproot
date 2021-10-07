@@ -74,6 +74,16 @@ If you choose to compile yourself:
     dart compile exe uprt.dart -o uprt   [or -o uprt.exe if you are on windows]
     ````
 
+7. If on Linux or Mac, set permission and copy into bin directory in path:
+
+   ```bash
+      sudo 700 ./uprt
+      sudo chown $(whoami) ./uprt
+      sudo cp ./uprt  /usr/local/bin/uprt
+   ````
+
+8. If on Windows, make sure `uprt.exe` is in a folder that is in your PATH environmental variable. If not, move it to the appropriate path or [add the directory](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/).
+
 ## Use
 
 For a complete list of options, type `uprt` or `uprt -h`
@@ -130,7 +140,7 @@ Usage:
 **Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):**
 
   ````bash
-    uprt lease-list-infile.csv -g cdjmnop
+    uprt test/test-data/lease-list-infile.csv -g cdjmnop -d test/test-output
   ````
 
   **Convert multiple csv files to PfSense and save output to a specified directory:**
