@@ -1,10 +1,16 @@
 <!-- markdownlint-disable MD033 -->
 
-# Uproot
+# [UPROOT](https://github.com/GeekVisit/uproot/)
 
 uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert static leases between routers. **Currently only ip4 static leases are supported.**
 
-Current router/firewall software supported:
+## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
+
+[Download Windows, Mac, and X86 Linux Binaries binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
+
+Like this project ? Please click the star at the top of this page.
+
+## Current router/firewall software supported
 
 * DD-WRT
 * Mikrotik RouterOS
@@ -212,7 +218,7 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 ### DD-WRT - Import
 
-1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).**All imports will REPLACE your existing static leases.  To add leases to an existing file, use the `--merge option`. **
+1. **NOTE: Always Make a [backup](https://support.flashrouters.com/setup-guides/dd-wrt-features/how-to-save-and-load-a-backup-file/) of your DD-WRT software configuration before importing (via backup tab in the Web interface).** All imports will REPLACE your existing static leases.  To add leases to an existing file, use the `--merge option`. **
 
 2. Using WinSCP (if on Windows) or a similar utility, login to your router and upload the `static_leases.ddwrt` file to the router.
 
