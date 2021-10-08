@@ -2,13 +2,21 @@
 
 # [UPROOT](https://github.com/GeekVisit/uproot/)
 
-uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert static leases between routers. **Currently only ip4 static leases are supported.**
+uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert a router's DHCP IP Reservations (also sometimes referred to as static mappings, and referred to throughout this documentation at static leases) between routers. **Currently only ip4 static leases are supported.**
 
 ## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
 
-[Download Windows, Mac, and X86 Linux Binaries binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
+[Download Windows, Mac, and X86 Linux binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
 
 Like this project ? Please click the star at the top of this page.
+
+## What is a Static Lease/DHCP Reservation ?
+
+A [static lease](https://community.fs.com/blog/dhcp-vs-static-ip-differences.html) or DHCP Reservation forces your router to assign the same IP address to a particular device on the network. By default, your router DHCP server will dynamically assign IP addresses randomly to your network devices.  By using a DHCP Reservation of an IP address for a particular device (e.g., 192.168.0.10 for a Raspberry Pi running [piHole](https://geekvisit.com/pi-hole-and-macvlan/)) you are reserving a specified IP address for that device only, resulting in the same lease being assigned each time the device comes online (the resulting in a statically assigned lease), making it much easier for other devices to communicate with it.  This can be particularly important for [configuring home automation devices](https://geekvisit.com/home-assistant-mosquitto-mqtt-cloudmqtt-work-mqtt-bridge/) or [setting up port forwarding](https://geekvisit.com/port-forwarding-httphttps-computers-home-network/) for which having an IP address that stays the same is very helpful.  
+
+## Why Do I need Uproot ?
+
+Many network administrators often have long lists of DHCP reservations specified in their router.  Those who do a lot of home automation, for example may have many devices for which IPs have been statically assigned, making upgrading to a different type of router painful.  Many times the IP reservations along with the associated Mac Addresses need to be manually re-entered into the new router's software. As long as the router formats are supported, Uproot allows one to export the list of DHCP Reservations from one router, and  easily convert the list to a format of another supported type. In addition to straight import, Uproot can merge and validate the static leases from both the old and the new router, eliminating duplicates.
 
 ## Current router/firewall software supported
 
