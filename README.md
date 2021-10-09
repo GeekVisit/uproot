@@ -255,23 +255,27 @@ Below are the export/import steps for each router/firewall type that is supporte
 
 ### OpenWrt - Export
 
-1. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, log into your router and type the following:
+1. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, log into your router and type the following which will extract the static leases to a separate file for download:
 
     ````bash
         grep -hnr -A3 "config host" /etc/config/dhcp > static_leases.openwrt
     ````
 
-2. Check if the resulting contains the static leases:
+    If this gives an error (e.g., if your version of OpenWrt does not have grep installed),  just use copy (`uprt` will still be able to ignore the extra configuration information and extract the lease information from the raw dhcp file):
+
+    ````bash
+        cp /etc/config/dhcp static_leases.openwrt
+    ````
+
+2. Verify that the resulting file contains the static lease information:
 
     ````bash
       cat static_leases.openwrt
     ````
 
-3. To confirm you have all the proper attributes for the static leases, open the /etc/config/dhcp file in vim and compare the resulting output with the "config host" sections in /etc/config/dhcp.
+3. Using [scp](https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/) or [WinScp](https://winscp.net) if on Windows, download the `static_leases.openwrt` file.
 
-4. Using [scp](https://linuxize.com/post/how-to-use-scp-command-to-securely-transfer-files/) or [WinScp](https://winscp.net) if on Windows, download the `static_leases.openwrt` file.
-
-5. Use the exported file as an input file to Uproot and convert to your required format.
+4. Use the exported file as an input file to Uproot and convert to your required format.
 
     **Examples:**
 
