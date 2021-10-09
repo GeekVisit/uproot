@@ -261,7 +261,7 @@ Below are the export/import steps for each router/firewall type that is supporte
         grep -hnr -A3 "config host" /etc/config/dhcp > static_leases.openwrt
     ````
 
-    If this gives an error (e.g., if your version of OpenWrt does not have grep installed),  just use copy (`uprt` will still be able to ignore the extra configuration errors and extract the lease information from the raw dhcp file):
+    If this gives an error (e.g., if your version of OpenWrt does not have grep installed),  just use copy (`uprt` will still be able to ignore the extra configuration information and extract the lease information from the raw dhcp file):
 
     ````bash
         cp /etc/config/dhcp static_leases.openwrt
