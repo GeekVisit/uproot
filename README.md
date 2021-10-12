@@ -2,19 +2,21 @@
 
 # [UPROOT](https://github.com/GeekVisit/uproot/)
 
-uprt (uproot) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert a router's DHCP IP Reservations (also sometimes referred to as static mappings, and referred to throughout this documentation at static leases) between routers. **Currently only ip4 static leases are supported.**
+Uproot(`uprt`) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert a router's DHCP IP Reservations between routers. DHCP Reservations are also sometimes referred to as static mappings (and throughout this documentation they are typically referred to as [static leases](#user-content-what-is-a-static-leasedhcp-reservation-)).
+
+For example, `uprt` can be used to help move static leases from DD-Wrt to OpenWrt, or from OpenWrt to pfSense, or back and forth between various other router formats.  `Uprt` avoids errors on import by verifying and enforcing required network ranges, eliminating duplicate leases, and validating Ip and Mac addresses.
+
+In addition, `uprt` can merge existing lists of static leases using the `merge` command.
+
+**ip6 static leases are not supported.**
 
 ## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
 
 [Download Windows, Mac, and X86 Linux binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
 
-Like this project ? Please click the star at the top of this page.
+Like this project ? Please click the star at the top right corner of this page.
 
-## What is a Static Lease/DHCP Reservation ?
-
-A [static lease](https://community.fs.com/blog/dhcp-vs-static-ip-differences.html) or DHCP Reservation forces your router to assign the same IP address to a particular device on the network. By default, your router DHCP server will dynamically assign IP addresses randomly to your network devices.  By using a DHCP Reservation of an IP address for a particular device (e.g., 192.168.0.10 for a Raspberry Pi running [piHole](https://geekvisit.com/pi-hole-and-macvlan/)) you are reserving a specified IP address for that device only, resulting in the same lease being assigned each time the device comes online (the resulting in a statically assigned lease), making it much easier for other devices to communicate with it.  This can be particularly important for [configuring home automation devices](https://geekvisit.com/home-assistant-mosquitto-mqtt-cloudmqtt-work-mqtt-bridge/) or [setting up port forwarding](https://geekvisit.com/port-forwarding-httphttps-computers-home-network/) for which having an IP address that stays the same is very helpful.  
-
-## Why Do I need Uproot ?
+## Why Do I Need Uproot ?
 
 Many network administrators often have long lists of DHCP reservations specified in their router.  Those who do a lot of home automation, for example may have many devices for which IPs have been statically assigned, making upgrading to a different type of router painful.  Many times the IP reservations along with the associated Mac Addresses need to be manually re-entered into the new router's software. As long as the router formats are supported, Uproot allows one to export the list of DHCP Reservations from one router, and  easily convert the list to a format of another supported type. In addition to straight import, Uproot can merge and validate the static leases from both the old and the new router, eliminating duplicates.
 
@@ -31,6 +33,8 @@ Also supports the following file formats:
 * json
 * csv
 
+If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#user-content-unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
+
 ## Features
 
 * Detection of input format based on extension (can also manually specify the format)
@@ -46,7 +50,7 @@ Also supports the following file formats:
 
 ## Limitations
 
-* Mikrotik RouterOS format does not yet support hostnames for Mikrotik leases (i.e., all output rsc files are generated without hostnames)
+* Mikrotik RouterOS format does not yet support hostnames for Mikrotik leases (i.e., all output `rsc` files are generated without hostnames)
 * Does not support ip6 leases
 
 ## Installing
@@ -59,7 +63,7 @@ If you choose to compile yourself:
 
 1. Open a terminal.
 2. Install the latest version of [Dart](https://dart.dev/get-dart) for your operating system.
-3. Clone the repository (you'll need a [personal access](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) token if by https).
+3. Clone the repository (you'll need a [personal access token](https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls) if by https).
 
    Example:
 
@@ -199,6 +203,18 @@ After the conversion the demo scrolls through the resulting files.
 To use Uproot, you'll need to export and import static leases to the respective routers.
 
 Below are the export/import steps for each router/firewall type that is supported by Uproot.
+  
+## Supported Routers and Firewall Software
+
+The following router and firewall software are supported:
+
+* DD-WRT
+* Mikrotik RouterOS
+* OPNSense
+* OpenWrt
+* pfSense
+
+If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#user-content-unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
 
 ## DD-WRT
 
@@ -524,3 +540,37 @@ This will output a "merge-output-pfs.xml" file. [Import](#user-content-pfsense--
     ````
 
 3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#user-content-mikrotik---import).
+
+## Unsupported Routers - Creating A CSV File of Network Devices Using Nmap
+
+If Uproot does not support your existing router and you wish to generate a list of the devices on your network to be used as a source file for `uprt`, you can use [nmap](https://nmap.org/download.html) and `awk` to generate a CSV file containing all online devices.  You will  need to edit the file to delete any devices you don't want to assign a static lease, or add any devices which were offline during the scan.
+
+  1. Install [nmap](https://nmap.org/download.html) and [awk](https://www.gnu.org/software/gawk/) if not already installed.
+
+      * Open a terminal and check if [`nmap`](https://nmap.org/download.html) is installed, if not [install](https://nmap.org/download.html).
+
+      * Do the same for `awk`.  `awk` is usually installed by default for Mac and Linux. [`gawk`](https://www.gnu.org/software/gawk/) will work.  
+
+      * To install `awk` on Windows, if you have [chocolatey](https://chocolatey.org/) installed, at an Administrator command prompt, enter `choco install nmap` and `choco install gawk`.  If you aren't using chocolatey, download and install [nmap](https://nmap.org/download.html) and [awk](http://gnuwin32.sourceforge.net/packages/gawk.htm).
+
+  2. The following command will generate the CSV file `ip_list.csv` containing the leases of your online devices.  The versions for the different operating systems differ slightly.
+
+  **Windows :**
+
+````bash
+           nmap -sn X.X.X.X/X| awk "BEGIN { printf \"host-name,mac-address,address\n\";}/Nmap scan report for/{host = (NF == 6) ? $5 : \"\"; ip = (NF==6) ? $6 : $5; gsub(/\(/,\"\",ip);gsub(/\)/,\"\",ip);}/MAC Address:/{mac=$3; printf host\",\"mac\",\"ip\"\n\";}" > ip_list.csv
+````
+
+  **Linux and Mac :**
+
+````bash
+        sudo nmap -sn X.X.X.X/X| awk 'BEGIN { printf "host-name,mac-address,address\r\n";}/Nmap scan report for/{host = (NF == 6) ? $5 : ""; ip = (NF==6) ? $6 : $5;  gsub(/\(/,"",ip); gsub(/\)/,"",ip);}/MAC Address:/{mac=$3; printf host","mac","ip"\n";}' > ip_list.csv
+````
+
+Replace "X.X.X.X/X" with your network's gateway and applicable [CIDR](https://www.freecodecamp.org/news/subnet-cheat-sheet-24-subnet-mask-30-26-27-29-and-other-ip-address-cidr-network-references/) (e.g., 192.168.1.1/24 if your network gateway is 192.168.1.1 using the typical home network CIDR of 24).
+
+**On Linux and Mac** you must use `sudo`. Otherwise `nmap` will not be able to detect the mac addresses.  The only difference between the above two statements, other than the removal of `sudo` for Windows is the different use of quotations. Windows requires quotes to be escaped and double quotes surrounding the `awk` statement.
+
+## What is a Static Lease/DHCP Reservation ?
+
+A [static lease](https://community.fs.com/blog/dhcp-vs-static-ip-differences.html) or DHCP Reservation forces your router to assign the same IP address to a particular device on the network. By default, your router DHCP server will dynamically assign IP addresses randomly to your network devices.  By using a DHCP Reservation of an IP address for a particular device (e.g., 192.168.0.10 for a Raspberry Pi running [piHole](https://geekvisit.com/pi-hole-and-macvlan/)) you are reserving a specified IP address for that device only, resulting in the same lease being assigned each time the device comes online (the resulting in a statically assigned lease), making it much easier for other devices to communicate with it.  This can be particularly important for [configuring home automation devices](https://geekvisit.com/home-assistant-mosquitto-mqtt-cloudmqtt-work-mqtt-bridge/) or [setting up port forwarding](https://geekvisit.com/port-forwarding-httphttps-computers-home-network/) for which having an IP address that stays the same is very helpful.  
