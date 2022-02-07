@@ -1,0 +1,11 @@
+url_path,views_total,views_unique
+/GeekVisit/uproot,25,21
+/GeekVisit/uproot/issues,4,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-infile.openwrt,2,1
+/GeekVisit/uproot/tree/master/test,2,1
+/GeekVisit/uproot/tree/master/test/test-data,2,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-bad-infile.openwrt,1,1
+/GeekVisit/uproot/issues/5,1,1
+/GeekVisit/uproot/issues/new,1,1
+/GeekVisit/uproot/releases,1,1
+/GeekVisit/uproot/releases/tag/v2021-10-001-beta,1,1
