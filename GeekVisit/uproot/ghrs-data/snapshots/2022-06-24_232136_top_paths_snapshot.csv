@@ -1,0 +1,11 @@
+url_path,views_total,views_unique
+/GeekVisit/uproot,38,19
+/GeekVisit/uproot/releases/tag/v2021-10-001-beta,4,4
+/GeekVisit/uproot/tree/master/test/test-data,4,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-infile.csv,3,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-infile.json,3,1
+/GeekVisit/uproot/tree/master/test,3,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-bad-all-data.json,2,1
+/GeekVisit/uproot/blob/master/test/test-data/lease-list-bad-empty.csv,1,1
+/GeekVisit/uproot/find/master,1,1
+/GeekVisit/uproot/tree/master/bin,1,1
