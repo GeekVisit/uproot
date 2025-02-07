@@ -278,7 +278,7 @@ If you have a target device that is supported, but an unsupported source device 
         sed -n '/config host/{:a;N;/\nconfig host/!ba;s/\nconfig host/\n/;p}' /etc/config/dhcp > static_leases.openwrt
     ````
 
-    If this gives an error (e.g., if your version of OpenWrt does not have grep installed),  just use copy (`uprt` will still be able to ignore the extra configuration information and extract the lease information from the raw dhcp file):
+    If this gives an error (e.g., if your version of OpenWrt does not have sed installed),  just use copy (`uprt` will still be able to ignore the extra configuration information and extract the lease information from the raw dhcp file):
 
     ````bash
         cp /etc/config/dhcp static_leases.openwrt
