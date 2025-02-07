@@ -274,7 +274,8 @@ If you have a target device that is supported, but an unsupported source device 
 1. Using [Putty](https://www.putty.org/) if on Windows, or other ssh command line client, log into your router and type the following which will extract the static leases to a separate file for download:
 
     ````bash
-        grep -hnr -A3 "config host" /etc/config/dhcp > static_leases.openwrt
+        
+        sed -n '/config host/{:a;N;/\nconfig host/!ba;s/\nconfig host/\n/;p}' /etc/config/dhcp > static_leases.openwrt
     ````
 
     If this gives an error (e.g., if your version of OpenWrt does not have grep installed),  just use copy (`uprt` will still be able to ignore the extra configuration information and extract the lease information from the raw dhcp file):
@@ -337,7 +338,7 @@ If you have a target device that is supported, but an unsupported source device 
           cp /etc/config/dhcp.openwrt /etc/config/dhcp
           ````
 
-5. Reboot the router. Your static leases should appear under the `Services` tab in the browser interface.
+5. Reboot the router. Your static leases should appear under `Network`->`Server Settings`->`Static Leases` tab in the browser interface (\[router ip]/cgi-bin/luci/admin/network/dhcp\]).
 
 6. **TIP:** If you have any issues with the above, login using your browser to your router. Static leases should appear in `Network->DHCP and DNS->Static Lease`.  If you don't see the imported leases, repeat steps, viewing the browser window as you make them. After the static leases appear, click `Save & Apply` on the`DHCP and DNS` web page.
 
