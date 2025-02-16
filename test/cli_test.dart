@@ -235,7 +235,7 @@ void testUpRooted() {
     expect(() => g.cliArgs.checkArgs(),
         checkErrorMessage("is missing argument and is set to --log-file-path"));
 
-    /* test if argument is an option without a hyphen it doesnt trigger error, 
+    /* test if argument is an option without a hyphen it doesn't trigger error, 
     in this example,
     it's -g d where there is a -d option for directory */
 
@@ -376,6 +376,7 @@ void testUpRooted() {
     //openwrt->json
     args = <String>[
       "test/test-data/lease-list-infile.openwrt",
+      
       "-t",
       "o",
       "-g",

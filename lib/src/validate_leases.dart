@@ -6,6 +6,8 @@ import 'package:validators/validators.dart';
 import '../lib.dart';
 import 'globals.dart' as g;
 
+//TODO: change validate lease to allow conversion even if openwrt doesn't have name in it see issue#3
+//TODO:and validate fails if duid is in it - fix that (see issue #2)
 class ValidateLeases {
   static bool printedLowHighRangeWarning = false;
   static List<String> processedMac = <String>[],
@@ -46,7 +48,7 @@ class ValidateLeases {
           ipAddress = leaseMap[g.lbIp]![i];
       String hostName;
       StringBuffer badLeaseBuffer = StringBuffer();
-      bool returnValue = true;
+      bool leaseIsValid = true;
 
       if (fileType != g.fFormats.mikrotik.formatName &&
           i < leaseMap[g.lbHost].length) {
@@ -60,23 +62,23 @@ class ValidateLeases {
       if (!ip.isMacAddress(macAddress)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
-        returnValue = false;
+        leaseIsValid = false;
       }
 
-      if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
+if ( !isFQDN(hostName, requireTld: false)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
-        returnValue = false;
+        leaseIsValid = false;
       }
 
       if (!isIP(ipAddress, 4)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}ip4 Address Not Valid");
-        returnValue = false;
+        leaseIsValid = false;
       }
 
       if (isDuplicate(macAddress, hostName, ipAddress, badLeaseBuffer)) {
-        returnValue = false;
+        leaseIsValid = false;
       }
 
       if ((g.argResults['ip-low-address'] != null &&
@@ -88,7 +90,7 @@ class ValidateLeases {
           )) {
         badLeaseBuffer.write("${(badLeaseBuffer.isNotEmpty) ? "," : ""}"
             "ip Address Outside Range");
-        returnValue = false;
+        leaseIsValid = false;
       } else if (!printedLowHighRangeWarning) {
         printMsg("Both Low and High Ranges Not Given So Not Enforcing Ip Range",
             onlyIfVerbose: true);
@@ -101,7 +103,7 @@ class ValidateLeases {
         badLeaseBuffer.clear();
       }
       addProcessedLease(macAddress, hostName, ipAddress);
-      return returnValue;
+      return leaseIsValid;
     } on Exception {
       return false;
     }
