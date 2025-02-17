@@ -11,7 +11,6 @@
 // use conventional commits:
 //https://www.conventionalcommits.org/en/v1.0.0/#summary
 
-//TODO:
 // TODO: Add support for pihole ?
 // TODO: Add support for isc-dhcp dhcpd.leases ?
 
@@ -19,17 +18,18 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    arguments = <String>[
-      "test/test-data/*.*",
-      "-g",
-      "cdjmnop",
-      //        "-v",
-      //        "v",
-      //  "-b",
-      //  "example-merge",
-      //       "-l",
-      //        "-P",
-      //        "bin/uprt.log"
+ 
+    // arguments = <String>[
+    //    "test/test-data/*.*",
+    //    "-g",
+    //    "cdjmnop",
+    //        "-v",
+    //        "v",
+    //  "-b",
+    //  "example-merge",
+    //       "-l",
+    //        "-P",
+    //        "bin/uprt.log"
 
       //     "test/test-data/lease-list-infile.csv",
       //     "-g",
@@ -68,11 +68,12 @@ void main(List<String> arguments) {
       //       "c",
       //          "cdjnmop",
 
-      //       "-v",
-      //        "-l",
-      //        "uprt-log-example.log"
-      //    "-V"
-    ];
+    //       "-v",
+    //        "-l",
+    //        "uprt-log-example.log"
+    //    "-V"
+    //  ];
+
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);

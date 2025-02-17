@@ -1,200 +1,249 @@
 config host
-             option mac 'F9:CF:5C:08:76:49'
-             option name 'testInputHostName1'
-             option ip '192.168.0.1'
-   config host
-             option mac 'DA:B9:29:92:07:26'
-             option name 'testInputHostName2'
-             option ip '192.168.0.2'
-   config host
-             option mac 'C4:4D:02:A0:E1:96'
-             option name 'testInputHostName3'
-             option ip '192.168.0.3'
-   config host
-             option mac '7F:B7:26:C3:A8:D3'
-             option name 'testInputHostName4'
-             option ip '192.168.0.4'
-   config host
-             option mac 'FC:D6:B5:48:65:3D'
-             option name 'testInputHostName5'
-             option ip '192.168.0.5'
-   config host
-             option mac 'F4:34:E2:3A:F9:30'
-             option name 'testInputHostName6'
-             option ip '192.168.0.6'
-   config host
-             option mac '89:2A:F0:C5:2A:30'
-             option name 'testInputHostName7'
-             option ip '192.168.0.7'
-   config host
-             option mac 'A1:C6:4E:4A:E6:96'
-             option name 'testInputHostName8'
-             option ip '192.168.0.8'
-   config host
-             option mac 'D1:F4:18:48:A9:C0'
-             option name 'testInputHostName9'
-             option ip '192.168.0.9'
-   config host
-             option mac '56:A5:2B:40:39:7F'
-             option name 'testInputHostName10'
-             option ip '192.168.0.10'
-   config host
-             option mac '28:5B:98:CD:B5:34'
-             option name 'testInputHostName11'
-             option ip '192.168.0.11'
-   config host
-             option mac '61:88:68:5E:86:7A'
-             option name 'testInputHostName12'
-             option ip '192.168.0.12'
-   config host
-             option mac '90:69:74:25:F0:49'
-             option name 'testInputHostName13'
-             option ip '192.168.0.13'
-   config host
-             option mac 'D6:55:91:F0:F2:89'
-             option name 'testInputHostName14'
-             option ip '192.168.0.14'
-   config host
-             option mac '90:83:FA:69:F2:74'
-             option name 'testInputHostName15'
-             option ip '192.168.0.15'
-   config host
-             option mac 'BD:E0:4D:82:D1:8E'
-             option name 'testInputHostName16'
-             option ip '192.168.0.16'
-   config host
-             option mac '9F:53:D9:17:4E:06'
-             option name 'testInputHostName17'
-             option ip '192.168.0.17'
-   config host
-             option mac '79:F3:07:D9:69:30'
-             option name 'testInputHostName18'
-             option ip '192.168.0.18'
-   config host
-             option mac '49:FB:D4:AA:0A:0B'
-             option name 'testInputHostName19'
-             option ip '192.168.0.19'
-   config host
-             option mac '84:2C:F8:4F:26:E6'
-             option name 'testInputHostName20'
-             option ip '192.168.0.20'
-   config host
-             option mac 'BD:54:4A:F8:6F:21'
-             option name 'testInputHostName21'
-             option ip '192.168.0.21'
-   config host
-             option mac '8D:4D:BC:92:C1:BD'
-             option name 'testInputHostName22'
-             option ip '192.168.0.22'
-   config host
-             option mac 'B1:3E:2E:D7:55:EC'
-             option name 'testInputHostName23'
-             option ip '192.168.0.23'
-   config host
-             option mac '15:55:AD:83:79:5B'
-             option name 'testInputHostName24'
-             option ip '192.168.0.24'
-   config host
-             option mac '05:47:4B:16:7B:B5'
-             option name 'testInputHostName25'
-             option ip '192.168.0.25'
-   config host
-             option mac '3C:EB:57:06:8B:C0'
-             option name 'testInputHostName26'
-             option ip '192.168.0.26'
-   config host
-             option mac '97:E4:42:BA:27:0F'
-             option name 'testInputHostName27'
-             option ip '192.168.0.27'
-   config host
-             option mac '8D:B8:3D:4B:F7:67'
-             option name 'testInputHostName28'
-             option ip '192.168.0.28'
-   config host
-             option mac '49:18:D0:A8:8E:F2'
-             option name 'testInputHostName29'
-             option ip '192.168.0.29'
-   config host
-             option mac 'CF:CE:63:CB:4C:06'
-             option name 'testInputHostName30'
-             option ip '192.168.0.30'
-   config host
-             option mac '43:E1:7E:A9:58:94'
-             option name 'testInputHostName31'
-             option ip '192.168.0.31'
-   config host
-             option mac 'CE:CC:9A:68:08:B8'
-             option name 'testInputHostName32'
-             option ip '192.168.0.32'
-   config host
-             option mac 'ED:AB:20:91:4B:3F'
-             option name 'testInputHostName33'
-             option ip '192.168.0.33'
-   config host
-             option mac 'A6:EF:DD:60:9A:40'
-             option name 'testInputHostName34'
-             option ip '192.168.0.34'
-   config host
-             option mac '7E:0E:0F:7F:F4:9F'
-             option name 'testInputHostName35'
-             option ip '192.168.0.35'
-   config host
-             option mac '3A:9D:95:21:BA:43'
-             option name 'testInputHostName36'
-             option ip '192.168.0.36'
-   config host
-             option mac 'B7:B4:7E:1C:04:BE'
-             option name 'testInputHostName37'
-             option ip '192.168.0.37'
-   config host
-             option mac 'C2:49:BB:82:02:A2'
-             option name 'testInputHostName38'
-             option ip '192.168.0.38'
-   config host
-             option mac '3D:26:5D:42:91:3F'
-             option name 'testInputHostName39'
-             option ip '192.168.0.39'
-   config host
-             option mac '81:67:FF:FD:AB:60'
-             option name 'testInputHostName40'
-             option ip '192.168.0.40'
-   config host
-             option mac '78:CE:DF:86:AE:A9'
-             option name 'testInputHostName41'
-             option ip '192.168.0.41'
-   config host
-             option mac '03:8E:E4:08:39:0E'
-             option name 'testInputHostName42'
-             option ip '192.168.0.42'
-   config host
-             option mac 'E8:96:FE:08:82:F0'
-             option name 'testInputHostName43'
-             option ip '192.168.0.43'
-   config host
-             option mac '53:5F:F7:11:38:1E'
-             option name 'testInputHostName44'
-             option ip '192.168.0.44'
-   config host
-             option mac 'EB:BF:B7:B7:6E:71'
-             option name 'testInputHostName45'
-             option ip '192.168.0.45'
-   config host
-             option mac 'E5:3B:F3:1D:32:66'
-             option name 'testInputHostName46'
-             option ip '192.168.0.46'
-   config host
-             option mac '7D:A6:13:0F:DF:3D'
-             option name 'testInputHostName47'
-             option ip '192.168.0.47'
-   config host
-             option mac '8E:34:32:C9:E8:5A'
-             option name 'testInputHostName48'
-             option ip '192.168.0.48'
-   config host
-             option mac '5B:92:24:9F:01:EB'
-             option name 'testInputHostName49'
-             option ip '192.168.0.49'
-   config host
-             option mac '8C:FF:BF:FB:CF:BC'
-             option name 'testInputHostName50'
-             option ip '192.168.0.50'
+    option mac 'F9:CF:5C:08:76:49'
+    option ip '192.168.0.1'
+    option duid '6b394735376d4e713854'
+    option hostid ':2a8e:99ff:fe4e:1d2c'
+    option name 'example-host'
+    option dns '1'
+
+config host
+    option mac 'C4:4D:02:A0:E1:96'	
+    option ip '192.168.0.2'
+
+config host
+    option mac 'FC:D6:B5:48:65:3D'
+    option name 'agXCrZIQT'
+    option ip '192.168.0.3'
+
+config host
+    option mac '89:2A:F0:C5:2A:30'	
+    option ip '192.168.0.4'
+
+config host
+    option mac 'D1:F4:18:48:A9:C0'
+    option name 'vAYoTegH'
+    option ip '192.168.0.5'
+
+config host
+    option mac '28:5B:98:CD:B5:34'
+    option name 'vlrZbMUO'
+    option ip '192.168.0.6'
+
+config host
+    option mac '90:69:74:25:F0:49'
+    option name 'CQvAEsca'
+    option ip '192.168.0.7'
+
+config host
+    option mac '90:83:FA:69:F2:74'
+    option name 'GxhW'
+    option ip '192.168.0.8'
+
+config host
+    option mac '9F:53:D9:17:4E:06'
+    option name 'lJujxAzHe'
+    option ip '192.168.0.9'
+
+config host
+    option mac '49:FB:D4:AA:0A:0B'
+    option name 'HFGJPW'
+    option ip '192.168.0.10'
+
+config host
+    option mac 'BD:54:4A:F8:6F:21'
+    option name 'ZxNeOCmfQ'
+    option ip '192.168.0.11'
+
+config host
+    option mac 'B1:3E:2E:D7:55:EC'
+    option name 'enpW'
+    option ip '192.168.0.12'
+
+config host
+    option mac '05:47:4B:16:7B:B5'
+    option name 'dHMXslJ'
+    option ip '192.168.0.13'
+
+config host
+    option mac '97:E4:42:BA:27:0F'
+    option name 'MgnHF'
+    option ip '192.168.0.14'
+
+config host
+    option mac '49:18:D0:A8:8E:F2'
+    option name 'JnCOzm'
+    option ip '192.168.0.15'
+
+config host
+    option mac '43:E1:7E:A9:58:94'
+    option name 'gJmHPo'
+    option ip '192.168.0.16'
+
+config host
+    option mac 'ED:AB:20:91:4B:3F'
+    option name 'ZAcgWwsY'
+    option ip '192.168.0.17'
+
+config host
+    option mac '7E:0E:0F:7F:F4:9F'
+    option name 'rvJf'
+    option ip '192.168.0.18'
+
+config host
+    option mac 'B7:B4:7E:1C:04:BE'
+    option name 'vMzVq'
+    option ip '192.168.0.19'
+
+config host
+    option mac '3D:26:5D:42:91:3F'
+    option name 'KpWxe'
+    option ip '192.168.0.20'
+
+config host
+    option mac '78:CE:DF:86:AE:A9'
+    option name 'rVBv'
+    option ip '192.168.0.21'
+
+config host
+    option mac 'E8:96:FE:08:82:F0'
+    option name 'QkChN'
+    option ip '192.168.0.22'
+
+config host
+    option mac 'EB:BF:B7:B7:6E:71'
+    option name 'vESR'
+    option ip '192.168.0.23'
+
+config host
+    option mac '7D:A6:13:0F:DF:3D'
+    option name 'LAbwKS'
+    option ip '192.168.0.24'
+
+config host
+    option mac '5B:92:24:9F:01:EB'	
+    option ip '192.168.0.25'
+
+config host
+    option mac 'A1:2B:3C:4D:5E:6F'
+    option name 'Host26'
+    option ip '192.168.0.26'
+
+config host
+    option mac 'B2:3C:4D:5E:6F:70'
+    option name 'Host27'
+    option ip '192.168.0.27'
+
+config host
+    option mac 'C3:4D:5E:6F:70:71'
+    option name 'Host28'
+    option ip '192.168.0.28'
+
+config host
+    option mac 'D4:5E:6F:70:71:72'
+    option name 'Host29'
+    option ip '192.168.0.29'
+
+config host
+    option mac 'E5:6F:70:71:72:73'
+    option name 'Host30'
+    option ip '192.168.0.30'
+
+config host
+    option mac 'F6:70:71:72:73:74'
+    option name 'Host31'
+    option ip '192.168.0.31'
+
+config host
+    option mac '07:71:72:73:74:75'
+    option name 'Host32'
+    option ip '192.168.0.32'
+
+config host
+    option mac '18:72:73:74:75:76'
+    option name 'Host33'
+    option ip '192.168.0.33'
+
+config host
+    option mac '29:73:74:75:76:77'
+    option name 'Host34'
+    option ip '192.168.0.34'
+
+config host
+    option mac '3A:74:75:76:77:78'
+    option name 'Host35'
+    option ip '192.168.0.35'
+
+config host
+    option mac '4B:75:76:77:78:79'
+    option name 'Host36'
+    option ip '192.168.0.36'
+
+config host
+    option mac '5C:76:77:78:79:7A'
+    option name 'Host37'
+    option ip '192.168.0.37'
+
+config host
+    option mac '6D:77:78:79:7A:7B'
+    option name 'Host38'
+    option ip '192.168.0.38'
+
+config host
+    option mac '7E:78:79:7A:7B:7C'
+    option name 'Host39'
+    option ip '192.168.0.39'
+
+config host
+    option mac '8F:79:7A:7B:7C:7D'
+    option name 'Host40'
+    option ip '192.168.0.40'
+
+config host
+    option mac '90:7A:7B:7C:7D:7E'
+    option name 'Host41'
+    option ip '192.168.0.41'
+
+config host
+    option mac 'A1:7B:7C:7D:7E:7F'
+    option name 'Host42'
+    option ip '192.168.0.42'
+
+config host
+    option mac 'B2:7C:7D:7E:7F:80'
+    option name 'Host43'
+    option ip '192.168.0.43'
+
+config host
+    option mac 'C3:7D:7E:7F:80:81'
+    option name 'Host44'
+    option ip '192.168.0.44'
+
+config host
+    option mac 'D4:7E:7F:80:81:82'
+    option name 'Host45'
+    option ip '192.168.0.45'
+
+config host
+    option mac 'E5:7F:80:81:82:83'
+    option name 'Host46'
+    option ip '192.168.0.46'
+
+config host
+    option mac 'F6:80:81:82:83:84'
+    option name 'Host47'
+    option ip '192.168.0.47'
+
+config host
+    option mac '07:81:82:83:84:85'
+    option name 'Host48'
+    option ip '192.168.0.48'
+
+config host
+    option mac '18:82:83:84:85:86'
+    option name 'Host49'
+    option ip '192.168.0.49'
+
+config host
+    option mac '29:83:84:85:86:87'
+    option name 'Host50'
+    option ip '192.168.0.50'
