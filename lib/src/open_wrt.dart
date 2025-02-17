@@ -76,8 +76,9 @@ class OpenWrt extends FileType {
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     try {
-      List<Map<String, List<String>>> fileLinesMap = [];
-
+      if (fileLines == null) {
+        fileLines = [];
+      }
       Map<String, List<String>> leaseMap = <String, List<String>>{
         g.lbMac: <String>[],
         g.lbHost: <String>[],
@@ -89,21 +90,14 @@ class OpenWrt extends FileType {
       RegExp optionNameRegExp = RegExp(r"option name '([^']+)'");
       RegExp optionIpRegExp = RegExp(r"option ip '([^']+)'");
 
-      Map<String, List<String>> currentHost = {
-        g.lbMac: [],
-        g.lbHost: [],
-        g.lbIp: [],
-      };
       int idxCurrentConfigSection = 0;
-      
-      for (String line in fileLines!) {
-        if (configHostRegExp.hasMatch(line)) {
-          
 
+      for (String line in fileLines) {
+        if (configHostRegExp.hasMatch(line)) {
 //if prior entry has no name set to mac address or if not mac address, nothing
           if (idxCurrentConfigSection > 0 &&
-            leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
-          leaseMap[g.lbHost]!.add((leaseMap[g.lbMac]!.last.isNotEmpty)  ?   leaseMap[g.lbMac]!.last.toString() : "");
+              leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
+            fillHostNameWIthMac(leaseMap);
           }
 
           idxCurrentConfigSection++;
@@ -122,9 +116,9 @@ class OpenWrt extends FileType {
       //when done with all config sections check last entry for name existence
 
 //if last entry has no name value, set name to mac address or if not mac address, nothing
-           if (leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
-          leaseMap[g.lbHost]!.add((leaseMap[g.lbMac]!.last.isNotEmpty)  ?   leaseMap[g.lbMac]!.last.toString() : "");
-          }
+      if (leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
+        fillHostNameWIthMac(leaseMap);
+      }
 
       if (removeBadLeases) {
         return g.validateLeases
@@ -135,6 +129,12 @@ class OpenWrt extends FileType {
       printMsg(e, errMsg: true);
       rethrow;
     }
+  }
+
+  void fillHostNameWIthMac(Map<String, List<String>> leaseMap) {
+    leaseMap[g.lbHost]!.add((leaseMap[g.lbMac]!.last.isNotEmpty)
+        ? leaseMap[g.lbMac]!.last.toString().replaceAll(':', '-')
+        : "");
   }
 
   /// Builds the OpenWrt configuration file content from the given [leaseMap].
@@ -274,6 +274,4 @@ config host
             "option ip '${leaseMap[g.lbIp]![i]}'")
         .trim();
   }
-
-  void addHostNameIfMissing() {}
 }
