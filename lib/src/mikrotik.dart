@@ -27,7 +27,7 @@ class Mikrotik extends FileType {
         return leaseMap;
       }
 
-      leaseMap[g.lbHost] = extractLeaseParam(fileLines, "name");
+      leaseMap[g.lbHost] = extractLeaseParam(fileLines, g.lbHost);
       leaseMap[g.lbMac] = extractLeaseParam(fileLines, g.lbMac);
       leaseMap[g.lbIp] = extractLeaseParam(fileLines, g.lbIp);
 
@@ -94,8 +94,8 @@ class Mikrotik extends FileType {
 //find parameters with values around =
   List<String> extractLeaseMatches(String inFileContents) {
     try {
-      RegExp regExp = RegExp(r"(\S*?=\S*?\s|\S*?$)");
 
+      RegExp regExp = RegExp(r"(\S*?=\S*?\s|\S*?$)");
       //Get List of all Parameters/Values separated by equals
       List<String> importList = regExp
           .allMatches(inFileContents)
