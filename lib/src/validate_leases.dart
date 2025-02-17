@@ -65,7 +65,7 @@ class ValidateLeases {
         leaseIsValid = false;
       }
 
-if ( !isFQDN(hostName, requireTld: false)) {
+      if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
         leaseIsValid = false;
