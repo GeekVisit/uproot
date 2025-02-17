@@ -11,7 +11,6 @@
 // use conventional commits:
 //https://www.conventionalcommits.org/en/v1.0.0/#summary
 
-//TODO:
 // TODO: Add support for pihole ?
 // TODO: Add support for isc-dhcp dhcpd.leases ?
 
@@ -19,32 +18,7 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    //all formats test
-    arguments = <String>[
-      "test/test-data/lease-list-infile.openwrt",
-      "-g",
-      "o",
-      "-b",
-      "test-output-file",
-      "-d",
-      "test/test-output",
-      "-w"
-    ];
-
-//   try {
-// // to test mikrotik
-//     arguments = <String>[
-//       "test/test-data/lease-list-infile.openwrt", //Input file argument replaced in test methods
-//       "-g",
-//       "o",
-//       "-b",
-//       "test-output-file",
-//       "-d",
-//       "test/test-output",
-//       "-m",
-//       "test/test-data/test-output-file.openwrt"
-//     ];
-
+ 
     // arguments = <String>[
     //    "test/test-data/*.*",
     //    "-g",
@@ -100,23 +74,6 @@ void main(List<String> arguments) {
     //    "-V"
     //  ];
 
-    // arguments = <String>[
-    //   "test/test-data/lease-list-infile.openwrt",
-    //   //"test/test-data/openwrt/lease-list-infile.openwrt.bad-test-file-to-be-good",
-    //   "-t",
-    //   "o",
-    //   "-g",
-    //   "j",
-    //   "-L",
-    //   "192.168.0.1",
-    //   "-H",
-    //   "192.168.0.254",
-    //   "-b",
-    //   "test-output-file",
-    //   "-d",
-    //   "test/test-output",
-    //   "-w"
-    // ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);
