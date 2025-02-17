@@ -6,8 +6,8 @@ import 'package:validators/validators.dart';
 import '../lib.dart';
 import 'globals.dart' as g;
 
-//TODO: change validate lease to allow conversion even if openwrt doesn't have name in it see issue#3
-//TODO:and validate fails if duid is in it - fix that (see issue #2)
+
+
 class ValidateLeases {
   static bool printedLowHighRangeWarning = false;
   static List<String> processedMac = <String>[],
@@ -65,6 +65,7 @@ class ValidateLeases {
         leaseIsValid = false;
       }
 
+//TODO: Make this an option to required tld
       if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
