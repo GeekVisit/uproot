@@ -123,41 +123,53 @@ uprt (2021.10.001 running on macos 10.15.7)
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
 
 Usage:
--a, --append                              Used when --merge and --sort are given.  If this flag is given, the merged file
-                                          will have the sorted leases from the source file appended to the end of the
-                                          target file leases rather than integrated with the merge file.
+
+uprt (2021.10.001 running on windows "Windows 10 Pro" 10.0 (Build 22631))
+
+A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
+
+Usage: 
+-a, --append                              Used when --merge and --sort are given.  If this flag is given, the merged file 
+                                          will have the sorted leases from the source file appended to the end of the 
+                                          target file leases rather than integrated with the merge file. 
 -b, --base-name                           Specify Base Name of Output Files (default uses basename of input file)
 -d, --directory-out                       Directory to write files to, defaults to same directory as input file.
--h, --help                                Help
--t, --input-type                          Input file type:   c (csv), d (ddwrt), j (json),
-                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
-                                          If this option is not used, uprt will try to determine file
-                                          type based on the following extensions: .csv, .ddwrt,
-                                          .json, .rsc (mikrotik), .xml (for opnsense and pfsense,
-                                          distinguishing by searching for <opnsense> in file)
--g, --generate-type                       Required. Generated types may be multiple. Valid values include:
+-f, --[no-]fqdn                           Require hostname to be fully qualified domain name - i.e., in domain.tld format
+-g, --generate-type                       Required. Generated types may be multiple. Valid values include: 
                                           c (csv), d (DD-WRT), j (json),
                                           m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
--L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
+-h, --help                                Help
 -H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File
--l, --log                                 Creates Log file, if -P not set, then location is in temp folder
--P, --log-file-path                       Full file path to log file.
--m, --merge                               Merge to file. Specify path to file to merge converted output.
+-l, --log                                 Creates Log file, if -P not set, then location is at 'C:\Users\***REMOVED***\AppData\Local\Temp\uprt.log'
+-L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
+-m, --merge                               Merge to file. Specify path to file to merge converted output. 
                                           Used to add static leases to an existing output file.
--S, --server                              Name to designate in output file for Mikrotik dhcp server.
-                                          (defaults to "defconf")
--r, --replace-duplicates-in-merge-file    Applies only when using --merge. If this option is set and the source file
+-P, --log-file-path                       Full file path to log file.
+                                         
+-r, --replace-duplicates-in-merge-file    Applies only when using --merge. If this option is set and the source file 
                                           has a static lease which has the same mac address, ip or hostname as a lease in
                                           the merge file, the lease or leases in the merge file that have any of the
-                                          duplicate components will be discarded and the input lease will be used.
-                                          By default, this is set to false so any lease in the input file that has the
+                                          duplicate components will be discarded and the input lease will be used.  
+                                          By default, this is set to false so any lease in the input file that has the 
                                           same ip, hostname, or mac address as one in the merge file is discarded.
 -s, --[no-]sort                           Leases in resulting output file are sorted by Ip address.
                                           (defaults to on)
+-S, --server                              Name to designate in output file for Mikrotik dhcp server.
+                                          (defaults to "defconf")
+-t, --input-type                          Input file type:   c (csv), d (ddwrt), j (json),
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+                                          If this option is not used, uprt will try to determine file 
+                                          type based on the following extensions: .csv, .ddwrt, 
+                                          .json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
+                                          distinguishing by searching for <opnsense> in file)
 -v, --verbose                             Verbosity - additional messages
--z, --verbose-debug                       Verbosity - debug level verbosity
 -V, --version                             Gives Version
 -w, --write-over                          Overwrites output files, if left out, will not overwrite
+-z, --verbose-debug                       Verbosity - debug level verbosity
+
+
+
+
 ````
 
 ***Examples:***

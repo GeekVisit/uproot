@@ -198,6 +198,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
               isStringAValidFilePath(g.argResults['log-file-path']))
           ? g.argResults['log-file-path']
           : '${p.join(Directory.systemTemp.path, "uprt.log")}';
+          
       if (File(g.logPath).existsSync()) {
         //delete old log
         File(g.logPath).deleteSync();

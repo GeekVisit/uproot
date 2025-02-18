@@ -712,7 +712,6 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
   });
 
   test('requireFqdn', () {
-    OpenWrt openWrt = OpenWrt();
     Converter uprt = Converter();
     List<String> args = <String>[
       "test/test-data/lease-list-infile.csv",
