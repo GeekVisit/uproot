@@ -38,6 +38,14 @@ Directory to write files to, defaults to same directory as input file.""")
             displayHelp(1);
           }
         })
+        ..addFlag(
+          "fqdn",
+          abbr: 'f',
+          defaultsTo: false,
+          help:
+              // ignore: lines_longer_than_80_chars
+              "Require hostname to be fully qualified domain name - i.e., in domain.tld format",
+        )
         ..addOption("input-type", mandatory: false, abbr: 't', help: """
 Input file type:   c (csv), d (ddwrt), j (json),
 m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
