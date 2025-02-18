@@ -140,7 +140,7 @@ Usage:
                                           m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
 -h, --help                                Help
 -H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File
--l, --log                                 Creates Log file, if -P not set, then location is at 'C:\Users\***REMOVED***\AppData\Local\Temp\uprt.log'
+-l, --log                                 Creates Log file, if -P not set, then location is at 'C:\Users\example-user\AppData\Local\Temp\uprt.log'
 -L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
 -m, --merge                               Merge to file. Specify path to file to merge converted output. 
                                           Used to add static leases to an existing output file.
