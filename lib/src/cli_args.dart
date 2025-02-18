@@ -37,6 +37,7 @@ Directory to write files to, defaults to same directory as input file.""")
           "fqdn",
           abbr: 'f',
           defaultsTo: false,
+          negatable: false,
           help:
               // ignore: lines_longer_than_80_chars
               "Require hostnames in input file to be fully qualified domain name - i.e., in domain.tld format",

@@ -134,7 +134,7 @@ Usage:
                                           target file leases rather than integrated with the merge file. 
 -b, --base-name                           Specify Base Name of Output Files (default uses basename of input file)
 -d, --directory-out                       Directory to write files to, defaults to same directory as input file.
--f, --[no-]fqdn                           Require hostname to be fully qualified domain name - i.e., in domain.tld format
+-f, --fqdn                           Require hostname to be fully qualified domain name - i.e., in domain.tld format
 -g, --generate-type                       Required. Generated types may be multiple. Valid values include: 
                                           c (csv), d (DD-WRT), j (json),
                                           m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
