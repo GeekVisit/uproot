@@ -710,6 +710,65 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
             """),
         false);
   });
+
+  test('requireFqdn', () {
+    OpenWrt openWrt = OpenWrt();
+    Converter uprt = Converter();
+    List<String> args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "-g",
+      "cdjmnop"
+          "-d",
+      "test/test-output",
+    ];
+
+    uprt.initialize(args);
+
+    Map<String, List<String>> testLeaseMap = {
+      g.lbHost: ["example.com"],
+      g.lbMac: ["00:1A:2B:3C:4D:5E"],
+      g.lbIp: ["192.168.0.23"]
+    };
+
+    //with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's a bad lease
+    testLeaseMap[g.lbHost] = ["example"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+    // no fqdn flag
+
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "cdjmnop"
+          "-d",
+      "test/test-output",
+    ];
+
+    uprt.initialize(args);
+
+    testLeaseMap[g.lbHost] = ["example.com"];
+//with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's still not a bad lease because fqdn not required
+    testLeaseMap[g.lbHost] = ["example"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+  });
+
   test('opnSense', () {
     OpnSense opnSense = OpnSense();
 

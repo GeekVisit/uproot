@@ -6,9 +6,8 @@ import 'package:validators/validators.dart';
 import '../lib.dart';
 import 'globals.dart' as g;
 
-
-
 class ValidateLeases {
+  static bool blnRequireTld = false;
   static bool printedLowHighRangeWarning = false;
   static List<String> processedMac = <String>[],
       processedIp = <String>[],
@@ -16,6 +15,7 @@ class ValidateLeases {
       badLeases = <String>[];
 
   String test = "";
+
   void addProcessedLease(String macAddress, String hostName, String ipAddress) {
     processedMac.add(macAddress);
     processedName.add(hostName);
@@ -65,10 +65,15 @@ class ValidateLeases {
         leaseIsValid = false;
       }
 
-//TODO: Make this an option to required tld
-      if (hostName != "" && !isFQDN(hostName, requireTld: false)) {
-        badLeaseBuffer.write(
-            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Host Name Not Valid");
+//requires tld if -fqdn argument is set
+
+      if (hostName != "" &&
+          !isFQDN(hostName, requireTld: g.argResults['fqdn'])) {
+        var failMessage = g.argResults['fqdn']
+            ? "Host Name Is Not A Valid FQDN (domain.tld) Name"
+            : "Not a Valid Host Name";
+        badLeaseBuffer
+            .write("${(badLeaseBuffer.isNotEmpty) ? "," : ""} ${failMessage}");
         leaseIsValid = false;
       }
 
