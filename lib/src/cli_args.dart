@@ -14,6 +14,7 @@ import 'globals.dart' as g;
 
 class CliArgs {
   ArgParser parser = ArgParser();
+
   ArgResults getArgs(List<String> arguments) {
     try {
       // Note that DefaultsTo only applies if option is not given at all
@@ -32,52 +33,40 @@ target file leases rather than integrated with the merge file. """)
         )
         ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
 Directory to write files to, defaults to same directory as input file.""")
-        ..addFlag("help", negatable: false, help: "Help", abbr: "h",
-            callback: (dynamic e) {
-          if (e) {
-            displayHelp(1);
-          }
-        })
         ..addFlag(
           "fqdn",
           abbr: 'f',
           defaultsTo: false,
           help:
               // ignore: lines_longer_than_80_chars
-              "Require hostname to be fully qualified domain name - i.e., in domain.tld format",
+              "Require hostnames in input file to be fully qualified domain name - i.e., in domain.tld format",
         )
-        ..addOption("input-type", mandatory: false, abbr: 't', help: """
-Input file type:   c (csv), d (ddwrt), j (json),
-m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
-If this option is not used, uprt will try to determine file 
-type based on the following extensions: .csv, .ddwrt, 
-.json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
-distinguishing by searching for <opnsense> in file)""")
         ..addMultiOption("generate-type", abbr: 'g', help: """
 Required. Generated types may be multiple. Valid values include: 
 c (csv), d (DD-WRT), j (json),
 m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
 """)
-        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
-Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
+        ..addFlag("help", negatable: false, help: "Help", abbr: "h",
+            callback: (dynamic e) {
+          if (e) {
+            displayHelp(1);
+          }
+        })
         ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
 Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File""")
         ..addFlag("log",
             abbr: 'l', negatable: false, defaultsTo: false, help: """
 Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
+        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
+Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
+        ..addOption("merge", abbr: 'm', mandatory: false, help: """
+Merge to file. Specify path to file to merge converted output. 
+Used to add static leases to an existing output file.""")
         ..addOption("log-file-path",
             abbr: 'P',
             mandatory: false,
             defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
             help: "Full file path to log file.")
-        ..addOption("merge", abbr: 'm', mandatory: false, help: """
-Merge to file. Specify path to file to merge converted output. 
-Used to add static leases to an existing output file.""")
-        ..addOption("server",
-            mandatory: false,
-            defaultsTo: "defconf",
-            abbr: 'S',
-            help: "Name to designate in output file for Mikrotik dhcp server.")
         ..addFlag("replace-duplicates-in-merge-file",
             negatable: false, defaultsTo: false, abbr: 'r', help: """
 Applies only when using --merge. If this option is set and the source file 
@@ -89,10 +78,20 @@ same ip, hostname, or mac address as one in the merge file is discarded.""")
         ..addFlag("sort",
             abbr: 's', negatable: true, defaultsTo: true, help: """
 Leases in resulting output file are sorted by Ip address.""")
+        ..addOption("server",
+            mandatory: false,
+            defaultsTo: "defconf",
+            abbr: 'S',
+            help: "Name to designate in output file for Mikrotik dhcp server.")
+        ..addOption("input-type", mandatory: false, abbr: 't', help: """
+Input file type:   c (csv), d (ddwrt), j (json),
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+If this option is not used, uprt will try to determine file 
+type based on the following extensions: .csv, .ddwrt, 
+.json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
+distinguishing by searching for <opnsense> in file)""")
         ..addFlag("verbose", abbr: 'v', negatable: false, help: """
 Verbosity - additional messages""")
-        ..addFlag("verbose-debug", abbr: 'z', negatable: false, help: """
-Verbosity - debug level verbosity""")
         ..addFlag("version", negatable: false, abbr: 'V', help: "Gives Version",
             callback: (dynamic e) {
           if (e) {
@@ -104,7 +103,9 @@ Verbosity - debug level verbosity""")
             defaultsTo: false,
             negatable: false,
             help: "Overwrites output files, if left out, will not overwrite",
-            abbr: "w");
+            abbr: "w")
+        ..addFlag("verbose-debug", abbr: 'z', negatable: false, help: """
+Verbosity - debug level verbosity""");
 
       if (arguments.isEmpty) {
         displayHelp(1);
@@ -136,6 +137,9 @@ ${meta["name"]} (${meta['version']} running on ${Platform.operatingSystem} ${Pla
 ${meta['description']}
 
 Usage: 
+ 
+ uprt <input_file_path> -g <c|d|j|m|n|o|p> -d <output file> [options]
+
 ${g.cliArgs.parser.usage}
 
 ${g.ansiBold}Examples${g.ansiFormatEnd}: 
