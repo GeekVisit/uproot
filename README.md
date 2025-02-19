@@ -2,7 +2,7 @@
 
 # [UPROOT](https://github.com/GeekVisit/uproot/)
 
-Uproot(`uprt`) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert a router's DHCP IP Reservations between routers. DHCP Reservations are also sometimes referred to as static mappings (and throughout this documentation they are typically referred to as [static leases](#user-content-what-is-a-static-leasedhcp-reservation-)).
+Uproot(`uprt`) is a multi-platform (Windows, MacOs, and Linux) command line utility written in Dart to convert a router's DHCP IP Reservations between routers. DHCP Reservations are also sometimes referred to as static mappings (and throughout this documentation they are typically referred to as [static leases](#what-is-a-static-leasedhcp-reservation-)).
 
 For example, `uprt` can be used to help move static leases from DD-Wrt to OpenWrt, or from OpenWrt to pfSense, or back and forth between various other router formats.  `Uprt` avoids errors on import by verifying and enforcing required network ranges, eliminating duplicate leases, and validating Ip and Mac addresses.
 
@@ -33,11 +33,14 @@ Also supports the following file formats:
 * json
 * csv
 
-If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#user-content-unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
+If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
 
 ## Features
 
-* Detection of input format based on extension (can also manually specify the format)
+`
+?
+
+* Detection of input format based on extension (can also manually specify the format)`
 * Converts to multiple formats simultaneously
 * Merges static leases from one file into another
 * Optionally sorts static leases by IP addresses
@@ -134,13 +137,16 @@ Usage:
                                           target file leases rather than integrated with the merge file. 
 -b, --base-name                           Specify Base Name of Output Files (default uses basename of input file)
 -d, --directory-out                       Directory to write files to, defaults to same directory as input file.
--f, --fqdn                           Require hostname to be fully qualified domain name - i.e., in domain.tld format
+-f, --fqdn                                Require hostname to be fully qualified domain name - i.e., 
+                                          in domain.tld format
 -g, --generate-type                       Required. Generated types may be multiple. Valid values include: 
                                           c (csv), d (DD-WRT), j (json),
                                           m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
 -h, --help                                Help
 -H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File
--l, --log                                 Creates Log file, if -P not set, then location is at 'C:\Users\example-user\AppData\Local\Temp\uprt.log'
+-l, --log                                 Creates Log file, if -P not set, then location 
+                                          is in the temp folder
+                                          
 -L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
 -m, --merge                               Merge to file. Specify path to file to merge converted output. 
                                           Used to add static leases to an existing output file.
@@ -208,7 +214,7 @@ To test uprt yourself, there are test input files are located under the `test/te
 
 Below is a demonstration done on Mac Catalina showing the conversion from a .csv file to all formats.
 After the conversion the demo scrolls through the resulting files.
-<img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450">
+<img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450" alt="Uprt demo on Mac">
 
 # Exporting amd Importing Static Leases
 
@@ -226,7 +232,7 @@ The following router and firewall software are supported:
 * OpenWrt
 * pfSense
 
-If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#user-content-unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
+If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
 
 ## DD-WRT
 
@@ -333,7 +339,7 @@ If you have a target device that is supported, but an unsupported source device 
         cat *infile.openwrt >> /etc/config/dhcp
     ````
 
-    **WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup! To merge [will remove duplicates] instead of append, see step 4.**
+    **WARNING: Be sure that there are two `>>`, otherwise the dhcp file will be overwritten instead of appended. Thus the recommended backup! To merge instead of append, see step 4.**
 
 4. **ALTERNATIVELY**, you can download the `dhcp` file to your local computer, merge the import file using `uprt`, then upload the resulting `dhcp.openwrt` file with the resulting merged file (you'll need to rename the output file to `dhcp`). The advantage of this is you'll be able to sort the static leases by IP address and `uprt` will also automatically take care of duplicates (please see `uprt -h` for sorting and append options). Example:
 
@@ -386,7 +392,7 @@ If you have a target device that is supported, but an unsupported source device 
 
 1. **NOTE: Always make a [backup](https://docs.opnsense.org/manual/backups.html) of your OPNsense configuration before importing !**
 
-2. **Importing REPLACES any static leases your router currently has. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-opnsense---merging-leases-with-an-existing-configuration) .**
+2. **Importing REPLACES any static leases your router currently has. If you are adding leases to an existing configuration, follow [these steps for merging](#opnsense---merging-leases-with-an-existing-configuration) .**
 
 3. To start your import, log in to your OPNsense router and navigate to System->Configuration->Backups.
 
@@ -400,7 +406,7 @@ If you have a target device that is supported, but an unsupported source device 
 
 6. OPNSense should respond with a "Successful" message.
 
-7. To view the imported leases, navigate to Services->DHCPv4->[LAN].
+7. To view the imported leases, navigate to Services->DHCPv4->LAN.
 
 8. Scroll down and verify the static leases have been imported.
 
@@ -414,7 +420,7 @@ If you are ADDING leases to an existing OpnSense configuration, you'll need to u
     uprt static_leases-to-import-opn.xml -m static-lease-backup.xml -g o -b merge-output 
 ````
 
-This will output a "merge-output-opn.xml" file. [Import](#user-content-opnsense---import) this into your OpnSense router.
+This will output a "merge-output-opn.xml" file. [Import](#opnsense---import) this into your OpnSense router.
 
 ## pfSense
 
@@ -443,7 +449,7 @@ This will output a "merge-output-opn.xml" file. [Import](#user-content-opnsense-
 
 1. **NOTE: Always make a [backup](https://docs.netgate.com/pfsense/en/latest/backup/index.html) of your pfSense configuration before importing !**
 
-2. **Importing REPLACES any static leases you currently have. If you are adding leases to an existing configuration, follow [these steps for merging](#user-content-pfsense---merging-leases-with-an-existing-configuration) .**
+2. **Importing REPLACES any static leases you currently have. If you are adding leases to an existing configuration, follow [these steps for merging](#pfsense---merging-leases-with-an-existing-configuration) .**
 
 3. Log into pfSense using your browser and navigate to Diagnostics->Backup & Restore:
 
@@ -471,7 +477,7 @@ Download to your local computer a backup from your existing configuration, then 
     uprt static_leases-to-import-pfs.xml -m static-lease-backup.xml -g p -b merge-output
 ````
 
-This will output a "merge-output-pfs.xml" file. [Import](#user-content-pfsense---import) this file into your pfSense router.
+This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this file into your pfSense router.
 
 ## Mikrotik
 
@@ -552,7 +558,7 @@ This will output a "merge-output-pfs.xml" file. [Import](#user-content-pfsense--
         uprt dhcp-static-leases.rsc -m dhcp-static-leases-export.rsc -g m -b merge-output
     ````
 
-3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#user-content-mikrotik---import).
+3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#mikrotik---import).
 
 ## Unsupported Routers - Creating A CSV File of Network Devices Using Nmap
 

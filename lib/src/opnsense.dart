@@ -54,16 +54,16 @@ class OpnSense extends FileType {
 
       leaseMap[g.lbMac] = opnsenseDoc
           .findAllElements('mac')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
 
       leaseMap[g.lbHost] = opnsenseDoc
           .findAllElements('hostname')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
       leaseMap[g.lbIp] = opnsenseDoc
           .findAllElements('ipaddr')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
 
       if (removeBadLeases) {

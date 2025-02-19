@@ -78,15 +78,15 @@ class PfSense extends FileType {
 
       leaseMap[g.lbMac] = pfsenseDoc
           .findAllElements('mac')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
       leaseMap[g.lbHost] = pfsenseDoc
           .findAllElements('hostname')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
       leaseMap[g.lbIp] = pfsenseDoc
           .findAllElements('ipaddr')
-          .map((dynamic e) => e.innerText.toString())
+          .map((dynamic e) => e.text.toString())
           .toList();
 
       if (removeBadLeases) {

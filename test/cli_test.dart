@@ -128,17 +128,16 @@ void testUpRooted() {
 
   test("Args", () {
     // /* test with no options */
-    // args = <String>[];
+    // List<String> args = <String>[];
     // expect(() => g.cliArgs.getArgs(args), returnsNormally);
     // expect(() => g.cliArgs.checkArgs(), returnsNormally);
 
     /* test if multiple options work */
 
-    args = <String>[...argsTestBase];
+    List<String> args = <String>[...argsTestBase];
     g.argResults = g.cliArgs.getArgs(args);
     g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
     uprt.setInputFile(g.inputFileList[0]);
-
     expect(g.cliArgs.getFormatTypeOfFile(), "c");
 
     uprt.setInputFile("test/test-data/lease-list-infile.ddwrt");
@@ -219,7 +218,8 @@ void testUpRooted() {
     ];
 
     expect(() => g.cliArgs.getArgs(args),
-        checkErrorMessage('Missing argument for "ip-low-address"'));
+        checkErrorMessage('Missing argument for "-L"'));
+
     args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-L",
