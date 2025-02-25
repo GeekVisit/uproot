@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
@@ -11,6 +11,22 @@ import 'package:validators/sanitizers.dart';
 
 import 'globals.dart' as g;
 
+/// Prints a message to the console or logs it to a file.
+///
+/// The message can be printed as an error message, only if verbose mode is enabled,
+/// or only logged to a file based on the provided parameters.
+///
+/// - [msgToPrint]: The message to be printed or logged. Can be of any type.
+/// - [errMsg]: If `true`, the message is printed as an error message to `stderr`.
+/// - [onlyIfVerbose]: If `true`, the message is printed only if verbose mode is enabled.
+/// - [logOnly]: If `true`, the message is only logged to a file and not printed to the console.
+///
+/// The function also handles printing stack traces if verbose-debug mode is enabled,
+/// and logs messages to a file if logging is enabled.
+///
+/// Throws:
+/// - [FormatException]: If there is an error formatting the log message.
+/// - [Exception]: For any other exceptions that occur during logging.
 void printMsg(
   dynamic msgToPrint, {
   bool errMsg = false,
@@ -23,7 +39,7 @@ void printMsg(
 
     if (errMsg) {
       stderr.writeln(
-          """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd}""");
+          """${g.colorError}${msg.toString().replaceFirst("Exception: ", "").trim()} ${g.ansiFormatEnd} """);
     } else if (!logOnly) {
       if (onlyIfVerbose) {
         (g.verbose) ? stdout.writeln(msg) : "";
@@ -35,8 +51,8 @@ void printMsg(
     /* Print Stack Trace if Debug */
     if (g.argResults['verbose-debug'] != null &&
         g.argResults['verbose-debug']) {
-      stdout
-          .writeln("${g.newL}${StackTrace.current.toString().trim()}${g.newL}");
+      stdout.writeln(
+          "${g.newL} ${StackTrace.current.toString().trim()} ${g.newL}");
     }
 
     //Write to Log
@@ -55,8 +71,7 @@ void printMsg(
               // ignore: prefer_interpolation_to_compose_strings
               """
     ${g.newL}${StackTrace.current.toString().trim()}${g.newL})"""
-              "${g.newL}",
-              mode: FileMode.append);
+              "${g.newL}", mode: FileMode.append);
         }
       }
     } on FormatException catch (e) {
@@ -71,6 +86,23 @@ void printMsg(
   }
 }
 
+/// Saves the given contents to a file at the specified path.
+///
+/// If [overWrite] is set to `false` (default), the method will create a new file
+/// with a unique name if a file with the same name already exists. The new file
+/// name will have a numeric suffix (e.g., `filename(01).ext`, `filename(02).ext`).
+///
+/// If [overWrite] is set to `true`, the method will overwrite any existing file
+/// with the same name.
+///
+/// Throws an [Exception] if an error occurs during file operations.
+///
+/// - Parameters:
+///   - contents: The content to be saved to the file.
+///   - savePath: The path where the file should be saved.
+///   - overWrite: A boolean flag indicating whether to overwrite an existing file.
+///
+/// - Returns: The absolute path of the saved file.
 String saveFile(String contents, String savePath, {bool overWrite = false}) {
   try {
     int x = 1;
@@ -158,7 +190,8 @@ String getGoodPath(String fPath) {
   }
 }
 
-/// Get contents of json file, or temporary json file if none given
+/// Get contents of file
 String getFileContents(String filePath) {
   return File(filePath).readAsStringSync();
 }
+

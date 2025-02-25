@@ -479,6 +479,15 @@ Download to your local computer a backup from your existing configuration, then 
 
 This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this file into your pfSense router.
 
+## PiHole
+
+### PiHole - Export
+
+1. Login to your Pi-hole instance and click on "Settings".
+2. Click on "Teleporter" and then "Backup". It will prompt you to save the tar.gz file.
+3. Uncompress the tar.gz file using the appropriate utility (tar, gzip, 7zip, etc.).
+4. Find the "04-pihole-static-dhcp.conf" file located in the dnsmasq.d folder.
+
 ## Mikrotik
 
 ### Mikrotik - Export
@@ -490,12 +499,12 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
 3. Execute the following:
 
     ````bash
-    /ip dhcp-server lease export file=dhcp-static-leases.rsc
+   /ip dhcp-server lease print terse file=dhcp-static-leases.rsc.txt
     ````
 
-4. This exports a file called "dhcp-static-leases.rsc" which will appear in `Files`.
+4. This exports a file called "dhcp-static-leases.rsc.txt" which will appear in `Files`.
 
-    ![alt](readme/../readme-pics/mikrotik-export.png))
+    ![alt](readme/../readme-pics/)
 
 5. Click on the `Files` menu item.
 

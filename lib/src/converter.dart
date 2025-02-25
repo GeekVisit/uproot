@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
@@ -26,7 +26,7 @@ class Converter {
         setInputFile(eachFilePath);
         printMsg("Scanning ${p.basename(eachFilePath)}...");
 
-        toOutput();
+        convertToOutput();
       }
     } on Exception {
       rethrow;
@@ -37,18 +37,20 @@ class Converter {
     try {
       g.inputFile = inputFilePath;
 
+//set base name
       g.baseName =
           (g.argResults['base-name'] == null || g.argResults['base-name'] == "")
               ? p.basenameWithoutExtension(g.inputFile)
               : g.argResults['base-name'];
 
-      g.inputType = g.cliArgs.getFormatTypeOfFile();
+//set global input type
+      g.inputType = g.cliArgs.getInputTypeAbbrev()!;
     } on Exception {
       return;
     }
   }
 
-  void toOutput() {
+  void convertToOutput() {
     try {
       /**  split type argument regardless of comma separator*/
       List<String> outputTypes =
@@ -57,39 +59,45 @@ class Converter {
       for (dynamic eachOutputType in outputTypes) {
         switch (eachOutputType) {
           case 'c':
-            saveAndValidateOutFile(
-                toCsv(), Csv(), g.fFormats.csv.abbrev, g.fFormats.csv.fileExt);
+            saveAndValidateOutFile(convertToCsv(), Csv(), g.fFormats.csv.abbrev,
+                g.fFormats.csv.fileExt);
             break;
 
           case 'd':
-            saveAndValidateOutFile(toDdwrt(), Ddwrt(), g.fFormats.ddwrt.abbrev,
-                g.fFormats.ddwrt.fileExt);
+            saveAndValidateOutFile(convertToDdwrt(), Ddwrt(),
+                g.fFormats.ddwrt.abbrev, g.fFormats.ddwrt.fileExt);
             break;
 
           case 'j':
-            saveAndValidateOutFile(toJson(), Json(), g.fFormats.json.abbrev,
-                g.fFormats.json.fileExt);
+            saveAndValidateOutFile(convertToJson(), Json(),
+                g.fFormats.json.abbrev, g.fFormats.json.fileExt);
             break;
 
           case 'm':
-            saveAndValidateOutFile(toMikroTik(), Mikrotik(),
+            saveAndValidateOutFile(convertToMikroTik(), Mikrotik(),
                 g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.fileExt);
             break;
 
           case 'n':
-            saveAndValidateOutFile(toOpnSense(), OpnSense(),
+            saveAndValidateOutFile(convertToOpnSense(), OpnSense(),
                 g.fFormats.opnsense.abbrev, "${g.fFormats.opnsense.fileExt}");
 
             break;
 
           case 'o':
-            saveAndValidateOutFile(toOpenWrt(), OpenWrt(),
+            saveAndValidateOutFile(convertToOpenWrt(), OpenWrt(),
                 g.fFormats.openwrt.abbrev, g.fFormats.openwrt.fileExt);
             break;
 
           case 'p':
-            saveAndValidateOutFile(toPfsense(), PfSense(),
+            saveAndValidateOutFile(convertToPfsense(), PfSense(),
                 g.fFormats.pfsense.abbrev, "${g.fFormats.pfsense.fileExt}");
+
+            break;
+
+          case 'h':
+            saveAndValidateOutFile(convertToPiHole(), PiHole(),
+                g.fFormats.pihole.abbrev, "${g.fFormats.pihole.fileExt}");
 
             break;
 
@@ -110,15 +118,15 @@ class Converter {
   }
 
   /// Save converted contents to outFile path and check if valid
-  void saveAndValidateOutFile(String fileContents, FileType outputClass,
-      String outputFormatName, String outputExt) {
+  void saveAndValidateOutFile(String convertedFileContents,
+      FileType outputClass, String outputFormatName, String outputExt) {
     try {
       setOutPath(outputExt);
       printMsg("Validating output ...", onlyIfVerbose: true);
       printCompletedAll(outputFormatName,
-          success: (fileContents != "" &&
-              outputClass.isContentValid(fileContents: fileContents) &&
-              saveToOutPath(fileContents)));
+          success: (convertedFileContents != "" &&
+              outputClass.isContentValid(fileContents: convertedFileContents) &&
+              saveToOutPath(convertedFileContents)));
     } on Exception {
       rethrow;
     }
@@ -198,7 +206,7 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
               isStringAValidFilePath(g.argResults['log-file-path']))
           ? g.argResults['log-file-path']
           : '${p.join(Directory.systemTemp.path, "uprt.log")}';
-          
+
       if (File(g.logPath).existsSync()) {
         //delete old log
         File(g.logPath).deleteSync();
@@ -222,7 +230,8 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     }
   }
 
-  /// Gets the temporary LeaseMap from json file and Merge if Option Given
+  /// Gets the temporary LeaseMap and Merge if Option Given.
+  /// The getLeaseMap is a "wrapper" for the [inputType].getLeaseMap (e.g., mikrotik.getLeaseMap)
 
   Map<String, List<String>> getSourceLeaseMap() {
     Map<String, List<String>> inputLeaseMap = g.inputTypeCl[g.inputType]!
@@ -246,40 +255,53 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
   }
 
   /// Builds Csv String from input File and Merge File
-  String toCsv() {
-    return Csv().build(getSourceLeaseMap());
+  String convertToCsv() {
+    return Csv().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds Ddwrt String from input File and Merge File
-  String toDdwrt() {
-    return Ddwrt().build(getSourceLeaseMap());
+  String convertToDdwrt() {
+    return Ddwrt().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds Json String from input & merge file
 
-  String toJson() {
-    return Json().build(getSourceLeaseMap());
+  String convertToJson() {
+    return Json().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds OpenWrt String from input and merge File
-  String toOpenWrt() {
-    return OpenWrt().build(getSourceLeaseMap());
+  String convertToOpenWrt() {
+    return OpenWrt().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds Mikrotik String from input and merge File
-  String toMikroTik() {
-    return Mikrotik().build(getSourceLeaseMap());
+  String convertToMikroTik() {
+    return Mikrotik().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds OpnSense from input and merge File
 
-  String toPfsense() {
-    return PfSense().build(getSourceLeaseMap());
+  String convertToPfsense() {
+    return PfSense().buildOutFileContents(getSourceLeaseMap());
   }
 
   /// Builds OpnSense String from OpnSense File and Merge File
-  String toOpnSense() {
-    return OpnSense().build(getSourceLeaseMap());
+  String convertToOpnSense() {
+    return OpnSense().buildOutFileContents(getSourceLeaseMap());
+  }
+
+  /// Builds PiHole String from PiHole File and Merge File
+  /// Converts the source lease map to a Pi-hole compatible format.
+  ///
+  /// This method retrieves the source lease map and uses the `PiHole` class
+  /// to build and return a string representation that is compatible with
+  /// Pi-hole.
+  ///
+  /// Returns:
+  ///   A string that represents the source lease map in a Pi-hole compatible format.
+  String convertToPiHole() {
+    return PiHole().buildOutFileContents(getSourceLeaseMap());
   }
 
   Map<String, List<String>> sortLeaseMapByIp(
@@ -371,8 +393,8 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
       g.lbIp: <String>[],
     };
 
-    dynamic mergeTargetFileType =
-        g.cliArgs.getFormatTypeOfFile(mergeTargetPath);
+    dynamic mergeTargetTypeAbbrev =
+        g.cliArgs.getInputTypeAbbrev(mergeTargetPath);
 
     String displayMergeFile = (g.verbose)
         ? p.canonicalize(mergeTargetPath)
@@ -381,11 +403,14 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     printMsg("Scanning merge file $displayMergeFile...");
     mergeTargetLeaseMap = mergeLeaseMaps(
         inputFileLeaseMap,
-        g.inputTypeCl[mergeTargetFileType]!.getLeaseMap(
+        g.inputTypeCl[mergeTargetTypeAbbrev]!.getLeaseMap(
             fileContents: File(mergeTargetPath).readAsStringSync()));
 
     /* Remove duplicate leases **/
     return g.validateLeases
-        .removeBadLeases(mergeTargetLeaseMap, mergeTargetFileType);
+
+        //file type should be words
+        .removeBadLeases(
+            mergeTargetLeaseMap, g.typeOptionToName[mergeTargetTypeAbbrev]!);
   }
 }

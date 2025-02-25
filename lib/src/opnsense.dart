@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'package:xml/xml.dart';
@@ -7,7 +7,7 @@ import '../lib.dart';
 import 'globals.dart' as g;
 
 class OpnSense extends FileType {
-  //
+//
 
   String preLeaseXml = '''<?xml version="1.0"?>
 <opnsense>
@@ -81,11 +81,12 @@ Unable to extract static leases from file, file may not be proper OPNsense XML f
     }
   }
 
-  String build(Map<String, List<String>?> leaseMap) {
+  @override
+  String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     try {
       StringBuffer sbOpn = StringBuffer();
       dynamic mergeTargetFileType = (g.argResults['merge'] != null)
-          ? g.cliArgs.getFormatTypeOfFile(getGoodPath(g.argResults['merge']))
+          ? g.cliArgs.getInputTypeAbbrev(getGoodPath(g.argResults['merge']))
           : "";
 
       preLeaseXml = updateXmlIpRange(preLeaseXml);
@@ -110,6 +111,17 @@ Unable to extract static leases from file, file may not be proper OPNsense XML f
   }
 
   @override
+
+  /// Validates the content of a file.
+  ///
+  /// This method checks if the provided file contents are valid by processing
+  /// the leases and validating them against the OpnSense format.
+  ///
+  /// Returns `true` if the content is valid, otherwise `false`.
+  ///
+  /// Parameters:
+  /// - `fileContents` (String): The contents of the file to be validated.
+  /// - `fileLines` (List<String>?): Optional list of file lines (not used in the current implementation).
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
     try {
       ValidateLeases.clearProcessedLeases();
@@ -125,7 +137,7 @@ Unable to extract static leases from file, file may not be proper OPNsense XML f
         return false;
       }
       g.validateLeases
-          .validateLeaseList(leaseMap, g.fFormats.opnsense.formatName);
+          .isLeaseMapListValid(leaseMap, g.fFormats.opnsense.formatName);
 
       return true;
     } on Exception catch (e) {

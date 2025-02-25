@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:convert';
@@ -6,6 +6,31 @@ import 'dart:convert';
 import '../lib.dart';
 import 'globals.dart' as g;
 
+/// A class that represents a CSV file type and provides methods to manipulate
+/// and validate CSV file contents.
+///
+/// The `Csv` class extends the `FileType` class and provides methods to:
+/// - Parse CSV file contents and convert them into a map of leases.
+/// - Build a CSV string from a map of device lists.
+/// - Validate the contents of a CSV file.
+/// - Add column names and rows to a CSV string buffer.
+///
+/// The class assumes that the CSV file has three columns: host name, MAC address,
+/// and IP address, in that order.
+///
+/// Constants:
+/// - `hostIdx`: The index of the host name column.
+/// - `macIdx`: The index of the MAC address column.
+/// - `ipIdx`: The index of the IP address column.
+///
+/// Properties:
+/// - `fileType`: The type of the file, which is set to the CSV format name.
+///
+/// Methods:
+/// - `getLeaseMap`: Parses the CSV file contents and returns a map of leases.
+/// - `build`: Builds a CSV string from a map of device lists.
+/// - `isContentValid`: Validates the contents of a CSV file.
+/// - `csvAddColumnNamesAndRows`: Adds column names and rows to a CSV string buffer.
 class Csv extends FileType {
   //
 //this is the appearance of the columns in the file (Mac comes first, etc.)
@@ -78,18 +103,18 @@ class Csv extends FileType {
   }
 
   @override
-  String build(Map<String, List<String>?> deviceList) {
+  String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     StringBuffer sb = StringBuffer();
 
-    if (deviceList[g.lbMac]!.isEmpty) {
+    if (leaseMap[g.lbMac]!.isEmpty) {
       return "";
     }
 
     sb.write("host-name, mac-address, address\n");
-    for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
+    for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       sb.write(
           // ignore: lines_longer_than_80_chars
-          "${deviceList[g.lbHost]![i]},${deviceList[g.lbMac]![i]},${deviceList[g.lbIp]![i]}\n");
+          "${leaseMap[g.lbHost]![i]},${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)}},${leaseMap[g.lbIp]![i]}\n");
     }
     return sb.toString();
   }
@@ -104,7 +129,7 @@ class Csv extends FileType {
         return false;
       }
 
-      g.validateLeases.validateLeaseList(leaseMap, g.fFormats.csv.formatName);
+      g.validateLeases.isLeaseMapListValid(leaseMap, g.fFormats.csv.formatName);
 
       return true;
     } on Exception catch (e) {

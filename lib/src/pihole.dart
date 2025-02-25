@@ -1,45 +1,29 @@
 // Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
-// This file defines the OpenWrt class which extends the FileType class.
-// It provides methods to validate, parse, and build OpenWrt configuration files.
+// This file defines the Pi-hole class which extends the FileType class.
+// It provides methods to validate, parse, and build Pi-hole configuration files.
+///
+/// The `PiHole` class includes the following methods:
+///
+/// - `isFileValid(String filePath)`: Validates if the file at [filePath] is a valid Pi-hole configuration file.
+/// - `isContentValid({String fileContents = "", List<String>? fileLines})`: Validates the content of the Pi-hole configuration file. Accepts either [fileContents] as a string or [fileLines] as a list of strings.
+/// - `getLeaseMap({String fileContents = "", List<String>? fileLines, bool removeBadLeases = true})`: Parses the Pi-hole configuration file and returns a map of leases. The map contains lists of MAC addresses, hostnames, and IP addresses.
+/// - `fillHostNameWIthMac(Map<String, List<String>> leaseMap)`: Fills the host name with the MAC address if the host name is not provided.
+/// - `buildOutFileContents(Map<String, List<String>?> leaseMap)`: Builds the Pi-hole configuration file content from the given [leaseMap].
+/// - `mergePiHoleConfig(Map<String, List<String>?> leaseMap)`: Used for Pfs and Opn conversions. Keeps and updates existing leases in the merge file and adds new ones from input.
+/// - `getPiHoleTemplate(Map<String, List<String>?> leaseMap, int i)`: Returns Pi-hole template to be used in building the file.
+/// - `fillInTemplate(String template, Map<String, List<String>?> leaseMap, int i)`: Fills in the config template with values from the lease map.
 
 import 'dart:io';
 
 import '../lib.dart';
 import 'globals.dart' as g;
 
-/// The `OpenWrt` class extends `FileType` and provides methods to handle
-/// OpenWrt configuration files. It includes methods to validate, parse,
-/// and build OpenWrt configuration files.
-///
-/// Properties:
-/// - `fileType`: A string representing the file type.
-///
-/// Methods:
-/// - `isFileValid(String filePath)`: Validates if the file at the given
-///   `filePath` is a valid OpenWrt configuration file.
-/// - `isContentValid({String fileContents = "", List<String>? fileLines})`:
-///   Validates the content of the OpenWrt configuration file. Accepts either
-///   `fileContents` as a string or `fileLines` as a list of strings.
-/// - `getLeaseMap({String fileContents = "", List<String>? fileLines, bool removeBadLeases = true})`:
-///   Parses the OpenWrt configuration file and returns a map of leases. The map
-///   contains lists of MAC addresses, hostnames, and IP addresses.
-/// - `fillHostNameWIthMac(Map<String, List<String>> leaseMap)`: Fills the hostname
-///   with the MAC address if the hostname is not set.
-/// - `buildOutFileContents(Map<String, List<String>?> leaseMap)`: Builds the OpenWrt configuration
-///   file content from the given `leaseMap`.
-/// - `mergeOpenWrtConfig(Map<String, List<String>?> leaseMap)`: Used for Pfs and Opn
-///   conversions. Keeps and updates existing leases in the merge file and adds new
-///   ones from the input.
-/// - `getOpenWrtTemplate(Map<String, List<String>?> leaseMap, int i)`: Returns the
-///   OpenWrt template to be used in building the file.
-/// - `fillInTemplate(String template, Map<String, List<String>?> leaseMap, int i)`:
-///   Fills in the configuration template with values from the `leaseMap`.
-class OpenWrt extends FileType {
-  String fileType = g.fFormats.openwrt.formatName;
+class PiHole extends FileType {
+  String fileType = g.fFormats.pihole.formatName;
 
-  /// Validates if the file at [filePath] is a valid OpenWrt configuration file.
+  /// Validates if the file at [filePath] is a valid Pi-hole configuration file.
   @override
   bool isFileValid(String filePath) {
     try {
@@ -59,7 +43,7 @@ class OpenWrt extends FileType {
     }
   }
 
-  /// Validates the content of the OpenWrt configuration file.
+  /// Validates the content of the Pi-hole configuration file.
   /// Accepts either [fileContents] as a string or [fileLines] as a list of strings.
   @override
   bool isContentValid({String fileContents = "", List<String>? fileLines}) {
@@ -75,18 +59,18 @@ class OpenWrt extends FileType {
       }
 
       if (fileLines == null) {
-        throw Exception("Missing Argument for isContentValid OpenWrt");
+        throw Exception("Missing Argument for isContentValid Pi-hole");
       }
       dynamic leaseMap =
           getLeaseMap(fileLines: fileLines, removeBadLeases: false);
 
       if (g.validateLeases
-          .containsBadLeases(leaseMap, g.fFormats.openwrt.formatName)) {
+          .containsBadLeases(leaseMap, g.fFormats.pihole.formatName)) {
         return false;
       }
 
       g.validateLeases
-          .isLeaseMapListValid(leaseMap, g.fFormats.openwrt.formatName);
+          .isLeaseMapListValid(leaseMap, g.fFormats.pihole.formatName);
       return true;
     } catch (e) {
       printMsg(e, errMsg: true);
@@ -94,7 +78,7 @@ class OpenWrt extends FileType {
     }
   }
 
-  /// Parses the OpenWrt configuration file and returns a map of leases.
+  /// Parses the Pi-hole configuration file and returns a map of leases.
   /// The map contains lists of MAC addresses, hostnames, and IP addresses.
 
   @override
@@ -103,8 +87,8 @@ class OpenWrt extends FileType {
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     try {
-      if (fileLines == null) {
-        fileLines = [];
+      if (fileLines == null && fileContents != "") {
+        fileLines = fileContents.split("\n");
       }
       Map<String, List<String>> leaseMap = <String, List<String>>{
         g.lbMac: <String>[],
@@ -112,43 +96,25 @@ class OpenWrt extends FileType {
         g.lbIp: <String>[],
       };
 
-      RegExp configHostRegExp = RegExp(r'config host');
-      RegExp optionMacRegExp = RegExp(r"option mac '([^']+)'");
-      RegExp optionNameRegExp = RegExp(r"option name '([^']+)'");
-      RegExp optionIpRegExp = RegExp(r"option ip '([^']+)'");
+      RegExp dhcpHostRegExp =
+          RegExp(r"dhcp-host=([^,]+),([^,]+),(([^,]+))?,?$");
 
-      int idxCurrentConfigSection = 0;
-
-      for (String line in fileLines) {
-        if (configHostRegExp.hasMatch(line)) {
-//if prior entry has no name set to mac address or if not mac address, nothing
-          if (idxCurrentConfigSection > 0 &&
-              leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
-            fillHostNameWIthMac(leaseMap);
-          }
-
-          idxCurrentConfigSection++;
-          //check for entries that have no host name, if not, then set to mac
-          //this avoids errors if config has no name but will still err if mac is empty
-        } else if (optionMacRegExp.hasMatch(line)) {
-          leaseMap[g.lbMac]!.add(optionMacRegExp.firstMatch(line)!.group(1)!);
-        } else if (optionNameRegExp.hasMatch(line)) {
-          leaseMap[g.lbHost]!.add(optionNameRegExp.firstMatch(line)!.group(1)!);
-        } else if (optionIpRegExp.hasMatch(line)) {
-          leaseMap[g.lbIp]!.add(optionIpRegExp.firstMatch(line)!.group(1)!);
+      for (String line in fileLines!) {
+        if (dhcpHostRegExp.hasMatch(line)) {
+          RegExpMatch match = dhcpHostRegExp.firstMatch(line)!;
+          //replace dashes with colons
+          leaseMap[g.lbMac]!.add(match.group(1)!);
+          leaseMap[g.lbIp]!.add(match.group(2)!);
+          //if there is no match for a host set same as mac but replace colons with hyphens
+          leaseMap[g.lbHost]!.add((match.group(3) == null)
+              ? leaseMap[g.lbMac]!.last.replaceAll(':', '-').toString()
+              : match.group(3).toString());
         }
-      }
-
-      //when done with all config sections check last entry for name existence
-
-//if last entry has no name value, set name to mac address or if not mac address, nothing
-      if (leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
-        fillHostNameWIthMac(leaseMap);
       }
 
       if (removeBadLeases) {
         return g.validateLeases
-            .removeBadLeases(leaseMap, g.fFormats.openwrt.formatName);
+            .removeBadLeases(leaseMap, g.fFormats.pihole.formatName);
       }
       return leaseMap;
     } on Exception catch (e) {
@@ -157,39 +123,31 @@ class OpenWrt extends FileType {
     }
   }
 
-  void fillHostNameWIthMac(Map<String, List<String>> leaseMap) {
-    leaseMap[g.lbHost]!.add((leaseMap[g.lbMac]!.last.isNotEmpty)
-        ? leaseMap[g.lbMac]!.last.toString().replaceAll(':', '-')
-        : "");
-  }
-
-  /// Builds the OpenWrt configuration file content from the given [leaseMap].
+  /// Builds the Pi-hole configuration file content from the given [leaseMap].
   @override
   String buildOutFileContents(Map<String, List<String>?> leaseMap) {
-    StringBuffer sbOpenwrt = StringBuffer();
+    StringBuffer sbPiHole = StringBuffer();
 
     dynamic mergeTargetFileType = (g.argResults['merge'] != null)
         ? g.cliArgs.getInputTypeAbbrev(getGoodPath(g.argResults['merge']))
         : "";
 
     if (g.argResults['merge'] != null && mergeTargetFileType == "o") {
-      return mergeOpenWrtConfig(leaseMap);
+      return mergePiHoleConfig(leaseMap);
     }
 
     for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
-      sbOpenwrt.write("""config host
-             option mac \'${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)}\'
-             option name \'${leaseMap[g.lbHost]?[x]}\'
-             option ip \'${leaseMap[g.lbIp]?[x]}\'
-   """);
+      sbPiHole.write(
+          """dhcp-host=${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)},${leaseMap[g.lbIp]?[x].trim()},${leaseMap[g.lbHost]?[x].trim()}
+""");
     }
 
-    return sbOpenwrt.toString();
+    return sbPiHole.toString();
   }
 
-  /// Used for Pfs and Opn conversions. Keeps and updates existing
+  /// Keeps and updates existing
   /// lease in merge file and adds new ones from input.
-  String mergeOpenWrtConfig(Map<String, List<String>?> leaseMap) {
+  String mergePiHoleConfig(Map<String, List<String>?> leaseMap) {
     try {
       StringBuffer sb = StringBuffer();
 
@@ -201,7 +159,7 @@ class OpenWrt extends FileType {
       String template = "";
       // update existing leases with components from the input file
       for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
-        template = getOpenWrtTemplate(
+        template = getPiHoleTemplate(
           leaseMap,
           i,
         );
@@ -215,14 +173,11 @@ class OpenWrt extends FileType {
     }
   }
 
-  /// Returns OpenWrt Template To Be Used in Building File
-  String getOpenWrtTemplate(Map<String, List<String>?> leaseMap, int i) {
+  /// Returns Pi-hole Template To Be Used in Building File
+  String getPiHoleTemplate(Map<String, List<String>?> leaseMap, int i) {
     try {
       String genericConfigTemplate = """
-config host
-    option mac
-    option name
-    option ip
+dhcp-host=mac-A1B2C3,ip-A1B2C3,name-A1B2C3
 """;
 
       String value = "${leaseMap[g.lbHost]![i]}|${leaseMap[g.lbMac]![i]}"
@@ -288,16 +243,11 @@ config host
   String fillInTemplate(
       String template, Map<String, List<String>?> leaseMap, int i) {
     return template
-        .replaceFirst(
-            RegExp(r'^.*option mac.*?$', multiLine: true, dotAll: false),
-            """  option mac '${leaseMap[g.lbMac]![i]}'""")
+        .replaceFirst("mac-A1B2C3", leaseMap[g.lbMac]![i])
         .trim()
-        .replaceFirst(
-            RegExp(r'option name.*?$', multiLine: true, dotAll: false),
-            "option name '${leaseMap[g.lbHost]![i]}'")
+        .replaceFirst("ip-A1B2C3", leaseMap[g.lbIp]![i])
         .trim()
-        .replaceFirst(RegExp(r'option ip.*?$', multiLine: true, dotAll: false),
-            "option ip '${leaseMap[g.lbIp]![i]}'")
+        .replaceFirst("host-A1B2C3", leaseMap[g.lbHost]![i])
         .trim();
   }
 }

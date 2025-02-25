@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:convert';
@@ -7,6 +7,18 @@ import '../lib.dart';
 
 import 'globals.dart' as g;
 
+/// A class that handles JSON file operations for static leases.
+///
+/// This class extends the `FileType` class and provides methods to:
+/// - Extract lease information from JSON file contents.
+/// - Build JSON strings from lease information.
+/// - Validate JSON file contents.
+///
+/// Methods:
+/// - `getLeaseMap`: Extracts lease information from JSON file contents.
+/// - `build`: Builds a JSON string from lease information.
+/// - `isContentValid`: Validates the JSON file contents.
+/// - `isJson`: Checks if a string is a valid JSON format.
 class Json extends FileType {
   @override
   String fileType = g.fFormats.json.formatName;
@@ -59,15 +71,16 @@ Unable to extract static leases from File, file may not be proper json format, $
     }
   }
 
-  String build(
-    Map<String, List<String>?> deviceList,
+  @override
+  String buildOutFileContents(
+    Map<String, List<String>?> leaseMap,
   ) {
     StringBuffer sbJson = StringBuffer();
-    for (int i = 0; i < deviceList[g.lbMac]!.length; i++) {
+    for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       if (sbJson.isNotEmpty) sbJson.write(',');
 
       sbJson.write('''
-{ "host-name" : "${deviceList[g.lbHost]![i]}", "mac-address" : "${deviceList[g.lbMac]![i]}", "address" : "${deviceList[g.lbIp]![i]}" }''');
+{ "host-name" : "${leaseMap[g.lbHost]![i]}", "mac-address" : "${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)}", "address" : "${leaseMap[g.lbIp]![i]}" }''');
     }
     return "[ ${sbJson.toString()} ]";
   }
@@ -91,7 +104,8 @@ Unable to extract static leases from File, file may not be proper json format, $
         return false;
       }
 
-      g.validateLeases.validateLeaseList(leaseMap, g.fFormats.json.formatName);
+      g.validateLeases
+          .isLeaseMapListValid(leaseMap, g.fFormats.json.formatName);
 
       return true;
     } on FormatException {

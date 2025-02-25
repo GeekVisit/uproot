@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 export 'abstract_file_type.dart';
@@ -16,5 +16,6 @@ export 'mikrotik.dart';
 export 'open_wrt.dart';
 export 'opnsense.dart';
 export 'pfsense.dart';
+export 'pihole.dart';
 
 export 'validate_leases.dart';

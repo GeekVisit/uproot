@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 import 'package:xml/xml.dart';
 
@@ -104,10 +104,11 @@ Unable to extract static leases from file, file may not be proper pfSense XML fo
     }
   }
 
-  String build(Map<String, List<String>?> leaseMap) {
+  @override
+  String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     try {
       dynamic mergeTargetFileType = (g.argResults['merge'] != null)
-          ? g.cliArgs.getFormatTypeOfFile(getGoodPath(g.argResults['merge']))
+          ? g.cliArgs.getInputTypeAbbrev(getGoodPath(g.argResults['merge']))
           : "";
 
       StringBuffer sbPf = StringBuffer();
@@ -150,7 +151,7 @@ Unable to extract static leases from file, file may not be proper pfSense XML fo
         return false;
       }
       g.validateLeases
-          .validateLeaseList(leaseMap, g.fFormats.pfsense.formatName);
+          .isLeaseMapListValid(leaseMap, g.fFormats.pfsense.formatName);
 
       return true;
     } on Exception catch (e) {

@@ -1,5 +1,29 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
+
+
+
+/// A class that handles updating and verifying metadata in Dart projects.
+///
+/// The `MetaUpdate` class provides functionality to read metadata from a 
+/// `pubspec.yaml` file, write metadata to a Dart file, and verify if the 
+/// metadata in the Dart file matches the `pubspec.yaml`.
+///
+/// Example usage:
+/// ```dart
+/// MetaUpdate metaUpdate = MetaUpdate('path/to/pubspec.yaml');
+/// metaUpdate.writeMetaDartFile('lib/src/meta.dart');
+/// int result = metaUpdate.verifyCodeHasUpdatedMeta();
+/// ```
+///
+/// The class has the following methods:
+///
+/// - `writeMetaDartFile(String metaDartFilePath)`: Writes metadata to the 
+///   specified Dart file.
+/// - `getPubSpec(String pubSpecParam)`: Retrieves a specific parameter from 
+///   the `pubspec.yaml` file.
+/// - `verifyCodeHasUpdatedMeta()`: Verifies if the metadata in the Dart file 
+///   matches the `pubspec.yaml` and updates the Dart file if necessary.
 
 import 'dart:io';
 import 'package:yaml/yaml.dart';

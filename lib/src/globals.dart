@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'dart:io';
@@ -37,6 +37,7 @@ Map<String, FileType> inputTypeCl = <String, FileType>{
   fFormats.openwrt.abbrev: OpenWrt(),
   fFormats.pfsense.abbrev: PfSense(),
   fFormats.opnsense.abbrev: OpnSense(),
+  fFormats.pihole.abbrev: PiHole(),
 };
 
 Map<String, String> typeOptionToName = <String, String>{
@@ -46,17 +47,19 @@ Map<String, String> typeOptionToName = <String, String>{
   fFormats.mikrotik.abbrev: fFormats.mikrotik.formatName,
   fFormats.openwrt.abbrev: fFormats.openwrt.formatName,
   fFormats.pfsense.abbrev: fFormats.pfsense.formatName,
-  fFormats.opnsense.abbrev: fFormats.opnsense.formatName
+  fFormats.opnsense.abbrev: fFormats.opnsense.formatName,
+  fFormats.pihole.abbrev: fFormats.pihole.formatName
 };
 
-Map<String, String> extToTypes = <String, String>{
+Map<String, String> extToAbbrev = <String, String>{
   fFormats.csv.fileExt: fFormats.csv.abbrev,
   fFormats.ddwrt.fileExt: fFormats.ddwrt.abbrev,
   fFormats.json.fileExt: fFormats.json.abbrev,
   fFormats.mikrotik.fileExt: fFormats.mikrotik.abbrev,
   fFormats.openwrt.fileExt: fFormats.openwrt.abbrev,
   fFormats.pfsense.fileExt: fFormats.pfsense.abbrev,
-  fFormats.opnsense.fileExt: fFormats.opnsense.abbrev
+  fFormats.opnsense.fileExt: fFormats.opnsense.abbrev,
+  fFormats.pihole.fileExt: fFormats.pihole.abbrev
 };
 
 enum fFormats {
@@ -67,7 +70,19 @@ enum fFormats {
   openwrt,
   pfsense,
   opnsense,
+  pihole,
 }
+
+Map<dynamic, String> macDelimiter = <dynamic, String>{
+  fFormats.csv.formatName: '|',
+  fFormats.ddwrt.formatName: ':',
+  fFormats.json.formatName: '|',
+  fFormats.mikrotik.formatName: ':',
+  fFormats.opnsense.formatName: ':',
+  fFormats.openwrt.formatName: ':',
+  fFormats.pfsense.formatName: ':',
+  fFormats.pihole.formatName: '-',
+};
 
 extension FileFormatProps on fFormats {
   static const Map<dynamic, String> abbrevs = <dynamic, String>{
@@ -78,7 +93,10 @@ extension FileFormatProps on fFormats {
     fFormats.opnsense: 'n',
     fFormats.openwrt: 'o',
     fFormats.pfsense: 'p',
+    fFormats.pihole: 'h',
   };
+
+//these are the Required delimiters for each format. the "|" means either colon or -
 
   static const Map<dynamic, String> fileExts = <dynamic, String>{
     fFormats.csv: '.csv',
@@ -88,6 +106,7 @@ extension FileFormatProps on fFormats {
     fFormats.opnsense: '-opn.xml',
     fFormats.openwrt: '.openwrt',
     fFormats.pfsense: '-pfs.xml',
+    fFormats.pihole: '-pihole.conf',
   };
 
   static const Map<dynamic, String> formatNames = <dynamic, String>{
@@ -98,6 +117,7 @@ extension FileFormatProps on fFormats {
     fFormats.opnsense: 'OPNsense',
     fFormats.openwrt: 'OpenWrt',
     fFormats.pfsense: 'pfSense',
+    fFormats.pihole: 'piHole',
   };
 
   String get abbrev => abbrevs[this]!;

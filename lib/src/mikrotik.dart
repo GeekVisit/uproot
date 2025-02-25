@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import '../lib.dart';
@@ -14,8 +14,6 @@ class Mikrotik extends FileType {
       List<String>? fileLines,
       bool removeBadLeases = true}) {
     try {
-      List<String> fileLines = extractLeaseMatches(fileContents);
-
       Map<String, List<String>> leaseMap = <String, List<String>>{
         g.lbHost: <String>[],
         g.lbMac: <String>[],
@@ -27,15 +25,47 @@ class Mikrotik extends FileType {
         return leaseMap;
       }
 
-      leaseMap[g.lbHost] = extractLeaseParam(fileLines, g.lbHost);
-      leaseMap[g.lbMac] = extractLeaseParam(fileLines, g.lbMac);
-      leaseMap[g.lbIp] = extractLeaseParam(fileLines, g.lbIp);
+      fileLines = fileContents.split("\n");
 
-      //fill up empty host names with empty strings
-      if (leaseMap[g.lbHost]!.isEmpty) {
-        for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
-          leaseMap[g.lbHost]!.add("");
+      /// Parses lines from a file to extract IP addresses, MAC addresses, and host names,
+      /// and adds them to the `leaseMap`.
+      ///
+      /// Each line is expected to contain an IP address, MAC address, and host name in the
+      /// following formats:
+      /// - IP address: `address=xxx.xxx.xxx.xxx`
+      /// - MAC address: `mac-address=xx:xx:xx:xx:xx:xx`
+      /// - Host name: `host-name=hostname`
+      ///
+      /// If a host name is not found, the MAC address with colons replaced by hyphens is used as the host name.
+      ///
+      /// The extracted values are added to the `leaseMap` under the keys `g.lbIp`, `g.lbMac`, and `g.lbHost`.
+      ///
+      /// - Parameters:
+      ///   - fileLines: A list of strings representing lines from the file.
+      ///   - leaseMap: A map where the extracted values will be added.
+      ///   - g.lbIp: The key for storing IP addresses in the `leaseMap`.
+      ///   - g.lbMac: The key for storing MAC addresses in the `leaseMap`.
+      ///   - g.lbHost: The key for storing host names in the `leaseMap`.
+      for (var line in fileLines) {
+        final ipMatch = RegExp(r'\saddress\s*=\s*((?:\d{1,3}\.){3}\d{1,3})')
+            .firstMatch(line);
+        final macMatch =
+            RegExp(r'mac-address=(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))')
+                .firstMatch(line);
+        final hostMatch = RegExp(r'host-name=([\w\-\.]+)').firstMatch(line);
+
+        //skip lines that don't have ip or mac addresses
+        if (ipMatch == null || macMatch == Null) {
+          continue;
         }
+
+        final ip = ipMatch.group(1) ?? '';
+        final mac = macMatch?.group(1) ?? '';
+        final host = hostMatch?.group(1) ?? mac.replaceAll(':', '-');
+
+        leaseMap[g.lbIp]!.add(ip);
+        leaseMap[g.lbMac]!.add(mac);
+        leaseMap[g.lbHost]!.add(host);
       }
 
       if (removeBadLeases) {
@@ -50,11 +80,12 @@ class Mikrotik extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList) {
+  @override
+  String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     StringBuffer sbMikrotik = StringBuffer();
-    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
+    for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
       sbMikrotik.write(
-          """\nadd mac-address=${deviceList[g.lbMac]?[x]} address=${deviceList[g.lbIp]?[x]} server=${g.argResults['server']}""");
+          """\nadd mac-address=${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)} address=${leaseMap[g.lbIp]?[x]} server=${g.argResults['server']}""");
     }
     return "/ip dhcp-server lease\n${sbMikrotik.toString().trim()}";
   }
@@ -82,52 +113,12 @@ class Mikrotik extends FileType {
       }
 
       g.validateLeases
-          .validateLeaseList(leaseMap, g.fFormats.mikrotik.formatName);
+          .isLeaseMapListValid(leaseMap, g.fFormats.mikrotik.formatName);
 
       return true;
     } on Exception catch (e) {
       printMsg(e, errMsg: true);
       return false;
-    }
-  }
-
-//find parameters with values around =
-  List<String> extractLeaseMatches(String inFileContents) {
-    try {
-
-      RegExp regExp = RegExp(r"(\S*?=\S*?\s|\S*?$)");
-      //Get List of all Parameters/Values separated by equals
-      List<String> importList = regExp
-          .allMatches(inFileContents)
-          .map((dynamic m) => m[0].trim().toString())
-          .toList();
-      return importList;
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
-      rethrow;
-    }
-  }
-
-  List<String> extractLeaseParam(List<String>? importList, String paramType) {
-    try {
-      List<String> leaseParamList = <String>[];
-
-      List<dynamic> param = importList!
-          .where((dynamic element) => (paramType == g.lbIp
-              ? element.contains(g.lbIp) && !element.contains(g.lbMac)
-              : element.contains(paramType)))
-          //.where((dynamic element) => (element.contains(paramType)))
-          .map((dynamic e) => (e.split("=")))
-          .toList();
-
-      for (dynamic element in param) {
-        leaseParamList.add(element[1].toString());
-      }
-
-      return leaseParamList;
-    } on Exception catch (e) {
-      printMsg(e, errMsg: true);
-      rethrow;
     }
   }
 

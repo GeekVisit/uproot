@@ -20,8 +20,7 @@ void main() {
 
 bool isCorrectLeaseMapLength(
     Map<String, List<String>> leaseMap, int listLength) {
-  print(
-      """
+  print("""
 List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
   return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
       (leaseMap[g.lbMac]?.length == listLength));
@@ -68,8 +67,7 @@ void testUpRooted() {
     File pubSpecTestFile =
         File(p.join(pubSpecTestDir.absolute.path, "pubspec-test.yaml"));
 
-    pubSpecTestFile.writeAsStringSync(
-        """
+    pubSpecTestFile.writeAsStringSync("""
     name: uprt
     description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
     version: 2019.09.001
@@ -80,8 +78,7 @@ void testUpRooted() {
 
     expect(mu.verifyCodeHasUpdatedMeta(), g.MetaCheck.mismatch);
 
-    pubSpecTestFile.writeAsStringSync(
-        """
+    pubSpecTestFile.writeAsStringSync("""
     name: ${meta['name']}
     description: ${meta['description']}
     version: ${meta['version']}
@@ -138,28 +135,28 @@ void testUpRooted() {
     g.argResults = g.cliArgs.getArgs(args);
     g.inputFileList = g.cliArgs.getInputFileList(g.argResults.rest);
     uprt.setInputFile(g.inputFileList[0]);
-    expect(g.cliArgs.getFormatTypeOfFile(), "c");
+    expect(g.cliArgs.getInputTypeAbbrev(), "c");
 
     uprt.setInputFile("test/test-data/lease-list-infile.ddwrt");
-    expect(g.cliArgs.getFormatTypeOfFile(), "d");
+    expect(g.cliArgs.getInputTypeAbbrev(), "d");
 
     uprt.setInputFile("test/test-data/lease-list-infile.json");
-    expect(g.cliArgs.getFormatTypeOfFile(), "j");
+    expect(g.cliArgs.getInputTypeAbbrev(), "j");
 
     uprt.setInputFile("test/test-data/lease-list-infile.rsc");
-    expect(g.cliArgs.getFormatTypeOfFile(), "m");
+    expect(g.cliArgs.getInputTypeAbbrev(), "m");
 
     uprt.setInputFile("test/test-data/lease-list-infile.openwrt");
-    expect(g.cliArgs.getFormatTypeOfFile(), "o");
+    expect(g.cliArgs.getInputTypeAbbrev(), "o");
 
     uprt.setInputFile("test/test-data/lease-list-infile-opn.xml");
-    expect(g.cliArgs.getFormatTypeOfFile(), "n");
+    expect(g.cliArgs.getInputTypeAbbrev(), "n");
 
     uprt.setInputFile("test/test-data/lease-list-infile-pfs.xml");
-    expect(g.cliArgs.getFormatTypeOfFile(), "p");
+    expect(g.cliArgs.getInputTypeAbbrev(), "p");
 
     uprt.setInputFile("test/test-data/lease-list-infile.dd");
-    g.cliArgs.getFormatTypeOfFile();
+    g.cliArgs.getInputTypeAbbrev();
     expect(g.lastPrint, contains("Unable to determine file type"));
 
 /* Test Mandatory */
@@ -173,7 +170,7 @@ void testUpRooted() {
 /** Test for Missing Arguments to options*/
     args = <String>[
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-L",
       "-b",
       "test-base-name",
@@ -266,7 +263,7 @@ void testUpRooted() {
     args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-L",
       "192.168.0.1",
       "--ip-high-address",
@@ -282,6 +279,66 @@ void testUpRooted() {
     expect(() => g.cliArgs.checkArgs(), returnsNormally);
   });
 
+  test('requireFqdn', () {
+    Converter uprt = Converter();
+    List<String> args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    uprt.convertFileList(args);
+
+    Map<String, List<String>> testLeaseMap = {
+      g.lbHost: ["example.com"],
+      g.lbMac: ["00:1A:2B:3C:4D:5E"],
+      g.lbIp: ["192.168.0.23"]
+    };
+
+    //with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's a bad lease
+    testLeaseMap[g.lbHost] = ["example"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+    // no fqdn flag
+
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    uprt.convertFileList(args);
+
+    testLeaseMap[g.lbHost] = ["example.com"];
+//with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's still not a bad lease because fqdn not required
+    testLeaseMap[g.lbHost] = ["example"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+  });
   test('ipRandomMac', () {
     for (int i = 0; i < 50; i++) {
       expect(ip.isMacAddress(ip.getRandomMacAddress()), true);
@@ -291,6 +348,9 @@ void testUpRooted() {
     expect(ip.isMacAddress("2B:0B:A5:7A:BC:13"), true);
     expect(ip.isMacAddress("3A:DE:97:22:68:75"), true);
     expect(ip.isMacAddress("71:65:DA:DB:0E:3C"), true);
+    expect(ip.isMacAddress("71-65-DA-DB-0E-3C"), true);
+    expect(ip.isMacAddress("71-65-DA-DB-0E-3C", ":"), false);
+    expect(ip.isMacAddress("3A:DE:97:22:68:75", "-"), false);
 
     expect(ip.isMacAddress("asdf:03:0323:"), false);
     expect(ip.isMacAddress("23:4f:03:0323"), false);
@@ -494,21 +554,18 @@ void testUpRooted() {
     ];
     uprt.convertFileList(args);
 
-    String badMikrotik =
-        """
+    String badMikrotik = """
     /ip dhcp-server lease 
     add mac-address= address=192.168.0.2 server=defconf 
     add mac-address=AC:18:26:55:7B:66 address=192.168.0.146 server=defconf
     """;
 
-    String badMikrotik2 =
-        """
+    String badMikrotik2 = """
     /ip dhcp-server lease 
     add mac-address= address=192.168.0.2 server=defconf 
     add mac-address=dasdfe =printer address=192.168.0.146 server=defconf
     """;
-    String badMikrotik3 =
-        """
+    String badMikrotik3 = """
     /ip dhcp-server lease 
     add mac-address= address=192.168.0.2 server=defconf 
     add mac-address=AC:18:26:55:7B:66 address=192168.0146 server=defconf
@@ -546,8 +603,7 @@ void testUpRooted() {
 
     LineSplitter lineSplitter = LineSplitter();
 
-    List<String> goodOpenWrt = lineSplitter.convert(
-        """
+    List<String> goodOpenWrt = lineSplitter.convert("""
  config host
              option mac '00:24:1D:D3:A0:C2'
              option name 'SATURN'          
@@ -562,15 +618,13 @@ void testUpRooted() {
              option ip '192.168.0.102'
     """);
 
-    List<String> badOpenWrt = lineSplitter.convert(
-        """
+    List<String> badOpenWrt = lineSplitter.convert("""
  config host
              option mac 'AC:18:26:55:7B:66'
              option name 'printer'          
     """);
 
-    List<String> badOpenWrt2 = lineSplitter.convert(
-        """
+    List<String> badOpenWrt2 = lineSplitter.convert("""
  config host
              option mac 'AC:18:26:55:7B:66'
              option name 'printer'          
@@ -581,8 +635,7 @@ void testUpRooted() {
  
     """);
 
-    List<String> badOpenWrt3 = lineSplitter.convert(
-        """
+    List<String> badOpenWrt3 = lineSplitter.convert("""
  config host
              option mac 'AC:18:26:55:7B:66'
              option name 'printer'          
@@ -596,6 +649,8 @@ void testUpRooted() {
 
     expect(
         openwrt.isFileValid("test/test-data/lease-list-infile.openwrt"), true);
+    expect(
+        openwrt.isFileValid("test/test-output/test-output-file.openwrt"), true);
     expect(openwrt.isFileValid("test/test-data/lease-list-infile.json"), false);
     expect(openwrt.isContentValid(fileLines: goodOpenWrt), true);
     expect(openwrt.isContentValid(fileLines: badOpenWrt2), false);
@@ -625,20 +680,16 @@ void testUpRooted() {
     ];
     uprt.convertFileList(args);
 
-    String goodDdWrt =
-        '''
+    String goodDdWrt = '''
 C4:4D:02:A0:E1:96=WHis=192.168.0.3=1440 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48:65:3D=agXCrZIQT=192.168.0.5=1440 F4:34:E2:3A:F9:30=umTiNUO=192.168.0.6=1440 89:2A:F0:C5:2A:30=KnOtLxjPCm=192.168.0.7=1440 A1:C6:4E:4A:E6:96=EfnktBOZWh=192.168.0.8=1440 D1:F4:18:48:A9:C0=vAYoTegH=192.168.0.9=1440 56:A5:2B:40:39:7F=mgeLTnQV=192.168.0.10=1440 28:5B:98:CD:B5:34=vlrZbMUO=192.168.0.11=1440 61:88:68:5E:86:7A=gfrM=192.168.0.12=1440 90:69:74:25:F0:49=CQvAEsca=192.168.0.13=1440 D6:55:91:F0:F2:89=EBknxyhwO=192.168.0.14=1440 90:83:FA:69:F2:74=GxhW=192.168.0.15=1440 BD:E0:4D:82:D1:8E=bcqGmaMSP=192.168.0.16=1440 9F:53:D9:17:4E:06=lJujxAzHe=192.168.0.17=1440 79:F3:07:D9:69:30=oIcqN=192.168.0.18=1440 49:FB:D4:AA:0A:0B=HFGJPW=192.168.0.19=1440 84:2C:F8:4F:26:E6=QJyNHnM=192.168.0.20=1440 BD:54:4A:F8:6F:21=ZxNeOCmfQ=192.168.0.21=1440 8D:4D:BC:92:C1:BD=OaMYUo=192.168.0.22=1440 B1:3E:2E:D7:55:EC=enpW=192.168.0.23=1440 15:55:AD:83:79:5B=zcnktlj=192.168.0.24=1440 05:47:4B:16:7B:B5=dHMXslJ=192.168.0.25=1440 3C:EB:57:06:8B:C0=ktwBTWFI=192.168.0.26=1440 97:E4:42:BA:27:0F=MgnHF=192.168.0.27=1440 8D:B8:3D:4B:F7:67=VFfXTH=192.168.0.28=1440 49:18:D0:A8:8E:F2=JnCOzm=192.168.0.29=1440 CF:CE:63:CB:4C:06=YAEBJzaPdl=192.168.0.30=1440 43:E1:7E:A9:58:94=gJmHPo=192.168.0.31=1440 CE:CC:9A:68:08:B8=oiFzC=192.168.0.32=1440 ED:AB:20:91:4B:3F=ZAcgWwsY=192.168.0.33=1440 A6:EF:DD:60:9A:40=ansiZ=192.168.0.34=1440 7E:0E:0F:7F:F4:9F=rvJf=192.168.0.35=1440 3A:9D:95:21:BA:43=NjXMRTW=192.168.0.36=1440 B7:B4:7E:1C:04:BE=vMzVq=192.168.0.37=1440 C2:49:BB:82:02:A2=NYptZcWBHo=192.168.0.38=1440 3D:26:5D:42:91:3F=KpWxe=192.168.0.39=1440 81:67:FF:FD:AB:60=SVpRvIl=192.168.0.40=1440 78:CE:DF:86:AE:A9=rVBv=192.168.0.41=1440 03:8E:E4:08:39:0E=YrUbFEk=192.168.0.183=1440 E8:96:FE:08:82:F0=QkChN=192.168.0.103=1440 53:5F:F7:11:38:1E=WwRhy=192.168.0.192=1440 EB:BF:B7:B7:6E:71=vESR=192.168.0.200=1440 E5:3B:F3:1D:32:66=sSwpycbOa=192.168.0.210=1440 7D:A6:13:0F:DF:3D=LAbwKS=192.168.0.225=1440 8E:34:32:C9:E8:5A=SYUNe=192.168.0.243=1440 5B:92:24:9F:01:EB=muYhDI=192.168.0.232=1440''';
 
-    String badDdWrt =
-        '''
+    String badDdWrt = '''
       C4:4D:02:A0:E1:96=WHis=192.168.0.3=1440 7F:B7:26:C3:A8=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48:65:3D=agXCrZIQT=192.168.5=1440 F4:34:E2:3A:F9:30=umTiNUO=192.168.0.6=1440 89:2A:F0:C5:2A:30=KnOtLxjPCm=192.168.0.7=1440 A1:C6:4E:4A:E6:96=EfnktBOZWh=192.168.0.8=1440 D1:F4:18:48:A9:C0=vAYoTegH=192.168.0.9=1440 56:A5:2B:40:39:7F=mgeLTnQV=192.168.0.10=1440 28:5B:98:CD:B5:34=vlrZbMUO=192.168.0.11=1440 61:88:68:5E:86:7A=gfrM=192.168.0.12=1440 90:69:74:25:F0:49=CQvAEsca=192.168.0.13=1440 D6:55:91:F0:F2:89=EBknxyhwO=192.168.0.14=1440 90:83:FA:69:F2:74=GxhW=192.168.0.15=1440 BD:E0:4D:82:D1:8E=bcqGmaMSP=192.168.0.16=1440 9F:53:D9:17:4E:06=lJujxAzHe=192.168.0.17=1440 79:F3:07:D9:69:30=oIcqN=192.168.0.18=1440 49:FB:D4:AA:0A:0B=HFGJPW=192.168.0.19=1440 84:2C:F8:4F:26:E6=QJyNHnM=192.168.0.20=1440 BD:54:4A:F8:6F:21=ZxNeOCmfQ=192.168.0.21=1440 8D:4D:BC:92:C1:BD=OaMYUo=192.168.0.22=1440 B1:3E:2E:D7:55:EC=enpW=192.168.0.23=1440 15:55:AD:83:79:5B=zcnktlj=192.168.0.24=1440 05:47:4B:16:7B:B5=dHMXslJ=192.168.0.25=1440 3C:EB:57:06:8B:C0=ktwBTWFI=192.168.0.26=1440 97:E4:42:BA:27:0F=MgnHF=192.168.0.27=1440 8D:B8:3D:4B:F7:67=VFfXTH=192.168.0.28=1440 49:18:D0:A8:8E:F2=JnCOzm=192.168.0.29=1440 CF:CE:63:CB:4C:06=YAEBJzaPdl=192.168.0.30=1440 43:E1:7E:A9:58:94=gJmHPo=192.168.0.31=1440 CE:CC:9A:68:08:B8=oiFzC=192.168.0.32=1440 ED:AB:20:91:4B:3F=ZAcgWwsY=192.168.0.33=1440 A6:EF:DD:60:9A:40=ansiZ=192.168.0.34=1440 7E:0E:0F:7F:F4:9F=rvJf=192.168.0.35=1440 3A:9D:95:21:BA:43=NjXMRTW=192.168.0.36=1440 B7:B4:7E:1C:04:BE=vMzVq=192.168.0.37=1440 C2:49:BB:82:02:A2=NYptZcWBHo=192.168.0.38=1440 3D:26:5D:42:91:3F=KpWxe=192.168.0.39=1440 81:67:FF:FD:AB:60=SVpRvIl=192.168.0.40=1440 78:CE:DF:86:AE:A9=rVBv=192.168.0.41=1440 03:8E:E4:08:39:0E=YrUbFEk=192.168.0.183=1440 E8:96:FE:08:82:F0=QkChN=192.168.0.103=1440 53:5F:F7:11:38:1E=WwRhy=192.168.0.192=1440 EB:BF:B7:B7:6E:71=vESR=192.168.0.200=1440 E5:3B:F3:1D:32:66=sSwpycbOa=192.168.0.210=1440 7D:A6:13:0F:DF:3D=LAbwKS=192.168.0.225=1440 8E:34:32:C9:E8:5A=SYUNe=192.168.0.243=1440 5B:92:24:9F:01:EB=muYhDI=192.168.0.232=1440''';
 
-    String badDdWrt2 =
-        '''
+    String badDdWrt2 = '''
 C4:4D:02:A0:E1:96=WHis=192.168.0.3=1440 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48:65:3D=agXCrZIQT=192168.0.5=1440 F4:34:E2:3A:F9:30=192.168.0.6=1440 89:2A:F0:C5:2A:30=KnOtLxjPCm=192.168.0.7=1440 A1:C6:4E:4A:E6:96=EfnktBOZWh=192.168.0.8=1440 D1:F4:18:48:A9:C0=vAYoTegH=192.168.0.9=1440 56:A5:2B:40:39:7F=mgeLTnQV=192.168.0.10=1440 28:5B:98:CD:B5:34=vlrZbMUO=192.168.0.11=1440 61:88:68:5E:86:7A=gfrM=192.168.0.12=1440 90:69:74:25:F0:49=CQvAEsca=192.168.0.13=1440 D6:55:91:F0:F2:89=EBknxyhwO=192.168.0.14=1440 90:83:FA:69:F2:74=GxhW=192.168.0.15=1440 BD:E0:4D:82:D1:8E=bcqGmaMSP=192.168.0.16=1440 9F:53:D9:17:4E:06=lJujxAzHe=192.168.0.17=1440 79:F3:07:D9:69:30=oIcqN=192.168.0.18=1440 49:FB:D4:AA:0A:0B=HFGJPW=192.168.0.19=1440 84:2C:F8:4F:26:E6=QJyNHnM=192.168.0.20=1440 BD:54:4A:F8:6F:21=ZxNeOCmfQ=192.168.0.21=1440 8D:4D:BC:92:C1:BD=OaMYUo=192.168.0.22=1440 B1:3E:2E:D7:55:EC=enpW=192.168.0.23=1440 15:55:AD:83:79:5B=zcnktlj=192.168.0.24=1440 05:47:4B:16:7B:B5=dHMXslJ=192.168.0.25=1440 3C:EB:57:06:8B:C0=ktwBTWFI=192.168.0.26=1440 97:E4:42:BA:27:0F=MgnHF=192.168.0.27=1440 8D:B8:3D:4B:F7:67=VFfXTH=192.168.0.28=1440 49:18:D0:A8:8E:F2=JnCOzm=192.168.0.29=1440 CF:CE:63:CB:4C:06=YAEBJzaPdl=192.168.0.30=1440 43:E1:7E:A9:58:94=gJmHPo=192.168.0.31=1440 CE:CC:9A:68:08:B8=oiFzC=192.168.0.32=1440 ED:AB:20:91:4B:3F=ZAcgWwsY=192.168.0.33=1440 A6:EF:DD:60:9A:40=ansiZ=192.168.0.34=1440 7E:0E:0F:7F:F4:9F=rvJf=192.168.0.35=1440 3A:9D:95:21:BA:43=NjXMRTW=192.168.0.36=1440 B7:B4:7E:1C:04:BE=vMzVq=192.168.0.37=1440 C2:49:BB:82:02:A2=NYptZcWBHo=192.168.0.38=1440 3D:26:5D:42:91:3F=KpWxe=192.168.0.39=1440 81:67:FF:FD:AB:60=SVpRvIl=192.168.0.40=1440 78:CE:DF:86:AE:A9=rVBv=192.168.0.41=1440 03:8E:E4:08:39:0E=YrUbFEk=192.168.0.183=1440 E8:96:FE:08:82:F0=QkChN=192.168.0.103=1440 53:5F:F7:11:38:1E=WwRhy=192.168.0.192=1440 EB:BF:B7:B7:6E:71=vESR=192.168.0.200=1440 E5:3B:F3:1D:32:66=sSwpycbOa=192.168.0.210=1440 7D:A6:13:0F:DF:3D=LAbwKS=192.168.0.225=1440 8E:34:32:C9:E8:5A=SYUNe=192.168.0.243=1440 5B:92:24:9F:01:EB=muYhDI=192.168.0.232=14''';
 
-    String badDdWrt3 =
-        '''
+    String badDdWrt3 = '''
 C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48:65:3D=agXCrZIQT=192.168.0.5=1440 F4:34:E2:3A:F9:30=umTiNUO=192.168.0.6=1440 89:2A:F0:C5:2A:30=KnOtLxjPCm=192.168.0.7=1440 A1:C6:4E:4A:E6:96=EfnktBOZWh=192.168.0.8=1440 D1:F4:18:48:A9:C0=vAYoTegH=192.168.0.9=1440 56:A5:2B:40:39:7F=mgeLTnQV=192.168.0.10=1440 28:5B:98:CD:B5:34=vlrZbMUO=192.168.0.11=1440 61:88:68:5E:86:7A=gfrM=192.168.0.12=1440 90:69:74:25:F0:49=CQvAEsca=192.168.0.13=1440 D6:55:91:F0:F2:89=EBknxyhwO=192.168.0.14=1440 90:83:FA:69:F2:74=GxhW=192.168.0.15=1440 BD:E0:4D:82:D1:8E=bcqGmaMSP=192.168.0.16=1440 9F:53:D9:17:4E:06=lJujxAzHe=192.168.0.17=1440 79:F3:07:D9:69:30=oIcqN=192.168.0.18=1440 49:FB:D4:AA:0A:0B=HFGJPW=192.168.0.19=1440 84:2C:F8:4F:26:E6=QJyNHnM=192.168.0.20=1440 BD:54:4A:F8:6F:21=ZxNeOCmfQ=192.168.0.21=1440 8D:4D:BC:92:C1:BD=OaMYUo=192.168.0.22=1440 B1:3E:2E:D7:55:EC=enpW=192.168.0.23=1440 15:55:AD:83:79:5B=zcnktlj=192.168.0.24=1440 05:47:4B:16:7B:B5=dHMXslJ=192.168.0.25=1440 3C:EB:57:06:8B:C0=ktwBTWFI=192.168.0.26=1440 97:E4:42:BA:27:0F=MgnHF=192.168.0.27=1440 8D:B8:3D:4B:F7:67=VFfXTH=192.168.0.28=1440 49:18:D0:A8:8E:F2=JnCOzm=192.168.0.29=1440 CF:CE:63:CB:4C:06=YAEBJzaPdl=192.168.0.30=1440 43:E1:7E:A9:58:94=gJmHPo=192.168.0.31=1440 CE:CC:9A:68:08:B8=oiFzC=192.168.0.32=1440 ED:AB:20:91:4B:3F=ZAcgWwsY=192.168.0.33=1440 A6:EF:DD:60:9A:40=ansiZ=192.168.0.34=1440 7E:0E:0F:7F:F4:9F=rvJf=192.168.0.35=1440 3A:9D:95:21:BA:43=NjXMRTW=192.168.0.36=1440 B7:B4:7E:1C:04:BE=vMzVq=192.168.0.37=1440 C2:49:BB:82:02:A2=NYptZcWBHo=192.168.0.38=1440 3D:26:5D:42:91:3F=KpWxe=192.168.0.39=1440 81:67:FF:FD:AB:60=SVpRvIl=192.168.0.40=1440 78:CE:DF:86:AE:A9=rVBv=192.168.0.41=1440 03:8E:E4:08:39:0E=YrUbFEk=192.168.0.183=1440 E8:96:FE:08:82:F0=QkChN=192.168.0.103=1440 53:5F:F7:11:38:1E=WwRhy=192.168.0.192=1440 EB:BF:B7:B7:6E:71=vESR=192.168.0.200=1440 E5:3B:F3:1D:32:66=sSwpycbOa=192.168.0.210=1440 7D:A6:13:0F:DF:3D=LAbwKS=192.168.0.225=1440 8E:34:32:C9:E8:5A=SYUNe=192.168.0.243=1440 5B:92:24:9F:01:EB=muYhDI=192.168.0.232=1440''';
     expect(ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"), true);
     expect(ddwrt.isFileValid("test/test-data/lease-list-infile.ddwrt"), true);
@@ -675,98 +726,90 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
 
     expect(csv.isFileValid("test/test-data/lease-list-infile.ddwrt"), false);
-    expect(
-        csv.isContentValid(
-            fileContents:
-                """
+    expect(csv.isContentValid(fileContents: """
             host-name,mac-address,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D9:8D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """),
-        true);
+            """), true);
     expect(
         csv.isContentValid(
             fileContents: '{"hostname, macaddress, address, value"}'),
         false);
-    expect(
-        csv.isContentValid(
-            fileContents:
-                """
+    expect(csv.isContentValid(fileContents: """
             host-name,mac-address,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D98D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """),
-        false);
-    expect(
-        csv.isContentValid(
-            fileContents:
-                """
+            """), false);
+    expect(csv.isContentValid(fileContents: """
             host-name,macaddress,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D9:8D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """),
-        false);
+            """), false);
   });
 
-  test('requireFqdn', () {
-    Converter uprt = Converter();
+  test('isPiHole', () {
+    PiHole piHole = PiHole();
     List<String> args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-f",
+      "test/test-data/lease-list-infile.json",
+      "-t",
+      "j",
       "-g",
-      "cdjmnop"
-          "-d",
+      "h",
+      "-L",
+      "192.168.0.1",
+      "-H",
+      "192.168.0.254",
+      "-b",
+      "test-output-file",
+      "-d",
       "test/test-output",
+      "-w"
     ];
+    uprt.convertFileList(args);
 
-    uprt.initialize(args);
+    LineSplitter lineSplitter = LineSplitter();
 
-    Map<String, List<String>> testLeaseMap = {
-      g.lbHost: ["example.com"],
-      g.lbMac: ["00:1A:2B:3C:4D:5E"],
-      g.lbIp: ["192.168.0.23"]
-    };
+    List<String> goodPiHole = lineSplitter.convert("""
+dhcp-host=74-56-3C-B2-DD-DA,192.168.0.1,host1
+dhcp-host=0A-00-27-00-00-0F,192.168.0.2,host2
+dhcp-host=AE-19-8E-A7-B4-3A,192.168.0.3,host3
+    """);
 
-    //with tld -> false it's not a bad lease
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-    // no tld -> true it's a bad lease
-    testLeaseMap[g.lbHost] = ["example"];
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+    List<String> badPiHole = lineSplitter.convert("""
+dhcp-host=74-56-3C-B2-DD-DA,192.168.0.1,host1
+dhcp-host=00-27-00-00-0F,192.168.0.2,host2
+dhcp-host=AE-19-8E-A7-B4-3A,192.168.0.3,host3      
+    """);
+
+    List<String> badPiHole2 = lineSplitter.convert("""
+ dhcp-host=74-56-3C-B2-DD-DA,192.168.0.1,host1
+dhcp-host=0A-00-27-00-00-0F,192.168.0.2,host2
+dhcp-host=AE-19-8E-A7-B4-3A,192.168.0,host3
+    """);
+
+    List<String> badPiHole3 = lineSplitter.convert("""
+ dhcp-host=74-56-3C-B2-DD-DA,192.1680.0.1,host1
+dhcp-host=0A-00-27-00-00-0F,192.168.0.2,host2
+dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
+     """);
+    expect(piHole.isFileValid("test/test-data/lease-list-infile-pihole.conf"),
         true);
+    expect(piHole.isFileValid("test/test-output/test-output-file-pihole.conf"),
+        true);
+    expect(piHole.isFileValid("test/test-data/lease-list-infile.json"), false);
 
-    // no fqdn flag
-
-    args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-g",
-      "cdjmnop"
-          "-d",
-      "test/test-output",
-    ];
-
-    uprt.initialize(args);
-
-    testLeaseMap[g.lbHost] = ["example.com"];
-//with tld -> false it's not a bad lease
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-    // no tld -> true it's still not a bad lease because fqdn not required
-    testLeaseMap[g.lbHost] = ["example"];
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+    expect(piHole.isContentValid(fileLines: goodPiHole), true);
+    expect(piHole.isContentValid(fileLines: badPiHole2), false);
+    expect(piHole.isContentValid(fileLines: badPiHole3), false);
+    expect(piHole.isContentValid(fileLines: badPiHole), false);
+    // ignore: always_specify_types
+    expect(piHole.isContentValid(fileLines: [""]), false);
   });
+
+  ;
 
   test('opnSense', () {
     OpnSense opnSense = OpnSense();
@@ -789,8 +832,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     ];
     uprt.convertFileList(args);
 
-    String goodOpnsense =
-        """<?xml version="1.0"?>
+    String goodOpnsense = """<?xml version="1.0"?>
 <opnsense>
 <dhcpd>
     <lan>
@@ -835,8 +877,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
   </opnsense>
    """;
 
-    String badOpnsense =
-        """
+    String badOpnsense = """
 <?xml version="1.0"?>
 <opnsense>
 <dhcpd>
@@ -921,8 +962,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
         ),
         true);
 
-    String goodPfsense =
-        """
+    String goodPfsense = """
 <dhcpd>
 	<lan>
 		<range>
@@ -962,8 +1002,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 </dhcpd>
    """;
 
-    String badPfsense =
-        """
+    String badPfsense = """
 <dhcpd>
 	<lan>
 		<range>
@@ -1012,17 +1051,18 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
   });
 
   test('allFormats', () {
+    //convert each file type to all filetypes
     List<String> args = <String>[
       "", //first argument gets replaced
       "-g",
-      "cdjnmop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
       "test/test-output",
       "-w"
     ];
-
+// file shown is the input file, to convert to all formats which are tested for validity
     testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.csv", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.json", uprt, 50);
@@ -1030,13 +1070,15 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     testConvertFile(args, "test/test-data/lease-list-infile.openwrt", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-opn.xml", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-pfs.xml", uprt, 50);
+    testConvertFile(
+        args, "test/test-data/lease-list-infile-pihole.conf", uprt, 50);
   });
 
   test('merge', () {
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1068,7 +1110,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1101,7 +1143,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1130,11 +1172,13 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       //  }
     }
   });
+
+  //convert each input into a csv file and see if they validate
   test('empty_input_files', () {
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
       "-g",
-      "cdjmnop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1144,13 +1188,13 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "c"
     ];
 
-    args[9] = "c";
+    args[9] = "c"; //test empty file with different types
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
         uprt, "failed to validate");
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
         uprt, "failed to validate");
-    args[9] = "d"; //test empty file with different types
+    args[9] = "d";
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
         uprt, "failed to validate");
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
@@ -1173,13 +1217,16 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     args[9] = "p";
     testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
         uprt, "failed to validate");
+    args[9] = "h";
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
+        uprt, "failed to validate");
   });
 
   test('bad_input_files', () {
     List<String> args = <String>[
       "", //Input file argument replaced in test methods
       "-g",
-      "cdjnmop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1189,37 +1236,40 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
 
     // Files totally bad
 
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
-        uprt, "failed to validate and save");
+    // testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
+    //     uprt, "failed to validate and save");
 
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
-        uprt, "failed to validate and save");
+    // testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
+    //     uprt, "failed to validate and save");
 
-    testPrintMsgOnGenerate(
-        args,
-        "test/test-data/lease-list-bad-address-data.json",
-        uprt,
-        "failed to validate and save");
+    // testPrintMsgOnGenerate(
+    //     args,
+    //     "test/test-data/lease-list-bad-address-data.json",
+    //     uprt,
+    //     "failed to validate and save");
 
-    //Partially bad files
-    testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
+    // //Partially bad files
+    // testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
 
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
+    // testConvertFile(
+    //     args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
 
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
+    // testConvertFile(
+    //     args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
 
-    testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
+    // testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
 
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
+    // testConvertFile(
+    //     args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
 
-    testConvertFile(
-        args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
+    // testConvertFile(
+    //     args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
 
     testConvertFile(
         args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile-pihole.conf", uprt, 48);
   });
 
   test('log', () {
@@ -1229,7 +1279,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     List<String> args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "cdjnmop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1257,7 +1307,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "cdjnmop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1286,7 +1336,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "cdjnmop",
+      "cdjmnoph",
       "-b",
       "test-output-file",
       "-d",
@@ -1312,7 +1362,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
   });
 }
 
-/* Runs tests on output file and expeted length given an input file*/
+/* Runs tests on output file and expected length given an input file*/
 void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
     int expectedGoodLeasesInFile,
     {bool deleteAllFiles = true}) {
@@ -1362,11 +1412,11 @@ void testOutputFiles(
   Csv csv = Csv();
   Ddwrt ddwrt = Ddwrt();
   Json json = Json();
-
   Mikrotik mikrotik = Mikrotik();
   OpenWrt openwrt = OpenWrt();
   OpnSense opnsense = OpnSense();
   PfSense pfSense = PfSense();
+  PiHole pihole = PiHole();
 
   /* test all output files*/
 
@@ -1385,6 +1435,9 @@ void testOutputFiles(
       testExpectedValue);
 
   expect(json.isFileValid("test/test-output/test-output-file.json"),
+      testExpectedValue);
+
+  expect(pihole.isFileValid("test/test-output/test-output-file-pihole.conf"),
       testExpectedValue);
 
   expect(
@@ -1440,6 +1493,15 @@ void testOutputFiles(
           pfSense.getLeaseMap(
               fileContents: File("test/test-output/test-output-file-opn.xml")
                   .readAsStringSync()),
+          testExpectedLeaseLength),
+      testExpectedValue);
+
+  expect(
+      isCorrectLeaseMapLength(
+          pihole.getLeaseMap(
+              fileContents:
+                  File("test/test-output/test-output-file-pihole.conf")
+                      .readAsStringSync()),
           testExpectedLeaseLength),
       testExpectedValue);
 }

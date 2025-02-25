@@ -11,6 +11,7 @@ dependencies:
   xml: ^6.5.0 #MIT
   glob: ^2.0.1  #BSD-3 Clause
   validators: ^3.0.0 
+  mockito: ^5.4.5
 
 dev_dependencies:
   

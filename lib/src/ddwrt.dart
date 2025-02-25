@@ -1,9 +1,22 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import '../lib.dart';
 import 'globals.dart' as g;
 
+/// A class representing the DD-WRT file type, extending the FileType class.
+/// This class provides methods to parse and validate DD-WRT lease files.
+///
+/// Properties:
+/// - `macIdx`: Index for MAC address in the lease properties.
+/// - `hostIdx`: Index for Hostname in the lease properties.
+/// - `ipIdx`: Index for IP address in the lease properties.
+/// - `fileType`: The format name of the DD-WRT file type.
+///
+/// Methods:
+/// - `getLeaseMap`: Parses the given file contents and returns a map of leases.
+/// - `build`: Constructs a DD-WRT formatted string from a map of device lists.
+/// - `isContentValid`: Validates the content of the DD-WRT file.
 class Ddwrt extends FileType {
   //
   //this is the appearance of the properties in the file (Mac comes first, etc.)
@@ -12,7 +25,7 @@ class Ddwrt extends FileType {
   String fileType = g.fFormats.ddwrt.formatName;
 
   @override
-  //Given a string this returns Maps of the a list of each lease
+  //Given a string this returns Maps of  a list of each lease
   Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
       List<String>? fileLines,
@@ -59,11 +72,13 @@ class Ddwrt extends FileType {
     }
   }
 
-  String build(Map<String, List<String>?> deviceList) {
+  @override
+  String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     StringBuffer sbDdwrt = StringBuffer();
-    for (int x = 0; x < deviceList[g.lbMac]!.length; x++) {
+
+    for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
       sbDdwrt.write(
-          """${deviceList[g.lbMac]?[x]}=${deviceList[g.lbHost]?[x]}=${deviceList[g.lbIp]?[x]}=1440 """);
+          """${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)}=${leaseMap[g.lbHost]?[x]}=${leaseMap[g.lbIp]?[x]}=1440 """);
     }
     return sbDdwrt.toString();
   }
@@ -83,7 +98,8 @@ class Ddwrt extends FileType {
           .containsBadLeases(leaseMap, g.fFormats.ddwrt.formatName)) {
         return false;
       }
-      g.validateLeases.validateLeaseList(leaseMap, g.fFormats.ddwrt.formatName);
+      g.validateLeases
+          .isLeaseMapListValid(leaseMap, g.fFormats.ddwrt.formatName);
 
       return true;
     } on Exception catch (e) {

@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 //Follow this convention for branching:
@@ -18,23 +18,18 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    //  arguments = <String>[
-    //     "test/test-data/lease-list-infile.json",
-    //     "-t",
-    //     "j",
-    //     "-f",
-    //     "-g",
-    //     "m",
-    //     "-L",
-    //     "192.168.0.1",
-    //     "-H",
-    //     "192.168.0.254",
-    //     "-b",
-    //     "test-output-file",
-    //     "-d",
-    //     "test/test-output",
-    //     "-w"
-    //   ];
+    arguments = <String>[
+      "test/test-data/lease-list-infile.json",
+      "-t",
+      "j",
+      "-g",
+      "h",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w"
+    ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);

@@ -1,4 +1,4 @@
-// Copyright 2021 GeekVisit All rights reserved.
+// Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
 import 'package:validators/validators.dart';
@@ -59,7 +59,7 @@ class ValidateLeases {
 
       Ip ip = Ip();
 
-      if (!ip.isMacAddress(macAddress)) {
+      if (!ip.isMacAddress(macAddress, g.macDelimiter[fileType]!)) {
         badLeaseBuffer.write(
             "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
         leaseIsValid = false;
@@ -178,9 +178,7 @@ class ValidateLeases {
         if (g.validateLeases.isLeaseValid(rawLeaseMap, i, fileType)) {
           goodLeaseMap[g.lbMac]!.add(rawLeaseMap[g.lbMac]![i].trim());
 
-          (fileType == "Mikrotik")
-              ? goodLeaseMap[g.lbHost]!.add("")
-              : goodLeaseMap[g.lbHost]!.add(rawLeaseMap[g.lbHost]![i].trim());
+          goodLeaseMap[g.lbHost]!.add(rawLeaseMap[g.lbHost]![i].trim());
 
           goodLeaseMap[g.lbIp]!.add(rawLeaseMap[g.lbIp]![i].trim());
 
@@ -213,9 +211,30 @@ class ValidateLeases {
     }
   }
 
-  bool validateLeaseList(Map<String, List<String>?> leaseMap, String fileType) {
+  /// Validates the lease map list for the given file type.
+  ///
+  /// This function checks if the provided lease map is valid by ensuring that:
+  /// 1. The lease map is not empty.
+  /// 2. Each lease has the same number of IP addresses and MAC addresses.
+  ///
+  /// If the lease map is invalid, an exception is thrown with an appropriate
+  /// error message, and the function returns `false`. If the lease map is valid,
+  /// the function returns `true`.
+  ///
+  /// - Parameters:
+  ///   - leaseMap: A map where the keys are strings and the values are lists of
+  ///     strings representing the leases.
+  ///   - fileType: A string representing the type of the file being validated.
+  ///
+  /// - Returns: A boolean value indicating whether the lease map list is valid.
+  ///
+  /// - Throws: An [Exception] if the lease map is empty or if any lease does not
+  ///   have both an IP address and a MAC address.
+
+  bool isLeaseMapListValid(
+      Map<String, List<String>?> leaseMap, String fileType) {
     try {
-      // if all of lists in leaseMap entries are empty, i.e., have 0 length
+      // if all of lists have 0 length throw error
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
         throw Exception(
             """File ${g.inputFile} is empty of Leases or is not a ${g.typeOptionToName[g.inputType]} format.""");
