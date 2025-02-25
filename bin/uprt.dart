@@ -11,7 +11,7 @@
 // use conventional commits:
 //https://www.conventionalcommits.org/en/v1.0.0/#summary
 
-// TODO: Add support for pihole ?
+// TODO: Generate script to import Mikrotik hostnames
 // TODO: Add support for isc-dhcp dhcpd.leases ?
 
 import 'package:uprt/lib.dart';
@@ -19,11 +19,11 @@ import 'package:uprt/lib.dart';
 void main(List<String> arguments) {
   try {
     arguments = <String>[
-      "test/test-data/lease-list-infile.json",
+      "test/test-data/dhcp-static-leases.rsc.txt",
       "-t",
-      "j",
+      "m",
       "-g",
-      "h",
+      "c",
       "-b",
       "test-output-file",
       "-d",

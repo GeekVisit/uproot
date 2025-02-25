@@ -1,0 +1,7 @@
+ # 2025-02-20 16:29:26 by RouterOS 7.16.1
+ 
+ 0 D address=192.168.0.26 mac-address=12:34:56:78:9A:BC address-lists= server=dhcp_default dhcp-option= status=bound expires-after=19m53s last-seen=10m7s active-address=192.168.0.26 active-mac-address=12:34:56:78:9A:BC active-server=dhcp_default class-id=dhcpcd-6.8.2:Linux-5.4.86-ab0011040830208:armv7l:Generic
+ 1 D address=192.168.0.5 mac-address=AB:CD:EF:12:34:56 address-lists= server=dhcp_default dhcp-option= status=bound expires-after=15m43s last-seen=14m17s active-address=192.168.0.5 active-mac-address=AB:CD:EF:12:34:56 active-server=dhcp_default class-id=dhcpcd-6.8.2:Linux-3.18.19-gbc74824-dirty:armv7l:Generic
+ 2   address=192.168.0.7 mac-address=98:76:54:32:10:FE address-lists= server=dhcp_default dhcp-option= status=bound expires-after=18m43s last-seen=11m17s active-address=192.168.0.7 active-mac-address=98:76:54:32:10:FE active-server=dhcp_default host-name=printer.lan class-id=dhcpcd-6.8.2:Linux-3.8.13+:armv7l:Marvell
+ 3   address=192.168.0.8 mac-address=DE:AD:BE:EF:CA:FE address-lists= server=dhcp_default dhcp-option= status=bound expires-after=18m42s last-seen=11m18s active-address=192.168.0.8 active-mac-address=DE:AD:BE:EF:CA:FE active-server=dhcp_default host-name=speaker.lan class-id=dhcpcd-6.8.2:Linux-3.8.13+:armv7l:Marvell
+ 4   address=192.168.0.42 mac-address=BA:DC:0F:FE:ED:CB address-lists= server=dhcp_default dhcp-option= status=bound expires-after=18m32s last-seen=11m28s active-address=192.168.0.42 active-mac-address=BA:DC:0F:FE:ED:CB active-server=dhcp_default host-name=nest.lan

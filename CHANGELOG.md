@@ -1,5 +1,13 @@
 # ChangeLog for [Uproot](https://github.com/GeekVisit/uproot) (uprt)
 
+2025.02.019
+
+* added support for piHole static leases
+* added option to strip out non-fully qualified domain name hosts from input files
+* added option to select colon or dash as delimiter character in mac addresses
+* fixed github issues #2,3 (lease conversions),6 (pihole)bug fixes
+* updated documentation
+
 ## RELEASED
 
 2021.10.001 (beta)  **Initial Release.**

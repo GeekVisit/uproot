@@ -33,14 +33,14 @@ target file leases rather than integrated with the merge file. """)
         )
         ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
 Directory to write files to, defaults to same directory as input file.""")
-        ..addFlag(
+        ..addOption(
           "fqdn",
           abbr: 'f',
-          defaultsTo: false,
-          negatable: false,
           help:
               // ignore: lines_longer_than_80_chars
-              "Require hostnames in input file to be fully qualified domain name - i.e., in domain.tld format. Any leases that do not have such hostnames are not added to the output file. ",
+              """By default uprt allows any host name that is specified in the input file. This option requires hostname to meet certain requirements for a domain name. Required options are 'strict' (host name must be fully qualified domain  requiring a tld (e.g., .local, .lan) and alphanumeric characters or hyphen),  "partial" is same as strict but does not require a tld (.e.g., .local). "relaxed" allows underscores and does not require tlds. Any leases with hostnames that do not fit the requirements are not added to the output file. """,
+          mandatory: false,
+          allowed: ['strict', 'partial', 'relaxed'],
         )
         ..addMultiOption("generate-type", abbr: 'g', help: """
 Required. Generated types may be multiple. Valid values include: 
@@ -295,22 +295,19 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
     }
   }
 
-  /// Determines the format type of a given file based on its extension.
+  /// Determines the input type abbreviation based on the provided file path.
   ///
   /// If no file path is provided, it defaults to using the global input file path.
-  /// The function first checks if the input type argument is provided and returns it if available.
-  /// Then, it checks the file extension against a set of allowed extension types and returns the corresponding type.
-  /// If the extension is not found, it attempts to get a hyphenated extension and checks again.
-  /// If the file type cannot be determined, an error message is printed and a default value of 'Z' is returned.
+  /// The method first checks if the input type is specified in the argument results.
+  /// If not, it attempts to determine the input type based on the file extension.
   ///
-  /// Throws:
-  /// - Exception: If an error occurs during the process.
+  /// - [filePath]: The path of the file for which the input type abbreviation is to be determined.
+  ///   Defaults to an empty string.
   ///
-  /// Parameters:
-  /// - [filePath] (optional): The path of the file to determine the format type for. Defaults to an empty string.
+  /// Returns the input type abbreviation as a [String].
+  /// If the file type cannot be determined, it prints an error message and returns 'Z'.
   ///
-  /// Returns:
-  /// - String: The determined format type of the file, or 'Z' if the type cannot be determined.
+  /// Throws an [Exception] if an error occurs during the process.
   String? getInputTypeAbbrev([String filePath = ""]) {
     try {
       if (filePath == "") {

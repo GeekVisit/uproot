@@ -69,8 +69,8 @@ void testUpRooted() {
 
     pubSpecTestFile.writeAsStringSync("""
     name: uprt
-    description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs and json.
-    version: 2019.09.001
+    description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs, json, and piHole.
+    version: 2025.02.019
 
     """);
 
@@ -284,6 +284,7 @@ void testUpRooted() {
     List<String> args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-f",
+      "strict",
       "-g",
       "cdjmnoph",
       "-b",
@@ -292,7 +293,7 @@ void testUpRooted() {
       "test/test-output",
     ];
 
-    uprt.convertFileList(args);
+g.argResults = g.cliArgs.getArgs(args);
 
     Map<String, List<String>> testLeaseMap = {
       g.lbHost: ["example.com"],
@@ -312,7 +313,56 @@ void testUpRooted() {
             .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
         true);
 
-    // no fqdn flag
+
+//partial
+
+ args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "partial",
+
+    ];
+testLeaseMap[g.lbHost] = ["example__"];
+g.argResults = g.cliArgs.getArgs(args);
+
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+
+testLeaseMap[g.lbHost] = ["example"];
+    g.argResults = g.cliArgs.getArgs(args);
+            expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+
+
+
+//relaxed
+testLeaseMap[g.lbHost] = ["example_"];
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "relaxed",
+    ];
+
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+testLeaseMap[g.lbHost] = ["example__::"];
+
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+    // no fqdn option
 
     args = <String>[
       "test/test-data/lease-list-infile.csv",
@@ -333,7 +383,7 @@ void testUpRooted() {
             .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
         false);
     // no tld -> true it's still not a bad lease because fqdn not required
-    testLeaseMap[g.lbHost] = ["example"];
+    testLeaseMap[g.lbHost] = ["example_"];
     expect(
         g.validateLeases
             .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),

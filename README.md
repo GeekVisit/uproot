@@ -10,9 +10,9 @@ In addition, `uprt` can merge existing lists of static leases using the `merge` 
 
 **ip6 static leases are not supported.**
 
-## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta)
+## [DOWNLOAD](https://github.com/GeekVisit/uproot/releases/tag/v2025-02-019)
 
-[Download Windows, Mac, and X86 Linux binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2021-10-001-beta>)
+[Download Windows, Mac, and X86 Linux binaries](<https://github.com/GeekVisit/uproot/releases/tag/v2025-02-019>)
 
 Like this project ? Please click the star at the top right corner of this page.
 
@@ -20,13 +20,14 @@ Like this project ? Please click the star at the top right corner of this page.
 
 Many network administrators often have long lists of DHCP reservations specified in their router.  Those who do a lot of home automation, for example may have many devices for which IPs have been statically assigned, making upgrading to a different type of router painful.  Many times the IP reservations along with the associated Mac Addresses need to be manually re-entered into the new router's software. As long as the router formats are supported, Uproot allows one to export the list of DHCP Reservations from one router, and  easily convert the list to a format of another supported type. In addition to straight import, Uproot can merge and validate the static leases from both the old and the new router, eliminating duplicates.
 
-## Current router/firewall software supported
+## Current router/firewall/dns software supported
 
 * DD-WRT
 * Mikrotik RouterOS
 * OPNSense
 * OpenWrt
 * pfSense
+* piHole
 
 Also supports the following file formats:
 
@@ -44,16 +45,18 @@ If you have a target device that is supported, but an unsupported source device 
 * Converts to multiple formats simultaneously
 * Merges static leases from one file into another
 * Optionally sorts static leases by IP addresses
+* Optionally choose colon or dash as mac address delimiter in output
 * Validates lease to avoid import errors:
   * Validates all generated files against expected output type
   * Enforces IP range (optional)
   * Excludes unnecessary duplicates from output
   * Excludes invalid ip4 and Mac addresses from output
+  * Excludes invalid host names and optionally, hostnames that do not have a tld
 * Example input files available in source for testing
 
 ## Limitations
 
-* Mikrotik RouterOS format does not yet support hostnames for Mikrotik leases (i.e., all output `rsc` files are generated without hostnames)
+* Mikrotik RouterOS output format does not yet support hostnames (i.e., all output `rsc` files are generated without hostnames). This is only a limitation on generated Mikrotik outputs. For example, using the steps in this readme you can take your exported Mikrotik static leases file from your Mikrotik router and convert it to another non-Mikrotik format, but if you convert it or any other source to Mikrotik file format the resulting output file will not contain the hostnames.  
 * Does not support ip6 leases
 
 ## Installing
@@ -120,16 +123,16 @@ Below is the latest help:
 
 ````bash
 
-uprt (2021.10.001 running on macos 10.15.7)
+uprt (2025.02.019 running on macos 10.15.7)
 
 
-A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
+A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
 Usage:
 
-uprt (2021.10.001 running on windows "Windows 10 Pro" 10.0 (Build 22631))
+uprt (2025.02.019)
 
-A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv and json.
+A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
 Usage: 
 -a, --append                              Used when --merge and --sort are given.  If this flag is given, the merged file 
@@ -149,6 +152,13 @@ Usage:
                                           
 -L, --ip-low-address                      Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File
 -m, --merge                               Merge to file. Specify path to file to merge converted output. 
+
+-M, --mac-delimiter                       Specify the delimiter (without quotes) to be used in the out file for mac addresses.
+                                          The delimiter can be either a colon (:) 8D:EB:29:19:6F:CE), or a hyphen (-) 8D-EB-29-19-6F-CE. 
+                                          If this option is not given, the delimiter will be what is required for the particular output type 
+                                          (e.g., pihole will use hyphen); for generic output types like cvs and json the delimiter will be
+                                           the same as the input file.                                          
+
                                           Used to add static leases to an existing output file.
 -P, --log-file-path                       Full file path to log file.
                                          
@@ -213,7 +223,7 @@ To test uprt yourself, there are test input files are located under the `test/te
 ## Video Demo
 
 Below is a demonstration done on Mac Catalina showing the conversion from a .csv file to all formats.
-After the conversion the demo scrolls through the resulting files.
+After the conversion the demo scrolls through the resulting files. Demo is using version 2021.10.001.
 <img src="readme-pics/uprt-demo-on-mac-2021-08-31_17-08-09.gif?raw=true" width="800" height="450" alt="Uprt demo on Mac">
 
 # Exporting amd Importing Static Leases
@@ -224,13 +234,14 @@ Below are the export/import steps for each router/firewall type that is supporte
   
 ## Supported Routers and Firewall Software
 
-The following router and firewall software are supported:
+The following router, firewall, and DNS software are supported:
 
 * DD-WRT
 * Mikrotik RouterOS
 * OPNSense
 * OpenWrt
 * pfSense
+* piHole
 
 If you have a target device that is supported, but an unsupported source device (e.g., you are migrating from Google Wifi to OpenWrt), see  [Unsupported Routers - Creating A CSV File of Network Devices Using Nmap](#unsupported-routers---creating-a-csv-file-of-network-devices-using-nmap).
 
@@ -510,7 +521,7 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
 
     ![alt](readme/../readme-pics/mikrotik-files-winbox.png))
 
-6. Download the `dhcp-static-leases.rsc` to your computer.
+6. Download the `dhcp-static-leases.rsc.txt` to your computer.
 
     ![alt](readme-pics/mikrotik-download-of-export.png)
 
@@ -561,13 +572,15 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
 
 1. If you are ADDING leases to an existing Mikrotik configuration, you'll want to use the `--merge` option, merging the import file into a backup file of your existing configuration.
 
-2. Download to your local computer a backup from your existing configuration, then merge with the file to be imported:
+2. Make sure to make a backup of your existing configuration and download to your computer.
+
+3. Perform the merge with the file to be imported (shown below with an exported Mikrotik file but can use any other supported source as input):
 
     ````bash
         uprt dhcp-static-leases.rsc -m dhcp-static-leases-export.rsc -g m -b merge-output
     ````
 
-3. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#mikrotik---import).
+4. This will output a "merge-output.rsc" file. Upload the file to your Mikrotik router and follow the steps for [importing](#mikrotik---import).
 
 ## Unsupported Routers - Creating A CSV File of Network Devices Using Nmap
 

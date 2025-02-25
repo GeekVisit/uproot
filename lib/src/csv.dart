@@ -114,7 +114,7 @@ class Csv extends FileType {
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       sb.write(
           // ignore: lines_longer_than_80_chars
-          "${leaseMap[g.lbHost]![i]},${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)}},${leaseMap[g.lbIp]![i]}\n");
+          "${leaseMap[g.lbHost]![i]},${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)},${leaseMap[g.lbIp]![i]}\n");
     }
     return sb.toString();
   }

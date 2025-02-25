@@ -67,11 +67,9 @@ class ValidateLeases {
 
 //requires tld if -fqdn argument is set
 
-      if (hostName != "" &&
-          !isFQDN(hostName, requireTld: g.argResults['fqdn'])) {
-        var failMessage = g.argResults['fqdn']
-            ? "Host Name Is Not A Valid FQDN (domain.tld) Name"
-            : "Not a Valid Host Name";
+      if (hostName != "" && !doesHostMeetFqdnReqts(hostName)) {
+        var failMessage =
+            "Host Name ${hostName} Does Not Meet FQDN Requirements - check the -fqdn option";
         badLeaseBuffer
             .write("${(badLeaseBuffer.isNotEmpty) ? "," : ""} ${failMessage}");
         leaseIsValid = false;
@@ -260,6 +258,45 @@ class ValidateLeases {
   }
 }
 
+doesHostMeetFqdnReqts(String hostName) {
+  bool requiresTLD = g.argResults['fqdn'] == 'strict';
+  bool allowsUnderScores = g.argResults['fqdn'] == 'relaxed';
+
+  bool result = true;
+  if (g.argResults['fqdn'] == null) return result;
+
+  return isHostFQDN(hostName,
+      requireTld: requiresTLD, allowUnderscores: allowsUnderScores);
+}
+
 class InvalidIpAddressException implements Exception {
   String errMsg() => 'Input file contains invalid IP Addresses';
+}
+
+bool isHostFQDN(String str,
+    {bool requireTld = true, bool allowUnderscores = false}) {
+  var parts = str.split('.');
+  if (requireTld) {
+    var tld = parts.removeLast();
+    if (parts.length == 0 || !new RegExp(r'^[a-z]{2,}$').hasMatch(tld)) {
+      return false;
+    }
+  }
+
+  for (var part in parts) {
+    if (!allowUnderscores) {
+      if (part.contains('_')) {
+        return false;
+      }
+    }
+    if (!new RegExp(r'^[a-zA-Z0-9\u00a1-\uffff-_]+$').hasMatch(part)) {
+      return false;
+    }
+    if (part[0] == '-' ||
+        part[part.length - 1] == '-' ||
+        part.indexOf('---') >= 0) {
+      return false;
+    }
+  }
+  return true;
 }
