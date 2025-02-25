@@ -140,11 +140,15 @@ Usage:
                                           target file leases rather than integrated with the merge file. 
 -b, --base-name                           Specify Base Name of Output Files (default uses basename of input file)
 -d, --directory-out                       Directory to write files to, defaults to same directory as input file.
--f, --fqdn                                Require hostname to be fully qualified domain name - i.e., 
-                                          in domain.tld format
+-f, --fqdn                                 By default uprt allows any host name that is specified in the input file. 
+                                          This option requires hostname to meet certain requirements for a domain name. 
+                                          Required options are  'strict' (host name must be fully qualified domain  requiring a tld
+                                          (e.g., .local, .lan) and alphanumeric characters or hyphen),  'partial' is same as strict 
+                                          but does not require a tld (.e.g., .local). "relaxed" allows underscores and does not require
+                                           tlds. Any leases with hostnames that do not fit the requirements are not added to the output file. 
 -g, --generate-type                       Required. Generated types may be multiple. Valid values include: 
                                           c (csv), d (DD-WRT), j (json),
-                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
 -h, --help                                Help
 -H, --ip-high-address                     Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File
 -l, --log                                 Creates Log file, if -P not set, then location 
@@ -173,7 +177,7 @@ Usage:
 -S, --server                              Name to designate in output file for Mikrotik dhcp server.
                                           (defaults to "defconf")
 -t, --input-type                          Input file type:   c (csv), d (ddwrt), j (json),
-                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+                                          m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
                                           If this option is not used, uprt will try to determine file 
                                           type based on the following extensions: .csv, .ddwrt, 
                                           .json, .rsc (mikrotik), .xml (for opnsense and pfsense, 

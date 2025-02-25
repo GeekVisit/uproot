@@ -45,7 +45,7 @@ Directory to write files to, defaults to same directory as input file.""")
         ..addMultiOption("generate-type", abbr: 'g', help: """
 Required. Generated types may be multiple. Valid values include: 
 c (csv), d (DD-WRT), j (json),
-m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
 """)
         ..addFlag("help", negatable: false, help: "Help", abbr: "h",
             callback: (dynamic e) {
@@ -65,7 +65,7 @@ Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Tar
           abbr: 'M',
           help:
               // ignore: lines_longer_than_80_chars
-              """Specify the delimiter (without quotes) to be used in the out file for mac addresses.The delimiter can be either a colon (:) 8D:EB:29:19:6F:CE), or a hyphen (-) 8D-EB-29-19-6F-CE. If this option is not given, the delimiter will be what is required for the particular output type (e.g., pihole will use hyphen); for generic output types like cvs and json the delimiter will be the same as the input file.""",
+              """Specify the delimiter (without quotes) to be used in the out file for mac addresses.The delimiter can be either a colon (:) 8D:EB:29:19:6F:CE), or a hyphen (-) 8D-EB-29-19-6F-CE. If this option is not given, the delimiter will be what is required for the particular output type (e.g., piHole will use hyphen); for generic output types like cvs and json the delimiter will be the same as the input file.""",
           mandatory: false,
           allowed: [':', '-'],
         )
@@ -95,7 +95,7 @@ Leases in resulting output file are sorted by Ip address.""")
             help: "Name to designate in output file for Mikrotik dhcp server.")
         ..addOption("input-type", mandatory: false, abbr: 't', help: """
 Input file type:   c (csv), d (ddwrt), j (json),
-m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense)
+m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
 If this option is not used, uprt will try to determine file 
 type based on the following extensions: .csv, .ddwrt, 
 .json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
@@ -148,13 +148,13 @@ ${meta['description']}
 
 Usage: 
  
- uprt <input_file_path> -g <c|d|j|m|n|o|p> -d <output file> [options]
+ uprt <input_file_path> -g <c|d|j|m|n|o|p|h> -d <output file> [options]
 
 ${g.cliArgs.parser.usage}
 
 ${g.ansiBold}Examples${g.ansiFormatEnd}: 
 
-${g.ansiBold}Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense, pihole)${g.ansiFormatEnd}:
+${g.ansiBold}Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense, piHole)${g.ansiFormatEnd}:
 
   uprt test/test-data/lease-list-infile.csv -g cdjmnoph -d test/test-output
 
