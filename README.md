@@ -39,7 +39,6 @@ If you have a target device that is supported, but an unsupported source device 
 ## Features
 
 `
-?
 
 * Detection of input format based on extension (can also manually specify the format)`
 * Converts to multiple formats simultaneously
