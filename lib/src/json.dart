@@ -56,6 +56,12 @@ class Json extends FileType {
         rawLeaseMap[key] = valueList.toList();
         valueList.clear();
       }
+
+      ///replace all quotes that might be in values
+      rawLeaseMap.updateAll((key, valueList) {
+        return valueList.map((value) => value.replaceAll('"', '')).toList();
+      });
+
       if (removeBadLeases) {
         return g.validateLeases
             .removeBadLeases(rawLeaseMap, g.fFormats.json.formatName);
@@ -79,8 +85,9 @@ Unable to extract static leases from File, file may not be proper json format, $
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
       if (sbJson.isNotEmpty) sbJson.write(',');
 
+//remove double quotes in host name
       sbJson.write('''
-{ "host-name" : "${leaseMap[g.lbHost]![i]}", "mac-address" : "${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)}", "address" : "${leaseMap[g.lbIp]![i]}" }''');
+{ "host-name" : "${leaseMap[g.lbHost]![i].toString().replaceAll("\"", "")}", "mac-address" : "${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)}", "address" : "${leaseMap[g.lbIp]![i]}" }''');
     }
     return "[ ${sbJson.toString()} ]";
   }

@@ -140,6 +140,8 @@ bool testRun = false;
 
 String newL = (Platform.isWindows) ? "\r\n" : newL = "\n";
 
+String fqdnStrictLevel = ""; // level of fqdn strictness
+
 // ignore: avoid_classes_with_only_static_members
 class MetaCheck {
   static int match = 0;

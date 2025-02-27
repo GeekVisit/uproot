@@ -1,0 +1,12 @@
+host-name, mac-address, address
+testpartial,F4:CF:5C:08:76:49,192.168.0.1
+teststrict.com,F5:CF:5C:08:76:49,192.168.0.2
+testrelaxed_,F6:CE:5C:07:76:49,192.168.0.3
+aNDCqrh,F7:CE:5C:08:76:49,192.168.0.4
+aNDC123qrh,F8:CF:5C:08:76:49,192.168.0.5
+"❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙",F9:CF:5C:08:76:49,192.168.0.6
+
+#partial: 4
+#strict: 1
+#relaxed: 5
+#anything-goes: 6

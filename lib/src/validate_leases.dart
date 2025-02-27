@@ -69,7 +69,7 @@ class ValidateLeases {
 
       if (hostName != "" && !doesHostMeetFqdnReqts(hostName)) {
         var failMessage =
-            "Host Name ${hostName} Does Not Meet FQDN Requirements - check the -fqdn option";
+            "Host Name ${hostName} Does Not Meet ${g.fqdnStrictLevel} FQDN hostname requirements, you may want to adjust your level using the -f option";
         badLeaseBuffer
             .write("${(badLeaseBuffer.isNotEmpty) ? "," : ""} ${failMessage}");
         leaseIsValid = false;
@@ -258,21 +258,56 @@ class ValidateLeases {
   }
 }
 
+/// Checks if the given host name meets the Fully Qualified Domain Name (FQDN) requirements.
+///
+/// The FQDN requirements are determined by the 'fqdn' argument in `g.argResults`.
+/// - If 'fqdn' is "anything-goes", any host name is accepted.
+/// - If 'fqdn' is 'strict', the host name must include a top-level domain (TLD) and no underscores allowed.
+/// - If 'fqdn' is 'relaxed', underscores are allowed in the host name and tld's are not required.
+///
+/// Returns `true` if the host name meets the FQDN requirements, otherwise `false`.
+///
+/// Parameters:
+/// - `hostName`: The host name to be validated.
+///
+/// Returns:
+/// - `bool`: `true` if the host name meets the FQDN requirements, otherwise `false`.
 doesHostMeetFqdnReqts(String hostName) {
-  bool requiresTLD = g.argResults['fqdn'] == 'strict';
-  bool allowsUnderScores = g.argResults['fqdn'] == 'relaxed';
+  if (g.fqdnStrictLevel == "anything-goes") {
+    return true;
+  }
+  bool result = false;
 
-  bool result = true;
-  if (g.argResults['fqdn'] == null) return result;
+  bool requiresTLD = g.fqdnStrictLevel == 'strict';
 
-  return isHostFQDN(hostName,
+  bool allowsUnderScores = g.fqdnStrictLevel == 'relaxed';
+
+  result = isHostFQDN(hostName,
       requireTld: requiresTLD, allowUnderscores: allowsUnderScores);
+
+  return result;
 }
 
 class InvalidIpAddressException implements Exception {
   String errMsg() => 'Input file contains invalid IP Addresses';
 }
 
+/// Checks if the given string is a fully qualified domain name (FQDN).
+///
+/// An FQDN is a complete domain name that specifies its exact location
+/// in the hierarchy of the Domain Name System (DNS). This function
+/// validates the FQDN based on the provided options.
+///
+/// The [str] parameter is the string to be checked.
+///
+/// The [requireTld] parameter specifies whether a top-level domain (TLD)
+/// is required. If true, the function will ensure that the last part of
+/// the domain name is a valid TLD. Defaults to true.
+///
+/// The [allowUnderscores] parameter specifies whether underscores are
+/// allowed in the domain name. Defaults to false.
+///
+/// Returns true if the string is a valid FQDN, false otherwise.
 bool isHostFQDN(String str,
     {bool requireTld = true, bool allowUnderscores = false}) {
   var parts = str.split('.');
@@ -283,13 +318,16 @@ bool isHostFQDN(String str,
     }
   }
 
+  //var test = isFQDN(str); - isFqdn in validators.dart does not allow underscores even if set to permit
   for (var part in parts) {
     if (!allowUnderscores) {
       if (part.contains('_')) {
         return false;
       }
     }
-    if (!new RegExp(r'^[a-zA-Z0-9\u00a1-\uffff-_]+$').hasMatch(part)) {
+    if (!new RegExp(r'^[_a-z\\u00a1-\\uffff0-9-]+$').hasMatch(part)) {
+      //from validators.dart
+      //if (!new RegExp(r'^[a-zA-Z0-9\u00a1-\uffff-_]+$').hasMatch(part)) {
       return false;
     }
     if (part[0] == '-' ||

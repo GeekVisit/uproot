@@ -38,9 +38,9 @@ Directory to write files to, defaults to same directory as input file.""")
           abbr: 'f',
           help:
               // ignore: lines_longer_than_80_chars
-              """By default uprt allows any host name that is specified in the input file. This option requires hostname to meet certain requirements for a domain name. Required options are 'strict' (host name must be fully qualified domain  requiring a tld (e.g., .local, .lan) and alphanumeric characters or hyphen),  "partial" is same as strict but does not require a tld (.e.g., .local). "relaxed" allows underscores and does not require tlds. Any leases with hostnames that do not fit the requirements are not added to the output file. """,
+              """If option is not specified, default behavior is the relaxed mode. This option requires hostname to meet certain requirements for a domain name. Required options are 'strict' (host name must be fully qualified domain  requiring a tld (e.g., .local, .lan) and alphanumeric characters or hyphen),  "partial" is same as strict but does not require a tld (.e.g., .local). "relaxed" allows underscores and does not require tlds. Any leases with hostnames that do not fit the requirements are not added to the output file. """,
           mandatory: false,
-          allowed: ['strict', 'partial', 'relaxed'],
+          allowed: ['strict', 'partial', 'relaxed', 'anything-goes'],
         )
         ..addMultiOption("generate-type", abbr: 'g', help: """
 Required. Generated types may be multiple. Valid values include: 
@@ -195,6 +195,7 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
   void checkArgs() {
     try {
       g.verbose = (g.argResults['verbose-debug'] || g.argResults['verbose']);
+      g.fqdnStrictLevel = g.argResults['fqdn'] ?? 'relaxed';
       checkIfOptionArgsAreGiven();
       checkForMissingMandatoryOptions(<String>["g"]);
       validateIpRangeOptions();

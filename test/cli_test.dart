@@ -263,7 +263,7 @@ void testUpRooted() {
     args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-g",
-      "cdjmnoph",
+      "cjdmnoph",
       "-L",
       "192.168.0.1",
       "--ip-high-address",
@@ -279,116 +279,6 @@ void testUpRooted() {
     expect(() => g.cliArgs.checkArgs(), returnsNormally);
   });
 
-  test('requireFqdn', () {
-    Converter uprt = Converter();
-    List<String> args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-f",
-      "strict",
-      "-g",
-      "cdjmnoph",
-      "-b",
-      "test-output-file",
-      "-d",
-      "test/test-output",
-    ];
-
-g.argResults = g.cliArgs.getArgs(args);
-
-    Map<String, List<String>> testLeaseMap = {
-      g.lbHost: ["example.com"],
-      g.lbMac: ["00:1A:2B:3C:4D:5E"],
-      g.lbIp: ["192.168.0.23"]
-    };
-
-    //with tld -> false it's not a bad lease
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-    // no tld -> true it's a bad lease
-    testLeaseMap[g.lbHost] = ["example"];
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        true);
-
-
-//partial
-
- args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-f",
-      "partial",
-
-    ];
-testLeaseMap[g.lbHost] = ["example__"];
-g.argResults = g.cliArgs.getArgs(args);
-
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        true);
-
-
-testLeaseMap[g.lbHost] = ["example"];
-    g.argResults = g.cliArgs.getArgs(args);
-            expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-
-
-
-
-//relaxed
-testLeaseMap[g.lbHost] = ["example_"];
-    args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-f",
-      "relaxed",
-    ];
-
-    g.argResults = g.cliArgs.getArgs(args);
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-
-testLeaseMap[g.lbHost] = ["example__::"];
-
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        true);
-
-    // no fqdn option
-
-    args = <String>[
-      "test/test-data/lease-list-infile.csv",
-      "-g",
-      "cdjmnoph",
-      "-b",
-      "test-output-file",
-      "-d",
-      "test/test-output",
-    ];
-
-    uprt.convertFileList(args);
-
-    testLeaseMap[g.lbHost] = ["example.com"];
-//with tld -> false it's not a bad lease
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-    // no tld -> true it's still not a bad lease because fqdn not required
-    testLeaseMap[g.lbHost] = ["example_"];
-    expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
-  });
   test('ipRandomMac', () {
     for (int i = 0; i < 50; i++) {
       expect(ip.isMacAddress(ip.getRandomMacAddress()), true);
@@ -1223,6 +1113,174 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     }
   });
 
+  test('isHostFqdn', () {
+    //Converter uprt = Converter();
+    List<String> args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "strict",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+    printMsg("Fqdn strict tests");
+    Map<String, List<String>> testLeaseMap = {
+      g.lbHost: ["example.com"],
+      g.lbMac: ["00:1A:2B:3C:4D:5E"],
+      g.lbIp: ["192.168.0.23"]
+    };
+
+    //with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's a bad lease
+    testLeaseMap[g.lbHost] = ["example"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+    printMsg("Fqdn partial tests");
+
+//partial
+
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "partial",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testLeaseMap[g.lbHost] = ["example__"];
+
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        true);
+
+    testLeaseMap[g.lbHost] = ["example"];
+    g.argResults = g.cliArgs.getArgs(args);
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+//relaxed
+
+    printMsg("Fqdn Relaxed tests");
+    testLeaseMap[g.lbHost] = ["example_"];
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-f",
+      "relaxed",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+    testLeaseMap[g.lbHost] = ["example__::"];
+
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+    // no fqdn option
+
+    args = <String>[
+      "test/test-data/lease-list-infile.csv",
+      "-g",
+      "cdjmnoph",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+    ];
+
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testLeaseMap[g.lbHost] = ["example.com"];
+//with tld -> false it's not a bad lease
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+    // no tld -> true it's still not a bad lease because fqdn not required
+    testLeaseMap[g.lbHost] = ["example_"];
+    expect(
+        g.validateLeases
+            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
+        false);
+
+    args = <String>[
+      "", //Input file argument replaced in test methods
+      "-g",
+      "cdjmnoph",
+      "-f",
+      "strict",
+      "-b",
+      "test-output-file",
+      "-d",
+      "test/test-output",
+      "-w"
+    ];
+    // strict
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 1);
+
+    args[4] = "partial";
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 4);
+
+    args[4] = "relaxed";
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 5);
+
+    args[4] = "anything-goes";
+    Converter().initialize(args);
+    g.argResults = g.cliArgs.getArgs(args);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 6);
+  });
+
   //convert each input into a csv file and see if they validate
   test('empty_input_files', () {
     List<String> args = <String>[
@@ -1277,6 +1335,8 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "", //Input file argument replaced in test methods
       "-g",
       "cdjmnoph",
+      "-f",
+      "partial",
       "-b",
       "test-output-file",
       "-d",
@@ -1286,37 +1346,37 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
 
     // Files totally bad
 
-    // testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
-    //     uprt, "failed to validate and save");
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
+        uprt, "failed to validate and save");
 
-    // testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
-    //     uprt, "failed to validate and save");
+    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
+        uprt, "failed to validate and save");
 
-    // testPrintMsgOnGenerate(
-    //     args,
-    //     "test/test-data/lease-list-bad-address-data.json",
-    //     uprt,
-    //     "failed to validate and save");
+    testPrintMsgOnGenerate(
+        args,
+        "test/test-data/lease-list-bad-address-data.json",
+        uprt,
+        "failed to validate and save");
 
     // //Partially bad files
-    // testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
-
-    // testConvertFile(
-    //     args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
-
-    // testConvertFile(
-    //     args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
-
-    // testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
-
-    // testConvertFile(
-    //     args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
-
-    // testConvertFile(
-    //     args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
+    testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
+        args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
+
+    testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
+
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
+
+    // testConvertFile(
+    //     args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
 
     testConvertFile(
         args, "test/test-data/lease-list-bad-infile-pihole.conf", uprt, 48);
@@ -1425,6 +1485,7 @@ void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
   // g.tempDir = Directory.systemTemp.createTempSync("uprt_");
 
   args[0] = inputFileToTest;
+  Converter().initialize(args);
   g.argResults = g.cliArgs.getArgs(args);
   uprt.convertFileList(args);
   testOutputFiles(testExpectedLeaseLength: expectedGoodLeasesInFile);

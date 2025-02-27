@@ -38,6 +38,12 @@ class Csv extends FileType {
 
   String fileType = g.fFormats.csv.formatName;
 
+  bool isValidCsvRow(String row) {
+    final RegExp regex = RegExp(r'^[^,]+,[^,]+,[^,]+,*.*$');
+    bool result = regex.hasMatch(row);
+    return result;
+  }
+
   @override
   Map<String, List<String>> getLeaseMap(
       {String fileContents = "",
@@ -79,7 +85,12 @@ class Csv extends FileType {
 
       for (int i = 1; i < csvRows.length; i++) {
         csvRow = csvRows[i].split(",");
+        if (!isValidCsvRow(csvRows[i])) {
+          printMsg(
+              "Skipping file Line ${i} for Insufficient Lease Data: ${csvRows[i]}");
 
+          continue;
+        }
         leaseMap[keyName[hostIdx].trim()]!.add(csvRow[hostIdx].trim());
         leaseMap[keyName[macIdx].trim()]!.add(csvRow[macIdx].trim());
         leaseMap[keyName[ipIdx].trim()]!.add(csvRow[ipIdx].trim());

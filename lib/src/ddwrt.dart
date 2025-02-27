@@ -1,6 +1,8 @@
 // Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
+import 'dart:ffi';
+
 import '../lib.dart';
 import 'globals.dart' as g;
 
@@ -44,20 +46,23 @@ class Ddwrt extends FileType {
         return leaseMap;
       }
 
-      List<String> lease = fileContents.split(' ');
+      // Define the regular expression to match the MAC address, hostname, and IP address
+      RegExp regExp = RegExp(r'([0-9A-Fa-f:]+)=([^=]+)=([0-9.]+)');
 
-      for (int x = 0; x < lease.length; x++) {
-        List<String> leaseProperty = lease[x].split('=');
+      // Find all matches in the fileContents
+      Iterable<RegExpMatch> matches = regExp.allMatches(fileContents);
 
-        if (leaseProperty.length < 3) {
-          printMsg("Bad Lease: \"${leaseProperty.join(" ")}\" Skipping ...");
-          continue;
-        }
-
-        leaseMap[g.lbMac]!.add(leaseProperty[macIdx]);
-        leaseMap[g.lbHost]!.add(leaseProperty[hostIdx]);
-        leaseMap[g.lbIp]!.add(leaseProperty[ipIdx]);
+      // Extract the MAC address, hostname, and IP address and add them to the leaseMap
+      for (RegExpMatch match in matches) {
+        leaseMap[g.lbMac]!.add(match.group(1)!);
+        leaseMap[g.lbHost]!.add(match.group(2)!);
+        leaseMap[g.lbIp]!.add(match.group(3)!);
       }
+
+      ///replace all quotes that might be in values
+      leaseMap.updateAll((key, valueList) {
+        return valueList.map((value) => value.replaceAll('"', '')).toList();
+      });
 
       if (removeBadLeases) {
         return g.validateLeases
@@ -76,6 +81,11 @@ class Ddwrt extends FileType {
   String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     StringBuffer sbDdwrt = StringBuffer();
 
+    ///replace all quotes that might be in values
+    leaseMap.updateAll((key, valueList) {
+      return valueList!.map((value) => value.replaceAll('"', '')).toList();
+    });
+
     for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
       sbDdwrt.write(
           """${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)}=${leaseMap[g.lbHost]?[x]}=${leaseMap[g.lbIp]?[x]}=1440 """);
@@ -93,6 +103,13 @@ class Ddwrt extends FileType {
 
       dynamic leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);
+          
+// there should be 3 equal signs for each lease group, if not there's a problem with the contents
+      double equalMatch = ("=".allMatches(fileContents).length / 3);
+
+      if (leaseMap['host-name']!.length != equalMatch) {
+        return false;
+      }
 
       if (g.validateLeases
           .containsBadLeases(leaseMap, g.fFormats.ddwrt.formatName)) {
