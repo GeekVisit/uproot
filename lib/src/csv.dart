@@ -121,8 +121,15 @@ class Csv extends FileType {
       return "";
     }
 
+
     sb.write("host-name, mac-address, address\n");
     for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
+
+      //if hostname is empty then fill it in with mac address with dashes
+      if (leaseMap[g.lbHost]![i] == "") {
+        leaseMap[g.lbHost]![i] = leaseMap[g.lbMac]![i].replaceAll(":", "-");
+      }
+      
       sb.write(
           // ignore: lines_longer_than_80_chars
           "${leaseMap[g.lbHost]![i]},${this.reformatMacForType(leaseMap[g.lbMac]![i], fileType)},${leaseMap[g.lbIp]![i]}\n");

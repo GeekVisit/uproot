@@ -18,18 +18,18 @@ import 'package:uprt/lib.dart';
 
 void main(List<String> arguments) {
   try {
-    arguments = <String>[
-      "test/test-data/dhcp-static-leases.rsc.txt",
-      "-f",
-      "-t",
-      "m",
-      "-g",
-      "c",
-      "-b",
-      "-d",
-      "test/test-output",
-      "-w"
-    ];
+    // arguments = <String>[
+    //   "test/test-data/dhcp-static-leases.rsc.txt",
+    //   "-f",
+    //   "-t",
+    //   "m",
+    //   "-g",
+    //   "c",
+    //   "-b",
+    //   "-d",
+    //   "test/test-output",
+    //   "-w"
+    // ];
 
     Converter uprt = Converter();
     uprt.convertFileList(arguments);

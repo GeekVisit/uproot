@@ -61,7 +61,7 @@ class ValidateLeases {
 
       if (!ip.isMacAddress(macAddress, g.macDelimiter[fileType]!)) {
         badLeaseBuffer.write(
-            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac A Address Not Valid");
         leaseIsValid = false;
       }
 
@@ -182,9 +182,8 @@ class ValidateLeases {
 
           //  continue;
         } else {
+          // ignore: lines_longer_than_80_chars
           printMsg(
-
-              // ignore: lines_longer_than_80_chars
               " ${g.colorWarning}Excluding lease from target file (total excluded: ${totalBadLeases + 1}): ${badLeases[totalBadLeases]}${g.ansiFormatEnd}");
           totalBadLeases++;
         }

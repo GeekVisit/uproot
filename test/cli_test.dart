@@ -21,7 +21,7 @@ void main() {
 bool isCorrectLeaseMapLength(
     Map<String, List<String>> leaseMap, int listLength) {
   print("""
-List Map length of host is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
+Number of good Hosts from file ${g.inputFile} is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
   return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
       (leaseMap[g.lbMac]?.length == listLength));
 }
@@ -1109,12 +1109,10 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
             50,
             deleteAllFiles: false);
       }
-      //  }
     }
   });
 
   test('isHostFqdn', () {
-    //Converter uprt = Converter();
     List<String> args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-f",
@@ -1375,8 +1373,8 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     testConvertFile(
         args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
 
-    // testConvertFile(
-    //     args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
+    testConvertFile(
+        args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
 
     testConvertFile(
         args, "test/test-data/lease-list-bad-infile-pihole.conf", uprt, 48);
@@ -1482,12 +1480,13 @@ void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
   }
 
   Converter.cleanUp();
-  // g.tempDir = Directory.systemTemp.createTempSync("uprt_");
 
   args[0] = inputFileToTest;
+  //convert the file to various formats
   Converter().initialize(args);
   g.argResults = g.cliArgs.getArgs(args);
   uprt.convertFileList(args);
+  //now test the output files for their expected good values
   testOutputFiles(testExpectedLeaseLength: expectedGoodLeasesInFile);
 }
 

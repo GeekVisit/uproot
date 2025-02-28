@@ -1,12 +1,25 @@
 # ChangeLog for [Uproot](https://github.com/GeekVisit/uproot) (uprt)
 
-2025.02.019
+## 2025.02.019
 
-* added support for piHole static leases
-* added option to strip out non-fully qualified domain name hosts from input files
-* added option to select colon or dash as delimiter character in mac addresses
-* fixed github issues #2,3 (lease conversions),6 (pihole)bug fixes
-* updated documentation
+### Added
+  
+* Added support for piHole static leases
+* Added -f option to adjust level of domain strictness required of hosts in input file; if lease having host does not meet requirement, lease is stripped from output file
+* Added -M option to select colon or dash as delimiter character in mac addresses
+
+### Changed
+
+* Where output file type requires it, empty hostnames are now filled in by dashed mac address
+* By default, host names must meet "relaxed" requirements of domain names (no tlds required, underscores allowed).  Requirements can be changed with the -f option
+
+### Fixes
+
+* Fixed github issues #2,3 (lease conversions),6 (pihole)bug fixes
+
+### Documentation
+
+* Updated documentation to reflect changes
 
 ## RELEASED
 

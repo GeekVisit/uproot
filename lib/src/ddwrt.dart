@@ -1,8 +1,6 @@
 // Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
-import 'dart:ffi';
-
 import '../lib.dart';
 import 'globals.dart' as g;
 
@@ -87,6 +85,11 @@ class Ddwrt extends FileType {
     });
 
     for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
+      //if hostname is empty then fill it in with mac address with dashes
+      if (leaseMap[g.lbHost]![x] == "") {
+        leaseMap[g.lbHost]![x] = leaseMap[g.lbMac]![x].replaceAll(":", "-");
+      }
+
       sbDdwrt.write(
           """${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)}=${leaseMap[g.lbHost]?[x]}=${leaseMap[g.lbIp]?[x]}=1440 """);
     }
@@ -103,7 +106,7 @@ class Ddwrt extends FileType {
 
       dynamic leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);
-          
+
 // there should be 3 equal signs for each lease group, if not there's a problem with the contents
       double equalMatch = ("=".allMatches(fileContents).length / 3);
 
