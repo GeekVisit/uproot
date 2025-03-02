@@ -1,19 +1,20 @@
 # ChangeLog for [Uproot](https://github.com/GeekVisit/uproot) (uprt)
 
-## 2025.02.019
+## 2025.03.001
 
 ### Added
   
 * Added support for piHole static leases
+* Added support for exporting and importing host names for Mikrotik leases
 * Added -f option to adjust level of domain strictness required of hosts in input file; if lease having host does not meet requirement, lease is stripped from output file
 * Added -M option to select colon or dash as delimiter character in mac addresses
 
 ### Changed
 
 * Where output file type requires it, empty hostnames are now filled in by dashed mac address
-* By default, host names must meet "relaxed" requirements of domain names (no tlds required, underscores allowed).  Requirements can be changed with the -f option
+* By default, host names must meet "relaxed" requirements of domain names (no tlds required, underscores allowed, but otherwise character requirements enforced).  Requirements can be changed with the -f option
 
-### Fixes
+### FixeD
 
 * Fixed github issues #2,3 (lease conversions),6 (pihole)bug fixes
 
@@ -21,9 +22,10 @@
 
 * Updated documentation to reflect changes
 
-## RELEASED
+## 2021.10.001 (beta)
 
-2021.10.001 (beta)  **Initial Release.**
+**Initial Release.**
+
 Features and options:
 
 ````bash

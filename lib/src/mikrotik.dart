@@ -4,6 +4,28 @@
 import '../lib.dart';
 import 'globals.dart' as g;
 
+
+/// A class representing Mikrotik file type operations.
+///
+/// This class extends the `FileType` class and provides methods to handle
+/// Mikrotik file contents and extract lease information.
+///
+/// Properties:
+/// - `fileType`: A string representing the format name of the Mikrotik file.
+///
+/// Methods:
+/// - `getLeaseMap`: Extracts lease information from the given Mikrotik file contents.
+///
+///   Parameters:
+///   - `fileContents` (String): The contents of the Mikrotik file. Default is an empty string.
+///   - `fileLines` (List<String>?): A list of lines from the file. Default is null.
+///   - `removeBadLeases` (bool): A flag indicating whether to remove bad leases. Default is true.
+///
+///   Returns:
+///   - `Map<String, List<String>>`: A map containing lease information categorized by host, MAC, and IP.
+///
+///   Throws:
+///   - `Exception`: If an error occurs during the processing of the file contents.
 class Mikrotik extends FileType {
   //
 
@@ -20,6 +42,8 @@ class Mikrotik extends FileType {
         g.lbIp: <String>[]
       };
 
+      bool isOutPutFile = fileContents.contains("/ip dns static");
+
       if (fileContents == "") {
         printMsg("Source file is empty or corrupt.", errMsg: true);
         return leaseMap;
@@ -27,45 +51,10 @@ class Mikrotik extends FileType {
 
       fileLines = fileContents.split("\n");
 
-      /// Parses lines from a file to extract IP addresses, MAC addresses, and host names,
-      /// and adds them to the `leaseMap`.
-      ///
-      /// Each line is expected to contain an IP address, MAC address, and host name in the
-      /// following formats:
-      /// - IP address: `address=xxx.xxx.xxx.xxx`
-      /// - MAC address: `mac-address=xx:xx:xx:xx:xx:xx`
-      /// - Host name: `host-name=hostname`
-      ///
-      /// If a host name is not found, the MAC address with colons replaced by hyphens is used as the host name.
-      ///
-      /// The extracted values are added to the `leaseMap` under the keys `g.lbIp`, `g.lbMac`, and `g.lbHost`.
-      ///
-      /// - Parameters:
-      ///   - fileLines: A list of strings representing lines from the file.
-      ///   - leaseMap: A map where the extracted values will be added.
-      ///   - g.lbIp: The key for storing IP addresses in the `leaseMap`.
-      ///   - g.lbMac: The key for storing MAC addresses in the `leaseMap`.
-      ///   - g.lbHost: The key for storing host names in the `leaseMap`.
-      for (var line in fileLines) {
-        final ipMatch = RegExp(r'\saddress\s*=\s*((?:\d{1,3}\.){3}\d{1,3})')
-            .firstMatch(line);
-        final macMatch =
-            RegExp(r'mac-address=(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))')
-                .firstMatch(line);
-        final hostMatch = RegExp(r'host-name=([\w\-\.]+)').firstMatch(line);
-
-        //skip lines that don't have ip or mac addresses
-        if (ipMatch == null || macMatch == Null) {
-          continue;
-        }
-
-        final ip = ipMatch.group(1) ?? '';
-        final mac = macMatch?.group(1) ?? '';
-        final host = hostMatch?.group(1) ?? mac.replaceAll(':', '-');
-
-        leaseMap[g.lbIp]!.add(ip);
-        leaseMap[g.lbMac]!.add(mac);
-        leaseMap[g.lbHost]!.add(host);
+      if (isOutPutFile) {
+        fillLeaseMapWithMikrotikOutputFile(fileLines, fileContents, leaseMap);
+      } else {
+        fillLeaseMapFromMikrotikInputFile(fileLines, fileContents, leaseMap);
       }
 
       if (removeBadLeases) {
@@ -80,14 +69,93 @@ class Mikrotik extends FileType {
     }
   }
 
+  void fillLeaseMapWithMikrotikOutputFile(List<String> fileLines,
+      String fileContents, Map<String, List<String>> leaseMap) {
+    final sectionRegEx = RegExp("/ip dhcp-server lease");
+
+    final ipRegEx =
+        RegExp(r'\smac-address=.*?address\s*=\s*((?:\d{1,3}\.){3}\d{1,3})');
+
+    final macRegEx =
+        RegExp(r'mac-address=(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))');
+
+    final hostRegEx = RegExp(r'\sname=([\w\-\.]+)');
+
+    int idxCurrentSection = 0;
+    for (var line in fileLines) {
+      if (sectionRegEx.hasMatch(line)) {
+        if (idxCurrentSection > 0 &&
+            leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
+          fillHostNameWithMac(leaseMap);
+        }
+
+        idxCurrentSection++;
+      } else if (macRegEx.hasMatch(line)) {
+        leaseMap[g.lbMac]!.add(macRegEx.firstMatch(line)!.group(1)!);
+
+        if (ipRegEx.hasMatch(line)) {
+          leaseMap[g.lbIp]!.add(ipRegEx.firstMatch(line)!.group(1)!);
+        }
+      } else if (hostRegEx.hasMatch(line)) {
+        leaseMap[g.lbHost]!.add(hostRegEx.firstMatch(line)!.group(1)!);
+      }
+    }
+    //after file has been processed check for hostName again
+    if (leaseMap[g.lbHost]!.length < leaseMap[g.lbMac]!.length) {
+      fillHostNameWithMac(leaseMap);
+    }
+  }
+
+  void fillLeaseMapFromMikrotikInputFile(List<String> fileLines,
+      String fileContents, Map<String, List<String>> leaseMap) {
+    for (var line in fileLines) {
+      var ipMatch =
+          RegExp(r'\saddress\s*=\s*((?:\d{1,3}\.){3}\d{1,3})').firstMatch(line);
+
+      final macMatch =
+          RegExp(r'mac-address=(([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2}))')
+              .firstMatch(line);
+      var hostMatch = RegExp(r'host-name=([\w\-\.]+)').firstMatch(line);
+
+      //skip lines that don't have ip or mac addresses
+      if (ipMatch == null || macMatch == null) {
+        continue;
+      }
+
+      final ip = ipMatch.group(1) ?? '';
+      final mac = macMatch.group(1) ?? '';
+      final host = hostMatch?.group(1) ?? mac.replaceAll(':', '-');
+
+      leaseMap[g.lbIp]!.add(ip);
+      leaseMap[g.lbMac]!.add(mac);
+      leaseMap[g.lbHost]!.add(host);
+    }
+  }
+
   @override
   String buildOutFileContents(Map<String, List<String>?> leaseMap) {
     StringBuffer sbMikrotik = StringBuffer();
     for (int x = 0; x < leaseMap[g.lbMac]!.length; x++) {
+      //if hostname is empty then fill it in with mac address with dashes
+      if (leaseMap[g.lbHost]![x] == "") {
+        leaseMap[g.lbHost]![x] = leaseMap[g.lbMac]![x].replaceAll(":", "-");
+      }
+      //two lines in rsc script - one to add mac/ip static lease, one to add hostname
+      sbMikrotik.write("""\n/ip dhcp-server lease""");
       sbMikrotik.write(
           """\nadd mac-address=${this.reformatMacForType(leaseMap[g.lbMac]![x], fileType)} address=${leaseMap[g.lbIp]?[x]} server=${g.argResults['server']}""");
+      sbMikrotik.write("""\n/ip dns static""");
+      sbMikrotik.write(
+          """\nadd address=${leaseMap[g.lbIp]?[x]} name=${leaseMap[g.lbHost]?[x]}""");
     }
-    return "/ip dhcp-server lease\n${sbMikrotik.toString().trim()}";
+    var result = "${sbMikrotik.toString().trim()}";
+    return result;
+  }
+
+  void fillHostNameWithMac(Map<String, List<String>> leaseMap) {
+    leaseMap[g.lbHost]!.add((leaseMap[g.lbMac]!.last.isNotEmpty)
+        ? leaseMap[g.lbMac]!.last.toString().replaceAll(':', '-')
+        : "");
   }
 
   @override
@@ -99,10 +167,6 @@ class Mikrotik extends FileType {
       }
 
       if (!fileContents.contains("/ip dhcp-server lease")) return false;
-
-      /*   List<String> importList = extractLeaseMatches(fileContents);
-      Map<String, List<String>> leaseMap =
-          getLease(fileLines: importList, removeBadLeases: false); */
 
       Map<String, List<String>> leaseMap =
           getLeaseMap(fileContents: fileContents, removeBadLeases: false);
@@ -120,7 +184,7 @@ class Mikrotik extends FileType {
       printMsg(e, errMsg: true);
       return false;
     }
-  }
 
-  //
+    //
+  }
 }

@@ -70,7 +70,7 @@ void testUpRooted() {
     pubSpecTestFile.writeAsStringSync("""
     name: uprt
     description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs, json, and piHole.
-    version: 2025.02.019
+    version: 2025.03.001
 
     """);
 
@@ -494,7 +494,7 @@ void testUpRooted() {
     ];
     uprt.convertFileList(args);
 
-    String badMikrotik = """
+    String partBadMikrotik = """
     /ip dhcp-server lease 
     add mac-address= address=192.168.0.2 server=defconf 
     add mac-address=AC:18:26:55:7B:66 address=192.168.0.146 server=defconf
@@ -514,7 +514,7 @@ void testUpRooted() {
     expect(mikrotik.isFileValid("test/test-data/lease-list-infile.rsc"), true);
     expect(
         mikrotik.isFileValid("test/test-data/lease-list-infile.json"), false);
-    expect(mikrotik.isContentValid(fileContents: badMikrotik), false);
+    expect(mikrotik.isContentValid(fileContents: partBadMikrotik), true);
     expect(mikrotik.isContentValid(fileContents: badMikrotik2), false);
     expect(mikrotik.isContentValid(fileContents: badMikrotik3), false);
     expect(mikrotik.isContentValid(fileContents: "hd nothing here"), false);
@@ -1004,6 +1004,9 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     ];
 // file shown is the input file, to convert to all formats which are tested for validity
     testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
+    testConvertFile(args, "test/test-data/dhcp-static-leases-rsc.txt", uprt, 6);
+    testConvertFile(
+        args, "test/test-data/dhcp-static-leases-bad-rsc.txt", uprt, 5);
     testConvertFile(args, "test/test-data/lease-list-infile.csv", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.json", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.ddwrt", uprt, 50);

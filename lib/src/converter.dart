@@ -52,60 +52,38 @@ class Converter {
 
   void convertToOutput() {
     try {
-      /**  split type argument regardless of comma separator*/
-      List<String> outputTypes =
+      // Create a map of output type handlers to eliminate switch statement
+      final outputHandlers = {
+        'c': () => _handleOutput(convertToCsv(), Csv(), g.fFormats.csv.abbrev,
+            g.fFormats.csv.fileExt),
+        'd': () => _handleOutput(convertToDdwrt(), Ddwrt(),
+            g.fFormats.ddwrt.abbrev, g.fFormats.ddwrt.fileExt),
+        'j': () => _handleOutput(convertToJson(), Json(),
+            g.fFormats.json.abbrev, g.fFormats.json.fileExt),
+        'm': () => _handleOutput(convertToMikroTik(), Mikrotik(),
+            g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.fileExt),
+        'n': () => _handleOutput(convertToOpnSense(), OpnSense(),
+            g.fFormats.opnsense.abbrev, g.fFormats.opnsense.fileExt),
+        'o': () => _handleOutput(convertToOpenWrt(), OpenWrt(),
+            g.fFormats.openwrt.abbrev, g.fFormats.openwrt.fileExt),
+        'p': () => _handleOutput(convertToPfsense(), PfSense(),
+            g.fFormats.pfsense.abbrev, g.fFormats.pfsense.fileExt),
+        'h': () => _handleOutput(convertToPiHole(), PiHole(),
+            g.fFormats.pihole.abbrev, g.fFormats.pihole.fileExt),
+      };
+
+      final outputTypes =
           g.cliArgs.getArgListOfMultipleOptions(g.argResults['generate-type']);
 
-      for (dynamic eachOutputType in outputTypes) {
-        switch (eachOutputType) {
-          case 'c':
-            saveAndValidateOutFile(convertToCsv(), Csv(), g.fFormats.csv.abbrev,
-                g.fFormats.csv.fileExt);
-            break;
+      for (final outputType in outputTypes) {
+        if (outputType == 'Z')
+          continue; // Skip if unable to determine file type
 
-          case 'd':
-            saveAndValidateOutFile(convertToDdwrt(), Ddwrt(),
-                g.fFormats.ddwrt.abbrev, g.fFormats.ddwrt.fileExt);
-            break;
-
-          case 'j':
-            saveAndValidateOutFile(convertToJson(), Json(),
-                g.fFormats.json.abbrev, g.fFormats.json.fileExt);
-            break;
-
-          case 'm':
-            saveAndValidateOutFile(convertToMikroTik(), Mikrotik(),
-                g.fFormats.mikrotik.abbrev, g.fFormats.mikrotik.fileExt);
-            break;
-
-          case 'n':
-            saveAndValidateOutFile(convertToOpnSense(), OpnSense(),
-                g.fFormats.opnsense.abbrev, "${g.fFormats.opnsense.fileExt}");
-
-            break;
-
-          case 'o':
-            saveAndValidateOutFile(convertToOpenWrt(), OpenWrt(),
-                g.fFormats.openwrt.abbrev, g.fFormats.openwrt.fileExt);
-            break;
-
-          case 'p':
-            saveAndValidateOutFile(convertToPfsense(), PfSense(),
-                g.fFormats.pfsense.abbrev, "${g.fFormats.pfsense.fileExt}");
-
-            break;
-
-          case 'h':
-            saveAndValidateOutFile(convertToPiHole(), PiHole(),
-                g.fFormats.pihole.abbrev, "${g.fFormats.pihole.fileExt}");
-
-            break;
-
-          case 'Z': //unable to determine file type
-            break;
-          default:
-            printMsg("Incorrect Output type: $eachOutputType.", errMsg: true);
-            break;
+        final handler = outputHandlers[outputType];
+        if (handler != null) {
+          handler();
+        } else {
+          printMsg("Incorrect Output type: $outputType.", errMsg: true);
         }
       }
     } on Exception catch (e) {
@@ -115,6 +93,12 @@ class Converter {
       }
       rethrow;
     }
+  }
+
+// Helper method to handle output operations
+  void _handleOutput(
+      dynamic convertedData, dynamic format, String abbrev, String fileExt) {
+    saveAndValidateOutFile(convertedData, format, abbrev, fileExt);
   }
 
   /// Save converted contents to outFile path and check if valid
@@ -383,34 +367,33 @@ $displaySourceFile =>>> $displayTargetFile (${g.typeOptionToName[g.inputType]} =
     return leaseList;
   }
 
-  ///  Merge Lease Map with Map of A Second File (Merge File Target)
-  /// Returns Lease Map of Merge
   Map<String, List<String>> mergeLeaseMapWithFile(
       Map<String, List<String>> inputFileLeaseMap, String mergeTargetPath) {
-    Map<String, List<String>> mergeTargetLeaseMap = <String, List<String>>{
-      g.lbMac: <String>[],
-      g.lbHost: <String>[],
-      g.lbIp: <String>[],
-    };
+    // Get type abbreviation once
+    final mergeTargetTypeAbbrev = g.cliArgs.getInputTypeAbbrev(mergeTargetPath);
 
-    dynamic mergeTargetTypeAbbrev =
-        g.cliArgs.getInputTypeAbbrev(mergeTargetPath);
-
-    String displayMergeFile = (g.verbose)
+    // Use lazy evaluation for display path
+    final displayMergeFile = g.verbose
         ? p.canonicalize(mergeTargetPath)
         : p.basename(mergeTargetPath);
 
     printMsg("Scanning merge file $displayMergeFile...");
-    mergeTargetLeaseMap = mergeLeaseMaps(
-        inputFileLeaseMap,
-        g.inputTypeCl[mergeTargetTypeAbbrev]!.getLeaseMap(
-            fileContents: File(mergeTargetPath).readAsStringSync()));
 
-    /* Remove duplicate leases **/
-    return g.validateLeases
+    // Read file contents once and store
+    final fileContents = File(mergeTargetPath).readAsStringSync();
 
-        //file type should be words
-        .removeBadLeases(
-            mergeTargetLeaseMap, g.typeOptionToName[mergeTargetTypeAbbrev]!);
+    // Get the input type handler once
+    final inputTypeHandler = g.inputTypeCl[mergeTargetTypeAbbrev];
+    if (inputTypeHandler == null) {
+      throw ArgumentError('Invalid merge target type: $mergeTargetTypeAbbrev');
+    }
+
+    // Perform merge operation
+    final mergedMap = mergeLeaseMaps(inputFileLeaseMap,
+        inputTypeHandler.getLeaseMap(fileContents: fileContents));
+
+    // Validate and return
+    return g.validateLeases.removeBadLeases(
+        mergedMap, g.typeOptionToName[mergeTargetTypeAbbrev] ?? 'unknown');
   }
 }

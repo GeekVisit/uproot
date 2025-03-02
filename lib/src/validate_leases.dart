@@ -24,21 +24,31 @@ class ValidateLeases {
 
 /* Check if already processed, if so mark as duplicate */
   bool isDuplicate(String mac, String host, String ip, StringBuffer sb) {
-    String reasonFailed;
+    // Early returns for the most common checks
+    if (processedMac.contains(mac)) {
+      _appendToBuffer(sb, "Mac Duplicate");
+      return true;
+    }
 
-    reasonFailed = processedMac.contains(mac)
-        ? "Mac Duplicate"
-        : processedName.contains(host) && host != ""
-            ? "Name Duplicate"
-            : processedIp.contains(ip)
-                ? "IP Duplicate"
-                : "";
+    if (host.isNotEmpty && processedName.contains(host)) {
+      _appendToBuffer(sb, "Name Duplicate");
+      return true;
+    }
 
-    (reasonFailed.isNotEmpty)
-        ? sb.write("${(sb.isNotEmpty) ? "," : ""}$reasonFailed")
-        : "";
+    if (processedIp.contains(ip)) {
+      _appendToBuffer(sb, "IP Duplicate");
+      return true;
+    }
 
-    return (reasonFailed.isNotEmpty);
+    return false;
+  }
+
+// Helper method to handle buffer appending
+  void _appendToBuffer(StringBuffer sb, String reason) {
+    if (sb.isNotEmpty) {
+      sb.write(',');
+    }
+    sb.write(reason);
   }
 
   /* Checks Validity of Mac, Ip, and Hostname for a particular lease */
@@ -61,7 +71,7 @@ class ValidateLeases {
 
       if (!ip.isMacAddress(macAddress, g.macDelimiter[fileType]!)) {
         badLeaseBuffer.write(
-            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac A Address Not Valid");
+            "${(badLeaseBuffer.isNotEmpty) ? "," : ""}Mac Address Not Valid");
         leaseIsValid = false;
       }
 
@@ -115,28 +125,38 @@ class ValidateLeases {
 
   bool containsBadLeases(Map<String, List<String>> leaseMap, String fileType) {
     ValidateLeases.clearProcessedLeases();
+
     try {
+      // Early returns for validation checks
       if (areAllLeaseMapValuesEmpty(leaseMap)) {
         printMsg("Source file is corrupt - unable to extract static leases.");
         return true;
       }
 
-      if (leaseMap[g.lbMac]!.length != leaseMap[g.lbIp]!.length) {
+      final macAddresses = leaseMap[g.lbMac];
+      final ipAddresses = leaseMap[g.lbIp];
+
+      if (macAddresses == null || ipAddresses == null) {
+        printMsg("Required lease data is missing.");
+        return true;
+      }
+
+      if (macAddresses.length != ipAddresses.length) {
         printMsg(
-            // ignore: lines_longer_than_80_chars
             "File is Corrupt - Mac Addresses do not match number of ip addresses.");
         return true;
       }
 
-      for (int i = 0; i < leaseMap[g.lbMac]!.length; i++) {
+      bool hasInvalidLease = false;
+      for (var i = 0; i < macAddresses.length && !hasInvalidLease; i++) {
         if (!g.validateLeases.isLeaseValid(leaseMap, i, fileType)) {
-          printBadLeases();
-          return true;
+          hasInvalidLease = true;
         }
       }
+
       printBadLeases();
-      return false;
-    } on Exception {
+      return hasInvalidLease;
+    } catch (e) {
       printBadLeases();
       return true;
     }
@@ -171,8 +191,12 @@ class ValidateLeases {
         printMsg("Error - no valid leases in source file.");
         return rawLeaseMap;
       }
+// get longest lease list length
+      int loopEnd = rawLeaseMap.values
+          .reduce((a, b) => a.length > b.length ? a : b)
+          .length;
 
-      for (int i = 0; i < rawLeaseMap[g.lbMac]!.length; i++) {
+      for (int i = 0; i < loopEnd; i++) {
         if (g.validateLeases.isLeaseValid(rawLeaseMap, i, fileType)) {
           goodLeaseMap[g.lbMac]!.add(rawLeaseMap[g.lbMac]![i].trim());
 

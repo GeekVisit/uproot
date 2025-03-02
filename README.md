@@ -55,7 +55,6 @@ If you have a target device that is supported, but an unsupported source device 
 
 ## Limitations
 
-* Mikrotik RouterOS output format does not yet support hostnames (i.e., all output `rsc` files are generated without hostnames). This is only a limitation on generated Mikrotik outputs. For example, using the steps in this readme you can take your exported Mikrotik static leases file from your Mikrotik router and convert it to another non-Mikrotik format, but if you convert it or any other source to Mikrotik file format the resulting output file will not contain the hostnames.  
 * Does not support ip6 leases
 
 ## Installing
@@ -122,14 +121,14 @@ Below is the latest help:
 
 ````bash
 
-uprt (2025.02.019 running on macos 10.15.7)
+uprt (2025.03.001 running on macos 10.15.7)
 
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
 Usage:
 
-uprt (2025.02.019)
+uprt (2025.03.001)
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
@@ -513,10 +512,10 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
 3. Execute the following:
 
     ````bash
-   /ip dhcp-server lease print terse file=dhcp-static-leases.rsc.txt
+   /ip dhcp-server lease print terse file=dhcp-static-leases-rsc.txt
     ````
 
-4. This exports a file called "dhcp-static-leases.rsc.txt" which will appear in `Files`.
+4. This exports a file called "dhcp-static-leases-rsc.txt" which will appear in `Files`.
 
     ![alt](readme/../readme-pics/)
 
@@ -524,7 +523,7 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
 
     ![alt](readme/../readme-pics/mikrotik-files-winbox.png))
 
-6. Download the `dhcp-static-leases.rsc.txt` to your computer.
+6. Download the `dhcp-static-leases-rsc.txt` to your computer.
 
     ![alt](readme-pics/mikrotik-download-of-export.png)
 
@@ -569,6 +568,12 @@ This will output a "merge-output-pfs.xml" file. [Import](#pfsense---import) this
   
       ````bash
       /ip dhcp-server lease print
+      ````
+
+    To view the static dns entries with hostnames, from Winbox - Click "IP" then "DNS" then "Static". From the terminal:
+
+      ````bash
+      /ip dns static print
       ````
 
 ### Mikrotik - Merging Static Leases with an Existing Configuration
