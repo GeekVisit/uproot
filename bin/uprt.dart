@@ -1,8 +1,6 @@
 // Copyright 2025 GeekVisit All rights reserved.
 // Use of this source code is governed by the license in the LICENSE file.
 
-
-
 // TODO: Add support for isc-dhcp dhcpd.leases ?
 
 import 'package:uprt/lib.dart';
@@ -11,6 +9,7 @@ void main(List<String> arguments) {
   try {
     // arguments = <String>[
     //   "test/test-data/dhcp-static-leases-rsc.txt",
+    //   "-f",
     //   "-t",
     //   "m",
     //   "-g",
@@ -19,7 +18,7 @@ void main(List<String> arguments) {
     //   "test-output-new-rsc",
     //   "-d",
     //   "test/test-output",
-    //   "-w"
+    //   "-w",
     // ];
 
     Converter uprt = Converter();

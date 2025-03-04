@@ -18,104 +18,181 @@ class CliArgs {
   ArgResults getArgs(List<String> arguments) {
     try {
       // Note that DefaultsTo only applies if option is not given at all
-      parser = ArgParser()
-        ..addFlag("append", abbr: 'a', negatable: false, help: """
+      parser =
+          ArgParser()
+            ..addFlag(
+              "append",
+              abbr: 'a',
+              negatable: false,
+              help: """
 Used when --merge and --sort are given.  If this flag is given, the merged file 
 will have the sorted leases from the source file appended to the end of the 
-target file leases rather than integrated with the merge file. """)
-        ..addOption(
-          "base-name",
-          abbr: 'b',
-          help:
-              // ignore: lines_longer_than_80_chars
-              "Specify Base Name of Output Files (default uses basename of input file)",
-          mandatory: false,
-        )
-        ..addOption("directory-out", mandatory: false, abbr: 'd', help: """
-Directory to write files to, defaults to same directory as input file.""")
-        ..addOption(
-          "fqdn",
-          abbr: 'f',
-          help:
+target file leases rather than integrated with the merge file. """,
+            )
+            ..addOption(
+              "base-name",
+              abbr: 'b',
+              help:
+                  // ignore: lines_longer_than_80_chars
+                  "Specify Base Name of Output Files (default uses basename of input file)",
+              mandatory: false,
+            )
+            ..addOption(
+              "directory-out",
+              mandatory: false,
+              abbr: 'd',
+              help: """
+Directory to write files to, defaults to same directory as input file.""",
+            )
+            ..addOption(
+              "fqdn",
+              abbr: 'f',
+              help:
               // ignore: lines_longer_than_80_chars
               """If option is not specified, default behavior is the relaxed mode. This option requires hostname to meet certain requirements for a domain name. Required options are 'strict' (host name must be fully qualified domain  requiring a tld (e.g., .local, .lan) and alphanumeric characters or hyphen),  "partial" is same as strict but does not require a tld (.e.g., .local). "relaxed" allows underscores and does not require tlds. Any leases with hostnames that do not fit the requirements are not added to the output file. """,
-          mandatory: false,
-          allowed: ['strict', 'partial', 'relaxed', 'anything-goes'],
-        )
-        ..addMultiOption("generate-type", abbr: 'g', help: """
+              mandatory: false,
+              allowed: ['strict', 'partial', 'relaxed', 'anything-goes'],
+            )
+            ..addMultiOption(
+              "generate-type",
+              abbr: 'g',
+              help: """
 Required. Generated types may be multiple. Valid values include: 
 c (csv), d (DD-WRT), j (json),
 m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
-""")
-        ..addFlag("help", negatable: false, help: "Help", abbr: "h",
-            callback: (dynamic e) {
-          if (e) {
-            displayHelp(1);
-          }
-        })
-        ..addOption("ip-high-address", mandatory: false, abbr: 'H', help: """
-Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File""")
-        ..addFlag("log",
-            abbr: 'l', negatable: false, defaultsTo: false, help: """
-Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""")
-        ..addOption("ip-low-address", mandatory: false, abbr: 'L', help: """
-Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""")
-        ..addOption(
-          "mac-delimiter",
-          abbr: 'M',
-          help:
+""",
+            )
+            ..addFlag(
+              "help",
+              negatable: false,
+              help: "Help",
+              abbr: "h",
+              callback: (dynamic e) {
+                if (e) {
+                  displayHelp(1);
+                }
+              },
+            )
+            ..addOption(
+              "ip-high-address",
+              mandatory: false,
+              abbr: 'H',
+              help: """
+Enforced Highest Ip of Network Range, Excludes Addresses Higher Than This From Target File""",
+            )
+            ..addFlag(
+              "log",
+              abbr: 'l',
+              negatable: false,
+              defaultsTo: false,
+              help: """
+Creates Log file, if -P not set, then location is at '${p.join(Directory.systemTemp.path, "uprt.log")}'""",
+            )
+            ..addOption(
+              "ip-low-address",
+              mandatory: false,
+              abbr: 'L',
+              help: """
+Enforced Lowest Ip of Network Range, Excludes Addresses Lower Than This From Target File""",
+            )
+            ..addOption(
+              "mac-delimiter",
+              abbr: 'M',
+              help:
               // ignore: lines_longer_than_80_chars
               """Specify the delimiter (without quotes) to be used in the out file for mac addresses.The delimiter can be either a colon (:) 8D:EB:29:19:6F:CE), or a hyphen (-) 8D-EB-29-19-6F-CE. If this option is not given, the delimiter will be what is required for the particular output type (e.g., piHole will use hyphen); for generic output types like cvs and json the delimiter will be the same as the input file.""",
-          mandatory: false,
-          allowed: [':', '-'],
-        )
-        ..addOption("merge", abbr: 'm', mandatory: false, help: """
+              mandatory: false,
+              allowed: [':', '-'],
+            )
+            ..addOption(
+              "merge",
+              abbr: 'm',
+              mandatory: false,
+              help: """
 Merge to file. Specify path to file to merge converted output. 
-Used to add static leases to an existing output file.""")
-        ..addOption("log-file-path",
-            abbr: 'P',
-            mandatory: false,
-            defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
-            help: "Full file path to log file.")
-        ..addFlag("replace-duplicates-in-merge-file",
-            negatable: false, defaultsTo: false, abbr: 'r', help: """
+Used to add static leases to an existing output file.""",
+            )
+            ..addOption(
+              "log-file-path",
+              abbr: 'P',
+              mandatory: false,
+              defaultsTo: '${p.join(Directory.systemTemp.path, "uprt.log")}',
+              help: "Full file path to log file.",
+            )
+            ..addFlag(
+              "replace-duplicates-in-merge-file",
+              negatable: false,
+              defaultsTo: false,
+              abbr: 'r',
+              help: """
 Applies only when using --merge. If this option is set and the source file 
 has a static lease which has the same mac address, ip or hostname as a lease in
 the merge file, the lease or leases in the merge file that have any of the
 duplicate components will be discarded and the input lease will be used.  
 By default, this is set to false so any lease in the input file that has the 
-same ip, hostname, or mac address as one in the merge file is discarded.""")
-        ..addFlag("sort",
-            abbr: 's', negatable: true, defaultsTo: true, help: """
-Leases in resulting output file are sorted by Ip address.""")
-        ..addOption("server",
-            mandatory: false,
-            defaultsTo: "defconf",
-            abbr: 'S',
-            help: "Name to designate in output file for Mikrotik dhcp server.")
-        ..addOption("input-type", mandatory: false, abbr: 't', help: """
+same ip, hostname, or mac address as one in the merge file is discarded.""",
+            )
+            ..addFlag(
+              "sort",
+              abbr: 's',
+              negatable: true,
+              defaultsTo: true,
+              help: """
+Leases in resulting output file are sorted by Ip address.""",
+            )
+            ..addOption(
+              "server",
+              mandatory: false,
+              defaultsTo: "defconf",
+              abbr: 'S',
+              help:
+                  "Name to designate in output file for Mikrotik dhcp server.",
+            )
+            ..addOption(
+              "input-type",
+              mandatory: false,
+              abbr: 't',
+              help: """
 Input file type:   c (csv), d (ddwrt), j (json),
 m (Mikrotik RouterOS), n (OPNsense), o (OpenWrt), p (pfsense), h (piHole)
 If this option is not used, uprt will try to determine file 
 type based on the following extensions: .csv, .ddwrt, 
 .json, .rsc (mikrotik), .xml (for opnsense and pfsense, 
-distinguishing by searching for <opnsense> in file)""")
-        ..addFlag("verbose", abbr: 'v', negatable: false, help: """
-Verbosity - additional messages""")
-        ..addFlag("version", negatable: false, abbr: 'V', help: "Gives Version",
-            callback: (dynamic e) {
-          if (e) {
-            print("${meta["name"]} version ${meta['version']}");
-            exit(0);
-          }
-        })
-        ..addFlag("write-over",
-            defaultsTo: false,
-            negatable: false,
-            help: "Overwrites output files, if left out, will not overwrite",
-            abbr: "w")
-        ..addFlag("verbose-debug", abbr: 'z', negatable: false, help: """
-Verbosity - debug level verbosity""");
+distinguishing by searching for <opnsense> in file)""",
+            )
+            ..addFlag(
+              "verbose",
+              abbr: 'v',
+              negatable: false,
+              help: """
+Verbosity - additional messages""",
+            )
+            ..addFlag(
+              "version",
+              negatable: false,
+              abbr: 'V',
+              help: "Gives Version",
+              callback: (dynamic e) {
+                if (e) {
+                  print("${meta["name"]} version ${meta['version']}");
+                  exit(0);
+                }
+              },
+            )
+            ..addFlag(
+              "write-over",
+              defaultsTo: false,
+              negatable: false,
+              help: "Overwrites output files, if left out, will not overwrite",
+              abbr: "w",
+            )
+            ..addFlag(
+              "verbose-debug",
+              abbr: 'z',
+              negatable: false,
+              help: """
+Verbosity - debug level verbosity""",
+            );
 
       if (arguments.isEmpty) {
         displayHelp(1);
@@ -124,24 +201,25 @@ Verbosity - debug level verbosity""");
       return parser.parse(arguments);
     } on FormatException catch (e) {
       if (!g.testRun) {
-        print(e);
-        displayHelp(1);
-        print("${g.newL}${g.colorError}Improper Usage - check help: "
-            "${e.message.toString().replaceFirst("""
-FormatException: """, "")}${g.ansiFormatEnd}");
+        ;
+        print(
+          "${g.newL}${g.colorError}Improper Usage - check help: "
+          "${e.message.toString().replaceFirst("""
+FormatException: """, "")}${g.ansiFormatEnd}",
+        );
         exit(1);
+      } else {
+        rethrow;
       }
-      rethrow;
     } on Exception {
-      displayHelp(1);
-      exit(1);
+      rethrow;
     }
   }
 
   void displayHelp(int errorCode) {
     try {
       //NOTE: Can't use printMsg here because argResults has not been
-      print("""
+      displayTextWithAutoPause("""
 ${meta["name"]} (${meta['version']} running on ${Platform.operatingSystem} ${Platform.operatingSystemVersion})
 
 ${meta['description']}
@@ -162,16 +240,13 @@ ${g.ansiBold}Convert multiple csv files to PfSense and saving output to a specif
 
   uprt test/test-data/*.csv -g p -d test/test-output
 
-${g.ansiBold}Convert a csv file to all formats, stripping out all leases that do not have a hostname that is a fully qualified domain name,  stripping out leases not in range, and saving output to specified directory${g.ansiFormatEnd}: 
+${g.ansiBold}Convert a csv file to all formats, stripping out all leases that do not have a hostname that is a fully qualified domain name, stripping out leases not in range, and saving output to specified directory${g.ansiFormatEnd}: 
 
-  uprt test/test-data/lease-list-infile.csv -fqdn -b converted-output -g cdjmnoph -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+  uprt test/test-data/lease-list-infile.csv -f strict -b converted-output -g cdjmnoph -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
   
 ${g.ansiBold}Convert a csv file from one that uses colons in mac addresses to a json file that has hyphens.${g.ansiFormatEnd}: 
 
   uprt test/test-data/lease-list-infile.csv -M - -b converted-output -g j -d test/test-output
-
-
-
 
 ${g.ansiBold}Merging leases in a CSV file with an existing DDWRT file and generating an OpnSense file${g.ansiFormatEnd}:
 
@@ -189,6 +264,32 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
       }
     } on Exception {
       rethrow;
+    }
+  }
+
+  void displayTextWithAutoPause(String text) {
+    if (g.testRun) {
+      printMsg(text);
+      return;
+    }
+    final terminalHeight = 20;
+    final lines = text.split('\n');
+    int lineNumber = 0;
+
+    for (final line in lines) {
+      stdout.writeln(line);
+      lineNumber++;
+
+      if (lineNumber >= terminalHeight) {
+        stdout.write('Press Return to continue...');
+        stdin.readLineSync();
+        lineNumber = 0;
+        /* stdout.write(
+          '\x1B[2J\x1B[H',
+        );
+        */
+        // Clear screen and move cursor to top-left
+      }
     }
   }
 
@@ -231,9 +332,12 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
         String fPath = "";
 
         // converts globlist to absolute path, works with .. */
-        List<dynamic> globList = Glob(p.absolute(
-                p.normalize(p.absolute(e)).toString().replaceAll(r'\', r'/')))
-            .listSync();
+        List<dynamic> globList =
+            Glob(
+              p.absolute(
+                p.normalize(p.absolute(e)).toString().replaceAll(r'\', r'/'),
+              ),
+            ).listSync();
 
         if (globList.isEmpty) {
           throw Exception("Source file \"$e\" not found");
@@ -261,10 +365,11 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
   void checkIfOptionArgsAreGiven() {
     try {
       String errorMessages = "";
-      List<dynamic> valueList = g.argResults.options
-              .toList()
-              .map((dynamic e) => g.argResults[e])
-              .toList(),
+      List<dynamic> valueList =
+              g.argResults.options
+                  .toList()
+                  .map((dynamic e) => g.argResults[e])
+                  .toList(),
           optionList = g.argResults.options.toList(),
           allowedOptionList = parser.options.keys.toList(),
           allowedAbbrevList =
@@ -333,10 +438,11 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
         //returns type option associated w/extension
       }
 
-      String errMsg = (filePath == g.inputFile)
-          // ignore: lines_longer_than_80_chars
-          ? "Please use only extensions specified in help or specify file type using -t"
-          : "";
+      String errMsg =
+          (filePath == g.inputFile)
+              // ignore: lines_longer_than_80_chars
+              ? "Please use only extensions specified in help or specify file type using -t"
+              : "";
       errMsg = """Unable to determine file type for $filePath $errMsg""";
 
       printMsg(errMsg);
@@ -377,28 +483,39 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
   /// Check if Mandatory Options Are Missing from Option or Value arguments
   void checkForMissingMandatoryOptions(List<String> requiredOptionsByAbbrs) {
     try {
-      List<String> allowedAbbrevList = parser.options.entries
-          .map((dynamic e) => e.value.abbr.toString())
-          .toList();
-      List<dynamic> optionsInValues = g.argResults.options
-          .map((dynamic e) => g.argResults[e])
-          .where((dynamic e) =>
-              (((allowedAbbrevList.contains(e.toString().replaceAll("-", ""))) |
-                      (allowedAbbrevList
-                          .contains(e.toString().replaceAll("--", ""))))
-                  ? true
-                  : false))
-          // ignore: always_specify_types
-          .map((dynamic e) => {
-                if (allowedAbbrevList.contains(e.toString().replaceAll("-", ""))
-                    ? true
-                    : false)
-                  parser
-                      .findByAbbreviation(e.toString().replaceAll("-", ""))!
-                      .name
-              })
-          .map((dynamic e) => e.join())
-          .toList();
+      List<String> allowedAbbrevList =
+          parser.options.entries
+              .map((dynamic e) => e.value.abbr.toString())
+              .toList();
+      List<dynamic> optionsInValues =
+          g.argResults.options
+              .map((dynamic e) => g.argResults[e])
+              .where(
+                (dynamic e) =>
+                    (((allowedAbbrevList.contains(
+                              e.toString().replaceAll("-", ""),
+                            )) |
+                            (allowedAbbrevList.contains(
+                              e.toString().replaceAll("--", ""),
+                            )))
+                        ? true
+                        : false),
+              )
+              // ignore: always_specify_types
+              .map(
+                (dynamic e) => {
+                  if (allowedAbbrevList.contains(
+                        e.toString().replaceAll("-", ""),
+                      )
+                      ? true
+                      : false)
+                    parser
+                        .findByAbbreviation(e.toString().replaceAll("-", ""))!
+                        .name,
+                },
+              )
+              .map((dynamic e) => e.join())
+              .toList();
       List<String> optionListNames = parser.options.keys.toList();
 
       List<String> missingOptionsOnCommandLine = <String>[];
@@ -411,26 +528,32 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
         }
       }
 
-      List<String> requiredOptionsByName = requiredOptionsByAbbrs
-          .map((dynamic e) =>
+      List<String> requiredOptionsByName =
+          requiredOptionsByAbbrs
+              .map(
+                (dynamic e) =>
+                // ignore: always_specify_types
+                {e = parser.findByAbbreviation(e.replaceAll("-", ""))!.name},
+              )
               // ignore: always_specify_types
-              {e = parser.findByAbbreviation(e.replaceAll("-", ""))!.name})
-          // ignore: always_specify_types
-          .map((e) => e.join())
-          .toList();
+              .map((e) => e.join())
+              .toList();
 
       /// Check for missing options, if in value list, that's ok since will be
       ///  messaged in calling method*/
       String missingMandatoryOptions = requiredOptionsByName
-          .where((dynamic e) =>
-              missingOptionsOnCommandLine.contains(e) &&
-              !optionsInValues.contains(e))
+          .where(
+            (dynamic e) =>
+                missingOptionsOnCommandLine.contains(e) &&
+                !optionsInValues.contains(e),
+          )
           .toList()
           .join(",");
 
       (missingMandatoryOptions.isNotEmpty)
           ? throw Exception(
-              "${g.newL}Missing mandatory option(s): $missingMandatoryOptions")
+            "${g.newL}Missing mandatory option(s): $missingMandatoryOptions",
+          )
           : "";
     } on Exception {
       rethrow;
@@ -438,9 +561,10 @@ ${g.ansiBold}Make a full backup of your router/firewall before importing any fil
   }
 
   List<String> getArgListOfMultipleOptions(dynamic argOption) {
-    List<String> types = (argOption[0].length > 1)
-        ? argOption[0].split(RegExp(r"b*"))
-        : argOption[0].split(",");
+    List<String> types =
+        (argOption[0].length > 1)
+            ? argOption[0].split(RegExp(r"b*"))
+            : argOption[0].split(",");
     return types;
   }
 }

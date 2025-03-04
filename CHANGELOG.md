@@ -1,5 +1,16 @@
 # ChangeLog for [Uproot](https://github.com/GeekVisit/uproot) (uprt)
 
+## 2025.03.004
+
+### Added
+
+* Help now pauses every 20 lines on scroll
+  
+### Fixed
+
+* Example in help was wrong
+* Pubspec.yaml fixed to permit compile
+
 ## 2025.03.001
 
 ### Added
@@ -14,7 +25,7 @@
 * Where output file type requires it, empty hostnames are now filled in by dashed mac address
 * By default, host names must meet "relaxed" requirements of domain names (no tlds required, underscores allowed, but otherwise character requirements enforced).  Requirements can be changed with the -f option
 
-### FixeD
+### Fixed
 
 * Fixed github issues #2,3 (lease conversions),6 (pihole)bug fixes
 

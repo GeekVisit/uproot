@@ -19,9 +19,13 @@ void main() {
 }
 
 bool isCorrectLeaseMapLength(
-    Map<String, List<String>> leaseMap, int listLength) {
-  print("""
-Number of good Hosts from file ${g.inputFile} is ${leaseMap[g.lbHost]!.length}, expected is $listLength""");
+  Map<String, List<String>> leaseMap,
+  int listLength,
+) {
+  print(
+    """
+Number of good Hosts from file ${g.inputFile} is ${leaseMap[g.lbHost]!.length}, expected is $listLength""",
+  );
   return ((leaseMap[g.lbIp]?.length == leaseMap[g.lbMac]?.length) &&
       (leaseMap[g.lbMac]?.length == listLength));
 }
@@ -31,8 +35,8 @@ Number of good Hosts from file ${g.inputFile} is ${leaseMap[g.lbHost]!.length}, 
 void testUpRooted() {
   Converter uprt = Converter();
 
-//Test whether have same number of lease components
-//in final file and have expected length
+  //Test whether have same number of lease components
+  //in final file and have expected length
   List<String> args = <String>[
     "test/test-data/lease-list-infile.csv",
     "-L",
@@ -40,7 +44,7 @@ void testUpRooted() {
     "-H",
     "192.168.0.254",
     "-b",
-    "test-output-file"
+    "test-output-file",
   ];
 
   List<String> argsTestBase = <String>[
@@ -53,7 +57,7 @@ void testUpRooted() {
     "test-output-file",
     "-d",
     "test/test-output",
-    "-w"
+    "-w",
   ];
 
   g.argResults = g.cliArgs.getArgs(args);
@@ -61,16 +65,17 @@ void testUpRooted() {
   ///*********** TEST METHODS */
 
   Ip ip = Ip();
-/**************** TESTS: *******************/
+  /**************** TESTS: *******************/
   test('metaCheck', () {
     Directory pubSpecTestDir = Directory.systemTemp.createTempSync("uprt-test");
-    File pubSpecTestFile =
-        File(p.join(pubSpecTestDir.absolute.path, "pubspec-test.yaml"));
+    File pubSpecTestFile = File(
+      p.join(pubSpecTestDir.absolute.path, "pubspec-test.yaml"),
+    );
 
     pubSpecTestFile.writeAsStringSync("""
     name: uprt
     description: A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports cvs, json, and piHole.
-    version: 2025.03.001
+    version: 2025.03.004
 
     """);
 
@@ -94,33 +99,55 @@ void testUpRooted() {
   test('isWithinRange', () {
     g.argResults = g.cliArgs.getArgs(args);
     expect(
-        ip.isWithinRange("192.168.0.23", "192.168.0.1", "192.168.0.254"), true);
+      ip.isWithinRange("192.168.0.23", "192.168.0.1", "192.168.0.254"),
+      true,
+    );
     expect(
-        ip.isWithinRange("192.168.0.2", "192.168.0.1", "192.168.0.254"), true);
+      ip.isWithinRange("192.168.0.2", "192.168.0.1", "192.168.0.254"),
+      true,
+    );
     expect(
-        ip.isWithinRange("192.168.0.1", "192.168.0.1", "192.168.0.254"), true);
+      ip.isWithinRange("192.168.0.1", "192.168.0.1", "192.168.0.254"),
+      true,
+    );
     expect(
-        ip.isWithinRange("192.168.0.25", "192.168.0.1", "192.168.0.254"), true);
+      ip.isWithinRange("192.168.0.25", "192.168.0.1", "192.168.0.254"),
+      true,
+    );
     expect(
-        ip.isWithinRange("192.168.0.0", "192.168.0.1", "192.168.0.254"), false);
-    expect(ip.isWithinRange("192.168.0.254", "192.168.0.1", "192.168.0.254"),
-        true);
-    expect(ip.isWithinRange("192.168.0.255", "192.168.0.1", "192.168.0.254"),
-        false);
+      ip.isWithinRange("192.168.0.0", "192.168.0.1", "192.168.0.254"),
+      false,
+    );
     expect(
-        ip.isWithinRange("9990.0.255", "192.168.0.1", "192.168.0.254"), false);
+      ip.isWithinRange("192.168.0.254", "192.168.0.1", "192.168.0.254"),
+      true,
+    );
+    expect(
+      ip.isWithinRange("192.168.0.255", "192.168.0.1", "192.168.0.254"),
+      false,
+    );
+    expect(
+      ip.isWithinRange("9990.0.255", "192.168.0.1", "192.168.0.254"),
+      false,
+    );
   });
 
   test('ipStrToNum', () {
     expect(ip.ipStrToNum("192.158.0.1"), 192158000001);
     expect(ip.ipStrToNum("192.158.244.244"), 192158244244);
-    expect(() => ip.ipStrToNum("192158.244.244"),
-        checkErrorMessage("Not an ip4 Address"));
-    expect(() => ip.ipStrToNum("192158.244.dd"),
-        checkErrorMessage("Not an ip4 Address"));
+    expect(
+      () => ip.ipStrToNum("192158.244.244"),
+      checkErrorMessage("Not an ip4 Address"),
+    );
+    expect(
+      () => ip.ipStrToNum("192158.244.dd"),
+      checkErrorMessage("Not an ip4 Address"),
+    );
     expect(() => ip.ipStrToNum(""), checkErrorMessage("Not an ip4 Address"));
-    expect(() => ip.ipStrToNum('\$\%#@192.168'),
-        checkErrorMessage("Not an ip4 Address"));
+    expect(
+      () => ip.ipStrToNum('\$\%#@192.168'),
+      checkErrorMessage("Not an ip4 Address"),
+    );
   });
 
   test("Args", () {
@@ -159,15 +186,17 @@ void testUpRooted() {
     g.cliArgs.getInputTypeAbbrev();
     expect(g.lastPrint, contains("Unable to determine file type"));
 
-/* Test Mandatory */
+    /* Test Mandatory */
 
     args = <String>[...argsTestBase];
     args.remove("-g");
     g.argResults = g.cliArgs.getArgs(args);
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("Missing mandatory option(s): generate-type"));
+    expect(
+      () => g.cliArgs.checkArgs(),
+      checkErrorMessage("Missing mandatory option(s): generate-type"),
+    );
 
-/** Test for Missing Arguments to options*/
+    /** Test for Missing Arguments to options*/
     args = <String>[
       "-g",
       "cdjmnoph",
@@ -176,15 +205,15 @@ void testUpRooted() {
       "test-base-name",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
 
     expect(
-        () => g.cliArgs.checkArgs(),
-        checkErrorMessage(
-            "ip-low-address is missing argument and is set to -b"));
+      () => g.cliArgs.checkArgs(),
+      checkErrorMessage("ip-low-address is missing argument and is set to -b"),
+    );
 
     args = <String>[
       "test/test-data/lease-list-infile.csv",
@@ -195,13 +224,15 @@ void testUpRooted() {
       "-b",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
 
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("is missing argument and is set to -d"));
+    expect(
+      () => g.cliArgs.checkArgs(),
+      checkErrorMessage("is missing argument and is set to -d"),
+    );
 
     args = <String>[
       "test/test-data/lease-list-infile.csv",
@@ -211,11 +242,13 @@ void testUpRooted() {
       "base-file",
       "-d",
       "-w",
-      "-L"
+      "-L",
     ];
 
-    expect(() => g.cliArgs.getArgs(args),
-        checkErrorMessage('Missing argument for "-L"'));
+    expect(
+      () => g.cliArgs.getArgs(args),
+      checkErrorMessage('Missing argument for "-L"'),
+    );
 
     args = <String>[
       "test/test-data/lease-list-infile.csv",
@@ -227,13 +260,15 @@ void testUpRooted() {
       "--log-file-path",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
 
-    expect(() => g.cliArgs.checkArgs(),
-        checkErrorMessage("is missing argument and is set to --log-file-path"));
+    expect(
+      () => g.cliArgs.checkArgs(),
+      checkErrorMessage("is missing argument and is set to --log-file-path"),
+    );
 
     /* test if argument is an option without a hyphen it doesn't trigger error, 
     in this example,
@@ -251,7 +286,7 @@ void testUpRooted() {
       "test/test-output",
       "-w",
       "-b",
-      "test-file"
+      "test-file",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
@@ -272,7 +307,7 @@ void testUpRooted() {
       "test-base-name",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
@@ -301,7 +336,7 @@ void testUpRooted() {
   test('isJson', () {
     Json json = Json();
 
-//  csv->json
+    //  csv->json
     List<String> args = <String>[
       "test/test-data/lease-list-infile.csv",
       "-t",
@@ -316,17 +351,19 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     uprt.convertFileList(args);
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
-//ddwrt->json
+    //ddwrt->json
     args = <String>[
       "test/test-data/lease-list-infile.ddwrt",
       "-t",
@@ -341,15 +378,17 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
     //mikrotik->json
     args = <String>[
@@ -366,15 +405,17 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
     //openwrt->json
     args = <String>[
@@ -391,16 +432,18 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
-//opnsense->json
+    //opnsense->json
     args = <String>[
       'test/test-data/lease-list-infile-opn.xml',
       "-t",
@@ -415,15 +458,17 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
     //pfsense->json
     args = <String>[
@@ -440,38 +485,50 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
     expect(
-        json.isContentValid(
-            fileContents: File("test/test-output/test-output-file.json")
-                .readAsStringSync()),
-        true);
+      json.isContentValid(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      true,
+    );
 
     String filePath = "test/test-data/lease-list-infile.json";
     String fileContents = File(filePath).readAsStringSync();
 
     expect(json.isContentValid(fileContents: fileContents), true);
     expect(
-        json.isContentValid(fileContents: '{"item1: value", "value"}'), false);
+      json.isContentValid(fileContents: '{"item1: value", "value"}'),
+      false,
+    );
 
     expect(
-        json.isJson('asld;asdf32323 asdfasdf [{23423} {asdf:asdfasdf'), false);
+      json.isJson('asld;asdf32323 asdfasdf [{23423} {asdf:asdfasdf'),
+      false,
+    );
     expect(json.isJson('{"item1: value", "item2: value"}'), false);
 
     expect(
-        json.isJson(
-            '{["item1: value", "value"} {"item1: value", item2: "value"}]'),
-        false);
-    expect(json.isJson('{["item1: value", "value"} , {"item1: value value"}]'),
-        false);
+      json.isJson(
+        '{["item1: value", "value"} {"item1: value", item2: "value"}]',
+      ),
+      false,
+    );
+    expect(
+      json.isJson('{["item1: value", "value"} , {"item1: value value"}]'),
+      false,
+    );
 
     expect(
-        json.isJson(
-            '''[ { "item1" : 2, "item2" : "value" }, { "item3" : "value", "item4" : "value" } ]'''),
-        true);
+      json.isJson(
+        '''[ { "item1" : 2, "item2" : "value" }, { "item3" : "value", "item4" : "value" } ]''',
+      ),
+      true,
+    );
   });
 
   test('isMikrotik', () {
@@ -490,7 +547,7 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -513,7 +570,9 @@ void testUpRooted() {
     expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"), true);
     expect(mikrotik.isFileValid("test/test-data/lease-list-infile.rsc"), true);
     expect(
-        mikrotik.isFileValid("test/test-data/lease-list-infile.json"), false);
+      mikrotik.isFileValid("test/test-data/lease-list-infile.json"),
+      false,
+    );
     expect(mikrotik.isContentValid(fileContents: partBadMikrotik), true);
     expect(mikrotik.isContentValid(fileContents: badMikrotik2), false);
     expect(mikrotik.isContentValid(fileContents: badMikrotik3), false);
@@ -537,7 +596,7 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -588,9 +647,13 @@ void testUpRooted() {
     """);
 
     expect(
-        openwrt.isFileValid("test/test-data/lease-list-infile.openwrt"), true);
+      openwrt.isFileValid("test/test-data/lease-list-infile.openwrt"),
+      true,
+    );
     expect(
-        openwrt.isFileValid("test/test-output/test-output-file.openwrt"), true);
+      openwrt.isFileValid("test/test-output/test-output-file.openwrt"),
+      true,
+    );
     expect(openwrt.isFileValid("test/test-data/lease-list-infile.json"), false);
     expect(openwrt.isContentValid(fileLines: goodOpenWrt), true);
     expect(openwrt.isContentValid(fileLines: badOpenWrt2), false);
@@ -616,7 +679,7 @@ void testUpRooted() {
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -658,7 +721,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -666,28 +729,45 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
     expect(csv.isFileValid("test/test-output/test-output-file.csv"), true);
 
     expect(csv.isFileValid("test/test-data/lease-list-infile.ddwrt"), false);
-    expect(csv.isContentValid(fileContents: """
+    expect(
+      csv.isContentValid(
+        fileContents: """
             host-name,mac-address,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D9:8D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """), true);
+            """,
+      ),
+      true,
+    );
     expect(
-        csv.isContentValid(
-            fileContents: '{"hostname, macaddress, address, value"}'),
-        false);
-    expect(csv.isContentValid(fileContents: """
+      csv.isContentValid(
+        fileContents: '{"hostname, macaddress, address, value"}',
+      ),
+      false,
+    );
+    expect(
+      csv.isContentValid(
+        fileContents: """
             host-name,mac-address,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D98D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """), false);
-    expect(csv.isContentValid(fileContents: """
+            """,
+      ),
+      false,
+    );
+    expect(
+      csv.isContentValid(
+        fileContents: """
             host-name,macaddress,address
             sbBjvPlVX,7F:5D:E0:9F:3D:00,192.168.0.233
             ZVdfiSQ,30:7C:6C:27:D9:8D,192.168.0.253
             IyPaYwzKNk,AF:17:50:02:F8:0A,192.168.0.240
-            """), false);
+            """,
+      ),
+      false,
+    );
   });
 
   test('isPiHole', () {
@@ -706,7 +786,7 @@ C4:4D:02:A0:E1:96=WHis= 7F:B7:26:C3:A8:D3=FxwzLDsBK=192.168.0.4=1440 FC:D6:B5:48
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -735,10 +815,14 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.168.0,host3
 dhcp-host=0A-00-27-00-00-0F,192.168.0.2,host2
 dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
      """);
-    expect(piHole.isFileValid("test/test-data/lease-list-infile-pihole.conf"),
-        true);
-    expect(piHole.isFileValid("test/test-output/test-output-file-pihole.conf"),
-        true);
+    expect(
+      piHole.isFileValid("test/test-data/lease-list-infile-pihole.conf"),
+      true,
+    );
+    expect(
+      piHole.isFileValid("test/test-output/test-output-file-pihole.conf"),
+      true,
+    );
     expect(piHole.isFileValid("test/test-data/lease-list-infile.json"), false);
 
     expect(piHole.isContentValid(fileLines: goodPiHole), true);
@@ -768,7 +852,7 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
@@ -862,14 +946,17 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
    """;
 
     expect(
-        opnSense.isFileValid(
-          "test/test-output/test-output-file-opn.xml",
-        ),
-        true);
+      opnSense.isFileValid("test/test-output/test-output-file-opn.xml"),
+      true,
+    );
     expect(
-        opnSense.isFileValid("test/test-data/lease-list-infile-opn.xml"), true);
+      opnSense.isFileValid("test/test-data/lease-list-infile-opn.xml"),
+      true,
+    );
     expect(
-        opnSense.isFileValid("test/test-data/lease-list-infile.json"), false);
+      opnSense.isFileValid("test/test-data/lease-list-infile.json"),
+      false,
+    );
     expect(opnSense.isContentValid(fileContents: badOpnsense), false);
 
     expect(opnSense.isContentValid(fileContents: goodOpnsense), true);
@@ -892,15 +979,14 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     uprt.convertFileList(args);
 
     expect(
-        pfSense.isFileValid(
-          "test/test-output/test-output-file-pfs.xml",
-        ),
-        true);
+      pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"),
+      true,
+    );
 
     String goodPfsense = """
 <dhcpd>
@@ -983,7 +1069,9 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
    """;
 
     expect(
-        pfSense.isFileValid("test/test-data/lease-list-infile-pfs.xml"), true);
+      pfSense.isFileValid("test/test-data/lease-list-infile-pfs.xml"),
+      true,
+    );
     expect(pfSense.isFileValid("test/test-data/lease-list-infile.json"), false);
     expect(pfSense.isContentValid(fileContents: badPfsense), false);
 
@@ -1000,13 +1088,17 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
-// file shown is the input file, to convert to all formats which are tested for validity
+    // file shown is the input file, to convert to all formats which are tested for validity
     testConvertFile(args, "test/test-data/lease-list-infile.rsc", uprt, 50);
     testConvertFile(args, "test/test-data/dhcp-static-leases-rsc.txt", uprt, 6);
     testConvertFile(
-        args, "test/test-data/dhcp-static-leases-bad-rsc.txt", uprt, 5);
+      args,
+      "test/test-data/dhcp-static-leases-bad-rsc.txt",
+      uprt,
+      5,
+    );
     testConvertFile(args, "test/test-data/lease-list-infile.csv", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.json", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile.ddwrt", uprt, 50);
@@ -1014,7 +1106,11 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     testConvertFile(args, "test/test-data/lease-list-infile-opn.xml", uprt, 50);
     testConvertFile(args, "test/test-data/lease-list-infile-pfs.xml", uprt, 50);
     testConvertFile(
-        args, "test/test-data/lease-list-infile-pihole.conf", uprt, 50);
+      args,
+      "test/test-data/lease-list-infile-pihole.conf",
+      uprt,
+      50,
+    );
   });
 
   test('merge', () {
@@ -1027,7 +1123,7 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "-d",
       "test/test-output",
       "-m",
-      "" //replace this with path to merge file
+      "", //replace this with path to merge file
     ];
 
     deleteFiles("test/test-output/*output*.*");
@@ -1039,11 +1135,12 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
             "test/test-data/lease-list-infile${eachFormatForMergeExt.fileExt}";
 
         testConvertFile(
-            args,
-            "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
-            uprt,
-            50,
-            deleteAllFiles: false);
+          args,
+          "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
+          uprt,
+          50,
+          deleteAllFiles: false,
+        );
       }
       //  }
     }
@@ -1072,11 +1169,12 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
             "test/test-data/lease-list-infile${eachFormatForMergeExt.fileExt}";
 
         testConvertFile(
-            args,
-            "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
-            uprt,
-            50,
-            deleteAllFiles: false);
+          args,
+          "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
+          uprt,
+          50,
+          deleteAllFiles: false,
+        );
       }
       //  }
     }
@@ -1094,7 +1192,7 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "-m",
       "" //replace this with path to merge file
           "-s",
-      "-a"
+      "-a",
     ];
 
     deleteFiles("test/test-output/*output*.*");
@@ -1106,11 +1204,12 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
             "test/test-data/lease-list-infile${eachFormatForMergeExt.fileExt}";
 
         testConvertFile(
-            args,
-            "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
-            uprt,
-            50,
-            deleteAllFiles: false);
+          args,
+          "test/test-data/lease-list-infile${eachFormatForInputExt.fileExt}",
+          uprt,
+          50,
+          deleteAllFiles: false,
+        );
       }
     }
   });
@@ -1134,24 +1233,30 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     Map<String, List<String>> testLeaseMap = {
       g.lbHost: ["example.com"],
       g.lbMac: ["00:1A:2B:3C:4D:5E"],
-      g.lbIp: ["192.168.0.23"]
+      g.lbIp: ["192.168.0.23"],
     };
 
     //with tld -> false it's not a bad lease
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
     // no tld -> true it's a bad lease
     testLeaseMap[g.lbHost] = ["example"];
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        true);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      true,
+    );
 
     printMsg("Fqdn partial tests");
 
-//partial
+    //partial
 
     args = <String>[
       "test/test-data/lease-list-infile.csv",
@@ -1171,18 +1276,24 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     testLeaseMap[g.lbHost] = ["example__"];
 
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        true);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      true,
+    );
 
     testLeaseMap[g.lbHost] = ["example"];
     g.argResults = g.cliArgs.getArgs(args);
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
 
-//relaxed
+    //relaxed
 
     printMsg("Fqdn Relaxed tests");
     testLeaseMap[g.lbHost] = ["example_"];
@@ -1202,16 +1313,22 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     g.argResults = g.cliArgs.getArgs(args);
 
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
 
     testLeaseMap[g.lbHost] = ["example__::"];
 
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
 
     // no fqdn option
 
@@ -1229,17 +1346,23 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
     g.argResults = g.cliArgs.getArgs(args);
 
     testLeaseMap[g.lbHost] = ["example.com"];
-//with tld -> false it's not a bad lease
+    //with tld -> false it's not a bad lease
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
     // no tld -> true it's still not a bad lease because fqdn not required
     testLeaseMap[g.lbHost] = ["example_"];
     expect(
-        g.validateLeases
-            .containsBadLeases(testLeaseMap, g.fFormats.openwrt.formatName),
-        false);
+      g.validateLeases.containsBadLeases(
+        testLeaseMap,
+        g.fFormats.openwrt.formatName,
+      ),
+      false,
+    );
 
     args = <String>[
       "", //Input file argument replaced in test methods
@@ -1251,35 +1374,51 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
     // strict
     Converter().initialize(args);
     g.argResults = g.cliArgs.getArgs(args);
 
     testConvertFile(
-        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 1);
+      args,
+      "test/test-data/lease-list-infile-fqdn-test.csv",
+      uprt,
+      1,
+    );
 
     args[4] = "partial";
     Converter().initialize(args);
     g.argResults = g.cliArgs.getArgs(args);
 
     testConvertFile(
-        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 4);
+      args,
+      "test/test-data/lease-list-infile-fqdn-test.csv",
+      uprt,
+      4,
+    );
 
     args[4] = "relaxed";
     Converter().initialize(args);
     g.argResults = g.cliArgs.getArgs(args);
 
     testConvertFile(
-        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 5);
+      args,
+      "test/test-data/lease-list-infile-fqdn-test.csv",
+      uprt,
+      5,
+    );
 
     args[4] = "anything-goes";
     Converter().initialize(args);
     g.argResults = g.cliArgs.getArgs(args);
 
     testConvertFile(
-        args, "test/test-data/lease-list-infile-fqdn-test.csv", uprt, 6);
+      args,
+      "test/test-data/lease-list-infile-fqdn-test.csv",
+      uprt,
+      6,
+    );
   });
 
   //convert each input into a csv file and see if they validate
@@ -1294,41 +1433,77 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test/test-output",
       "-w",
       "-t",
-      "c"
+      "c",
     ];
 
     args[9] = "c"; //test empty file with different types
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     args[9] = "d";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     args[9] = "j";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     args[9] = "m";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     args[9] = "n";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     args[9] = "o";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     testPrintMsgOnGenerate(args, "test/test-data/*.csv", uprt, "");
     args[9] = "p";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
     args[9] = "h";
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-empty.csv",
-        uprt, "failed to validate");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-empty.csv",
+      uprt,
+      "failed to validate",
+    );
   });
 
   test('bad_input_files', () {
@@ -1342,45 +1517,78 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "test-output-file",
       "-d",
       "test/test-output",
-      "-w"
+      "-w",
     ];
 
     // Files totally bad
 
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-all-data.json",
-        uprt, "failed to validate and save");
-
-    testPrintMsgOnGenerate(args, "test/test-data/lease-list-bad-mac-data.json",
-        uprt, "failed to validate and save");
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-all-data.json",
+      uprt,
+      "failed to validate and save",
+    );
 
     testPrintMsgOnGenerate(
-        args,
-        "test/test-data/lease-list-bad-address-data.json",
-        uprt,
-        "failed to validate and save");
+      args,
+      "test/test-data/lease-list-bad-mac-data.json",
+      uprt,
+      "failed to validate and save",
+    );
+
+    testPrintMsgOnGenerate(
+      args,
+      "test/test-data/lease-list-bad-address-data.json",
+      uprt,
+      "failed to validate and save",
+    );
 
     // //Partially bad files
     testConvertFile(args, "test/test-data/lease-list-bad-infile.csv", uprt, 45);
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-infile.ddwrt", uprt, 47);
+      args,
+      "test/test-data/lease-list-bad-infile.ddwrt",
+      uprt,
+      47,
+    );
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-infile.openwrt", uprt, 47);
+      args,
+      "test/test-data/lease-list-bad-infile.openwrt",
+      uprt,
+      47,
+    );
 
     testConvertFile(args, "test/test-data/lease-list-bad-infile.rsc", uprt, 47);
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-infile-opn.xml", uprt, 47);
+      args,
+      "test/test-data/lease-list-bad-infile-opn.xml",
+      uprt,
+      47,
+    );
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-infile-pfs.xml", uprt, 47);
+      args,
+      "test/test-data/lease-list-bad-infile-pfs.xml",
+      uprt,
+      47,
+    );
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-host-data.json", uprt, 7);
+      args,
+      "test/test-data/lease-list-bad-host-data.json",
+      uprt,
+      7,
+    );
 
     testConvertFile(
-        args, "test/test-data/lease-list-bad-infile-pihole.conf", uprt, 48);
+      args,
+      "test/test-data/lease-list-bad-infile-pihole.conf",
+      uprt,
+      48,
+    );
   });
 
   test('log', () {
@@ -1407,10 +1615,11 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("Uprt converting") &&
-            logFileContents.contains("Validating output") &&
-            logFileContents.contains("Finished validating leases"),
-        true);
+      logFileContents.contains("Uprt converting") &&
+          logFileContents.contains("Validating output") &&
+          logFileContents.contains("Finished validating leases"),
+      true,
+    );
 
     deleteFiles("test/test-output/*output*.*");
     logFile.deleteSync();
@@ -1426,7 +1635,7 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "-w",
       "-l",
       "-P",
-      "test/test-output/uprt.log"
+      "test/test-output/uprt.log",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
@@ -1436,10 +1645,11 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("Uprt converting") &&
-            logFileContents.contains("Validating output") &&
-            logFileContents.contains("Finished validating leases"),
-        true);
+      logFileContents.contains("Uprt converting") &&
+          logFileContents.contains("Validating output") &&
+          logFileContents.contains("Finished validating leases"),
+      true,
+    );
 
     deleteFiles("test/test-output/*output*.*");
     logFile.deleteSync();
@@ -1456,7 +1666,7 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
       "-l",
       "-z",
       "-P",
-      "test/test-output/uprt.log"
+      "test/test-output/uprt.log",
     ];
 
     g.argResults = g.cliArgs.getArgs(args);
@@ -1466,17 +1676,22 @@ dhcp-host=AE-19-8E-A7-B4-3A,192.1680.0.3,host3
 
     expect(logFile.existsSync(), true);
     expect(
-        logFileContents.contains("Uprt converting") &&
-            logFileContents.contains("Converter.") &&
-            logFileContents.contains("Finished validating leases"),
-        true);
+      logFileContents.contains("Uprt converting") &&
+          logFileContents.contains("Converter.") &&
+          logFileContents.contains("Finished validating leases"),
+      true,
+    );
   });
 }
 
 /* Runs tests on output file and expected length given an input file*/
-void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
-    int expectedGoodLeasesInFile,
-    {bool deleteAllFiles = true}) {
+void testConvertFile(
+  List<String> args,
+  String inputFileToTest,
+  Converter uprt,
+  int expectedGoodLeasesInFile, {
+  bool deleteAllFiles = true,
+}) {
   if (deleteAllFiles) {
     deleteFiles("test/test-output/*output*.*");
     deleteFiles("test/test-output/*.log");
@@ -1493,8 +1708,12 @@ void testConvertFile(List<String> args, String inputFileToTest, Converter uprt,
   testOutputFiles(testExpectedLeaseLength: expectedGoodLeasesInFile);
 }
 
-void testExceptionOnGenerate(List<String> args, String inputFileToTest,
-    Converter uprt, String exceptionMessage) {
+void testExceptionOnGenerate(
+  List<String> args,
+  String inputFileToTest,
+  Converter uprt,
+  String exceptionMessage,
+) {
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
@@ -1505,8 +1724,12 @@ void testExceptionOnGenerate(List<String> args, String inputFileToTest,
   expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
 }
 
-void testPrintMsgOnGenerate(List<String> args, String inputFileToTest,
-    Converter uprt, String printMessage) {
+void testPrintMsgOnGenerate(
+  List<String> args,
+  String inputFileToTest,
+  Converter uprt,
+  String printMessage,
+) {
   deleteFiles("test/test-output/*output*.*");
   deleteFiles("test/test-output/*.log");
   Converter.cleanUp();
@@ -1514,14 +1737,16 @@ void testPrintMsgOnGenerate(List<String> args, String inputFileToTest,
 
   args[0] = inputFileToTest;
   g.argResults = g.cliArgs.getArgs(args);
-//expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
+  //expect(() => uprt.convertFileList(args), checkErrorMessage(exceptionMessage));
   uprt.convertFileList(args);
 
   expect(g.lastPrint, contains(printMessage));
 }
 
-void testOutputFiles(
-    {bool testExpectedValue = true, int testExpectedLeaseLength = 0}) {
+void testOutputFiles({
+  bool testExpectedValue = true,
+  int testExpectedLeaseLength = 0,
+}) {
   Csv csv = Csv();
   Ddwrt ddwrt = Ddwrt();
   Json json = Json();
@@ -1533,95 +1758,143 @@ void testOutputFiles(
 
   /* test all output files*/
 
-  expect(csv.isFileValid("test/test-output/test-output-file.csv"),
-      testExpectedValue);
-  expect(ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"),
-      testExpectedValue);
-  expect(mikrotik.isFileValid("test/test-output/test-output-file.rsc"),
-      testExpectedValue);
-
-  expect(openwrt.isFileValid("test/test-output/test-output-file.openwrt"),
-      testExpectedValue);
-  expect(opnsense.isFileValid("test/test-output/test-output-file-opn.xml"),
-      testExpectedValue);
-  expect(pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"),
-      testExpectedValue);
-
-  expect(json.isFileValid("test/test-output/test-output-file.json"),
-      testExpectedValue);
-
-  expect(pihole.isFileValid("test/test-output/test-output-file-pihole.conf"),
-      testExpectedValue);
+  expect(
+    csv.isFileValid("test/test-output/test-output-file.csv"),
+    testExpectedValue,
+  );
+  expect(
+    ddwrt.isFileValid("test/test-output/test-output-file.ddwrt"),
+    testExpectedValue,
+  );
+  expect(
+    mikrotik.isFileValid("test/test-output/test-output-file.rsc"),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          csv.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file.csv")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    openwrt.isFileValid("test/test-output/test-output-file.openwrt"),
+    testExpectedValue,
+  );
+  expect(
+    opnsense.isFileValid("test/test-output/test-output-file-opn.xml"),
+    testExpectedValue,
+  );
+  expect(
+    pfSense.isFileValid("test/test-output/test-output-file-pfs.xml"),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          ddwrt.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file.ddwrt")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    json.isFileValid("test/test-output/test-output-file.json"),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          json.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file.json")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    pihole.isFileValid("test/test-output/test-output-file-pihole.conf"),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          mikrotik.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file.rsc")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    isCorrectLeaseMapLength(
+      csv.getLeaseMap(
+        fileContents:
+            File("test/test-output/test-output-file.csv").readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          openwrt.getLeaseMap(
-              fileLines: File("test/test-output/test-output-file.openwrt")
-                  .readAsLinesSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    isCorrectLeaseMapLength(
+      ddwrt.getLeaseMap(
+        fileContents:
+            File("test/test-output/test-output-file.ddwrt").readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          pfSense.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file-pfs.xml")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    isCorrectLeaseMapLength(
+      json.getLeaseMap(
+        fileContents:
+            File("test/test-output/test-output-file.json").readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          pfSense.getLeaseMap(
-              fileContents: File("test/test-output/test-output-file-opn.xml")
-                  .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    isCorrectLeaseMapLength(
+      mikrotik.getLeaseMap(
+        fileContents:
+            File("test/test-output/test-output-file.rsc").readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
 
   expect(
-      isCorrectLeaseMapLength(
-          pihole.getLeaseMap(
-              fileContents:
-                  File("test/test-output/test-output-file-pihole.conf")
-                      .readAsStringSync()),
-          testExpectedLeaseLength),
-      testExpectedValue);
+    isCorrectLeaseMapLength(
+      openwrt.getLeaseMap(
+        fileLines:
+            File("test/test-output/test-output-file.openwrt").readAsLinesSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
+
+  expect(
+    isCorrectLeaseMapLength(
+      pfSense.getLeaseMap(
+        fileContents:
+            File(
+              "test/test-output/test-output-file-pfs.xml",
+            ).readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
+
+  expect(
+    isCorrectLeaseMapLength(
+      pfSense.getLeaseMap(
+        fileContents:
+            File(
+              "test/test-output/test-output-file-opn.xml",
+            ).readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
+
+  expect(
+    isCorrectLeaseMapLength(
+      pihole.getLeaseMap(
+        fileContents:
+            File(
+              "test/test-output/test-output-file-pihole.conf",
+            ).readAsStringSync(),
+      ),
+      testExpectedLeaseLength,
+    ),
+    testExpectedValue,
+  );
 }
 
 /// Provides match for error message result when testing, argument
 /// can be partial match */
 Matcher checkErrorMessage(String partialErrMessage) {
-  return throwsA(predicate(
-      (dynamic e) => e.message.toString().trim().contains(partialErrMessage)));
+  return throwsA(
+    predicate(
+      (dynamic e) => e.message.toString().trim().contains(partialErrMessage),
+    ),
+  );
 }
