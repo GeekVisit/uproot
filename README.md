@@ -121,14 +121,14 @@ Below is the latest help:
 
 ````bash
 
-uprt (2025.03.001 running on macos 10.15.7)
+uprt (2025.03.004 running on macos 10.15.7)
 
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
 Usage:
 
-uprt (2025.03.001)
+uprt (2025.03.004)
 
 A tool to migrate static leases between DD-WRT, OpenWrt, OPNsense, Mikrotik, and pfSense routers. Also supports csv, json and piHole.
 
@@ -192,10 +192,10 @@ Usage:
 
 ***Examples:***
 
-**Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense):**
+**Convert a csv file to all formats (csv, json, DD-WRT, Mikrotik, OpenWrt, OPNsense, pfSense, piHole):**
 
   ````bash
-    uprt test/test-data/lease-list-infile.csv -g cdjmnop -d test/test-output
+    uprt test/test-data/lease-list-infile.csv -g cdjmnoph -d test/test-output
   ````
 
   **Convert multiple csv files to PfSense and save output to a specified directory:**
@@ -207,7 +207,13 @@ Usage:
 **Convert a csv file to all formats, stripping out leases not in range and saving output to specified directory:**
 
 ````bash
-  uprt test/test-data/lease-list-infile.csv -g cdjmnop -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+  uprt test/test-data/lease-list-infile.csv -g cdjmnoph -L 192.168.0.1 -H 192.168.0.254 -d test/test-output
+````
+
+**Convert a csv file from one that uses colons in mac addresses to a json file that has hyphens.:**
+
+````bash
+  uprt test/test-data/lease-list-infile.csv -M - -b converted-output -g j -d test/test-output
 ````
 
 **Merging leases in a CSV file with an existing DDWRT file and generating an OpnSense file:**
